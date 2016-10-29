@@ -41,9 +41,9 @@
       icon: metadata.icon,
       width: 640,
       height: 480,
-      allow_resize: false,
-      allow_restore: false,
-      allow_maximize: false
+      allow_resize: true,
+      allow_restore: true,
+      allow_maximize: true
     }]);
   }
 
