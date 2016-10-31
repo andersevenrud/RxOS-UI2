@@ -1,0 +1,9 @@
+{
+  "className":  "ApplicationWeather",
+  "name":       "Weather",
+  "mime":       "application/json",
+  "icon":       "./weather_favicon.ico",
+  "preload":    [
+    {"src": "main.js", "type": "javascript"}
+  ]
+}

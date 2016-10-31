@@ -27,58 +27,34 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(CoreWM, Panel, PanelItem, Utils, API, VFS) {
+(function(Application, GUI, Dialogs, Utils, API, VFS) {
   'use strict';
 
   /////////////////////////////////////////////////////////////////////////////
-  // ITEM
+  // APPLICATION
   /////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * PanelItem: AppMenu
-   */
-  function PanelItemAppMenu(settings) {
-    PanelItem.apply(this, ['PanelItemAppMenu', 'AppMenu', settings, {}]);
-    this.$container = null;
+  function ApplicationWeather(args, metadata) {
+    Application.apply(this, ['ApplicationWeather', args, metadata, {
+      src: 'data/index.html',
+      title: metadata.name,
+      icon: metadata.icon,
+      width: 640,
+      height: 480,
+      allow_resize: true,
+      allow_restore: true,
+      allow_maximize: true
+    }]);
   }
 
-  PanelItemAppMenu.prototype = Object.create(PanelItem.prototype);
-  PanelItemAppMenu.constructor = PanelItem;
-
-  PanelItemAppMenu.prototype.init = function() {
-    var root = PanelItem.prototype.init.apply(this, arguments);
-    var wm = OSjs.Core.getWindowManager();
-
-    var sel = document.createElement('li');
-    sel.title = API._('LBL_APPLICATIONS');
-    sel.innerHTML = '<img alt="" src="' + API.getIcon(wm.getSetting('icon') || 'outernet.png') + '" />';
-    sel.className = 'corewm-panel-button-centered';
-    sel.setAttribute('role', 'button');
-    sel.setAttribute('data-label', 'OS.js Application Menu');
-
-    Utils.$bind(sel, 'click', function(ev) {
-      ev.preventDefault();
-      ev.stopPropagation();
-      OSjs.Applications.CoreWM.showMenu(ev);
-    });
-
-    this._$container.appendChild(sel);
-
-    return root;
-  };
-
-  PanelItemAppMenu.prototype.destroy = function() {
-    this.$container = null;
-    PanelItem.prototype.destroy.apply(this, arguments);
-  };
+  ApplicationWeather.prototype = Object.create(Application.prototype);
 
   /////////////////////////////////////////////////////////////////////////////
   // EXPORTS
   /////////////////////////////////////////////////////////////////////////////
 
   OSjs.Applications = OSjs.Applications || {};
-  OSjs.Applications.CoreWM = OSjs.Applications.CoreWM || {};
-  OSjs.Applications.CoreWM.PanelItems = OSjs.Applications.CoreWM.PanelItems || {};
-  OSjs.Applications.CoreWM.PanelItems.AppMenu = PanelItemAppMenu;
+  OSjs.Applications.ApplicationWeather = OSjs.Applications.ApplicationWeather || {};
+  OSjs.Applications.ApplicationWeather.Class = Object.seal(ApplicationWeather);
 
-})(OSjs.Applications.CoreWM.Class, OSjs.Applications.CoreWM.Panel, OSjs.Applications.CoreWM.PanelItem, OSjs.Utils, OSjs.API, OSjs.VFS);
+})(OSjs.Helpers.IFrameApplication, OSjs.GUI, OSjs.Dialogs, OSjs.Utils, OSjs.API, OSjs.VFS);
