@@ -378,13 +378,13 @@
         },
         "Mountpoints": {
             "applications": {
-                "enabled": true,
+                "enabled": false,
                 "transport": "Applications",
                 "icon": "places/user-bookmarks.png",
                 "description": "Applications"
             },
             "desktop": {
-                "enabled": true,
+                "enabled": false,
                 "icon": "places/desktop.png",
                 "description": "Desktop",
                 "options": {
@@ -393,20 +393,25 @@
                 }
             },
             "osjs": {
-                "enabled": true,
+                "enabled": false,
                 "transport": "OSjs",
                 "icon": "devices/harddrive.png",
                 "description": "OS.js"
             },
             "home": {
-                "enabled": true,
+                "enabled": false,
                 "icon": "places/folder_home.png",
                 "description": "Home"
             },
             "shared": {
-                "enabled": true,
+                "enabled": false,
                 "description": "Shared",
                 "icon": "places/folder-publicshare.png"
+            },
+            "downloads": {
+                "enabled": true,
+                "description": "Downloads",
+                "icon": "devices/harddrive.png"
             }
         }
     },

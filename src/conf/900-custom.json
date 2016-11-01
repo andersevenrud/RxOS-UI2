@@ -2,6 +2,11 @@
   "server": {
     "http": {
       "port": 8080
+    },
+    "vfs": {
+      "mounts": {
+        "downloads": "/mnt/downloads"
+      }
     }
   },
   "client": {
@@ -24,6 +29,30 @@
       "lines": [
         "RxOS 4.0 (C) 2016 Outernet Inc, based on OS.js"
       ]
+    },
+    "VFS": {
+      "Mountpoints": {
+        "applications": {
+          "enabled": false
+        },
+        "desktop": {
+          "enabled": false
+        },
+        "osjs": {
+          "enabled": false
+        },
+        "shared": {
+          "enabled": false
+        },
+        "downloads": {
+          "enabled": true,
+          "description": "Downloads",
+          "icon": "devices/harddrive.png"
+        },
+        "home": {
+          "enabled": false
+        }
+      }
     }
   }
 }

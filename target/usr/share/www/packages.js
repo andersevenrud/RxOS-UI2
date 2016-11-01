@@ -588,7 +588,7 @@
     "default/Weather": {
         "className": "ApplicationWeather",
         "name": "Weather",
-        "mime": "application/json",
+        "mime": null,
         "icon": "./weather_favicon.ico",
         "preload": [
             {
