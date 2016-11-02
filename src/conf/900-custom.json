@@ -6,7 +6,8 @@
     "vfs": {
       "mounts": {
         "downloads": "/mnt/downloads"
-      }
+      },
+      "homes": "/mnt/downloads"
     }
   },
   "client": {
@@ -46,7 +47,7 @@
           "icon": "devices/harddrive.png"
         },
         "home": {
-          "enabled": false
+          "enabled": true
         }
       }
     }

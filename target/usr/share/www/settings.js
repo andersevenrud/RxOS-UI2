@@ -389,7 +389,7 @@
             },
             "osjs": true,
             "home": {
-                "enabled": false,
+                "enabled": true,
                 "icon": "places/folder_home.png",
                 "description": "Home"
             },
