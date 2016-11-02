@@ -308,6 +308,27 @@
         "build": {},
         "repo": "default"
     },
+    "default/LogViewer": {
+        "className": "ApplicationLogViewer",
+        "name": "Log Viewer",
+        "mime": null,
+        "icon": "mimetypes/html.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            }
+        ],
+        "type": "application",
+        "path": "default/LogViewer",
+        "build": {},
+        "repo": "default"
+    },
     "default/MusicPlayer": {
         "className": "ApplicationMusicPlayer",
         "name": "Music Player",

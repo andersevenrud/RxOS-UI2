@@ -51,7 +51,7 @@
     function ShadowHandler() {
       DefaultHandler.call(this, instance, {
         login: function(server, login, callback) {
-          var cfg = server.config.handlers.pam;
+          var cfg = server.config.handlers.shadow;
           _passwd.checkPass(login.username, login.password, function(err, res) {
 
             if ( !err && res !== 'passwordCorrect' ) {
@@ -73,7 +73,7 @@
         },
 
         settings: function(server, args, callback) {
-          var cfg = server.config.handlers.pam;
+          var cfg = server.config.handlers.shadow;
           server.handler.onSystemSettings(server, cfg, args.settings, callback);
         }
       });

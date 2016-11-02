@@ -32,15 +32,11 @@
     },
     "VFS": {
       "Mountpoints": {
-        "applications": {
-          "enabled": false
-        },
+        "applications": true,
         "desktop": {
           "enabled": false
         },
-        "osjs": {
-          "enabled": false
-        },
+        "osjs": true,
         "shared": {
           "enabled": false
         },

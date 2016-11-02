@@ -377,12 +377,7 @@
             "Enabled": false
         },
         "Mountpoints": {
-            "applications": {
-                "enabled": false,
-                "transport": "Applications",
-                "icon": "places/user-bookmarks.png",
-                "description": "Applications"
-            },
+            "applications": true,
             "desktop": {
                 "enabled": false,
                 "icon": "places/desktop.png",
@@ -392,12 +387,7 @@
                     "path": "home:///.desktop"
                 }
             },
-            "osjs": {
-                "enabled": false,
-                "transport": "OSjs",
-                "icon": "devices/harddrive.png",
-                "description": "OS.js"
-            },
+            "osjs": true,
             "home": {
                 "enabled": false,
                 "icon": "places/folder_home.png",
