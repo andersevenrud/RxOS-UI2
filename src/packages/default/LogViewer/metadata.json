@@ -1,0 +1,14 @@
+{
+  "className":  "ApplicationLogViewer",
+  "name":       "Log Viewer",
+  "mime":       null,
+  "icon":       "apps/logviewer.png",
+  "category": "utilities",
+  "preload":    [
+    {"src": "main.js", "type": "javascript"},
+    {"src": "scheme.html", "type": "scheme"}
+  ]
+}
+
+
+

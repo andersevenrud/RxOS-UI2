@@ -312,7 +312,7 @@
         "className": "ApplicationLogViewer",
         "name": "Log Viewer",
         "mime": null,
-        "icon": "mimetypes/html.png",
+        "icon": "apps/logviewer.png",
         "category": "utilities",
         "preload": [
             {

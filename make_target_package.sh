@@ -26,6 +26,14 @@ cp -a dist/* target/usr/share/www
 cp -a src/server/node/* target/usr/lib/node_modules/ui2/server
 cp src/server/*.json target/usr/lib/node_modules/ui2/
 
+# copy over api files
+for i in src/packages/default/*/api.js
+do
+    mkdir -p target/usr/share/$(dirname $i)
+    cp "$i" target/usr/share/$(dirname $i)
+done
+
+
 # fix dist name
 sed -i 's/"dist"/"www"/' target/usr/lib/node_modules/ui2/packages.json
 
