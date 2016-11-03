@@ -1,0 +1,35 @@
+<application-window data-id="TunerWindow">
+    <gui-tabs>
+        <!-- beam selection -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true" data-label="Satellite">
+            <gui-vbox>
+                <gui-vbox-container data-grow="0" data-shrink="0" data-basis="auto" data-expand="true">
+                    <!-- list of beams -->
+                    <gui-select data-id="Beams">
+                    </gui-select>
+                </gui-vbox-container>
+
+                <gui-vbox-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true">
+                    <gui-list-view data-id="BeamParameters" data-multiple="false">
+                    </gui-list-view>
+                </gui-vbox-container>
+
+                <gui-vbox-container data-grow="0" data-shrink="0" data-basis="30px" data-fill="false">
+                    <!-- save button -->
+                    <gui-button data-id="BeamSave">Apply</gui-button>
+                </gui-vbox-container>
+            </gui-vbox>
+        </gui-tab-container>
+
+        <!-- custom beam -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true" data-label="Custom">
+        </gui-tab-container>
+
+        <!-- tuner status -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-fill="true" data-label="Status">
+            <gui-vbox><gui-vbox-container data-grow="1" data-shrink="0" data-fill="true">
+                <gui-textarea data-id="Status"></gui-textarea>
+            </gui-vbox-container></gui-vbox>
+        </gui-tab-container>
+    </gui-tabs>
+</application-window>

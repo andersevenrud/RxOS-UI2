@@ -606,6 +606,27 @@
         "build": {},
         "repo": "default"
     },
+    "default/Tuner": {
+        "className": "ApplicationTuner",
+        "name": "Tuner",
+        "mime": null,
+        "icon": "apps/tuner.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            }
+        ],
+        "type": "application",
+        "path": "default/Tuner",
+        "build": {},
+        "repo": "default"
+    },
     "default/Weather": {
         "className": "ApplicationWeather",
         "name": "Weather",

@@ -558,7 +558,7 @@ gui-tabs {
 
 application-window-content > gui-tabs {
   width : 100%;
-  height : 100%;
+  height : calc(100% - 10px);
 }
 
 /* Grid */
