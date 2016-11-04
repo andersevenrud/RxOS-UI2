@@ -23,6 +23,7 @@ mkdir target
 mkdir -p target/usr/share/www
 mkdir -p target/usr/lib/node_modules/ui2/server
 cp -a dist/* target/usr/share/www
+rm target/usr/share/www/packages/*/*/api.*
 cp -a src/server/node/* target/usr/lib/node_modules/ui2/server
 cp src/server/*.json target/usr/lib/node_modules/ui2/
 
