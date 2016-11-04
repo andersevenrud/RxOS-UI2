@@ -2,7 +2,7 @@
 (function(rxos_config) {
   'use strict';
 
-  module.exports.demod_restart = function(args, callback, request, response) {
+  module.exports.tunerRestart = function(args, callback, request, response) {
     rxos_config.runTask( 'tunerRestart' , function(r) {
         callback(false,r);
     });
