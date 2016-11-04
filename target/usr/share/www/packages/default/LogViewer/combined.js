@@ -30,7 +30,7 @@
         txtarea.set('value', "Loading...");
         if( ev && ev.detail && ev.detail.entries) {
             var entry = ev.detail.entries[0];
-            app._api('test', {'cmd': entry.data[0], 'args': entry.data[1] }, function(err, r) {
+            app._api('runTask', entry.data, function(err, r) {
                 txtarea.set('value', r || '');
             });
         } else {
@@ -39,9 +39,16 @@
     });
 
     var items = [
-        { value: ['cat', [ '/etc/fstab'] ], columns: [ { label: 'fstab'} ] },
-        { value: ['dmesg', [] ], columns: [ { label: 'dmesg'} ] },
-        { value: ['ip', [ 'addr' ] ], columns: [ { label: 'network'} ] }
+        { value: 'mounts', columns: [ { label: 'Mounted Filesystems'} ] },
+        { value: 'dmesg' , columns: [ { label: 'Kernel Messages'} ] },
+        { value: 'syslog', columns: [ { label: 'System Messages'} ] },
+        { value: 'motd',   columns: [ { label: 'Motd'} ] },
+        { value: 'top',    columns: [ { label: 'Running Processes'} ] },
+        { value: 'systemStatus', columns: [ { label: 'System Status'} ] },
+        { value: 'platformRelease', columns: [ { label: 'Release Info'} ] },
+        { value: 'ifconfig', columns: [ { label: 'Ifconfig'} ] },
+        { value: 'ipaddr', columns: [ { label: 'Network Addresses'} ] },
+        { value: 'iproute', columns: [ { label: 'Network Routes'} ] }
     ];
 
     var side = this._find('SideView');

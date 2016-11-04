@@ -1,0 +1,74 @@
+{
+	"ondd": {
+		"controlSocket": "/var/run/ondd.ctrl",
+		"statusQuery": "<get uri=\"/status\" />\\u0000"
+	},
+	"configfiles": {
+		"tuner": "/mnt/data/librarian/librarian.json"
+	},
+	"cmds": {
+		"tunerRestart": {
+			"cmd": "/etc/etc/init.d/S90sdr",
+			"args": [
+				"restart"
+			]
+		},
+		"dmesg": {
+			"cmd": "dmesg",
+			"args": []
+		},
+		"syslog": {
+			"cmd": "cat",
+			"args": [
+				"/var/log/messages"
+			]
+		},
+		"motd": {
+			"cmd": "cat",
+			"args": [
+				"/etc/motd"
+			]
+		},
+		"top": {
+			"cmd": "top",
+			"args": [
+				"-bn1"
+			]
+		},
+		"systemStatus": {
+			"cmd": "/usr/bin/status",
+			"args": []
+		},
+		"platformRelease": {
+			"cmd": "cat",
+			"args": [
+				"/etc/platform-release"
+			]
+		},
+		"mounts": {
+			"cmd": "cat",
+			"args": [
+				"/proc/mounts"
+			]
+		},
+		"ifconfig": {
+			"cmd": "ifconfig",
+			"args": []
+		},
+		"ipaddr": {
+			"cmd": "ip",
+			"args": [
+				"addr"
+			]
+		},
+		"iproute": {
+			"cmd": "ip",
+			"args": [
+				"route"
+			]
+		}
+	},
+	"packages": {
+		"p1": 1
+	}
+}

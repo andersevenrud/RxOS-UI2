@@ -33,17 +33,24 @@ do
     cp "$i" target/usr/share/$(dirname $i)
 done
 
+# copy over additional target code
+cp -a target_fs/* target/
+
 
 # fix dist name
 sed -i 's/"dist"/"www"/' target/usr/lib/node_modules/ui2/packages.json
 
 # generate list of modules required on target
 # this is required by buildroot
-mod=$(grep -r "require("  src/server/node | cut -d : -f 2 | tr ',' '\n' | sed "s/.*require('\([a-z_A-Z0-9-]*\)').*/\1/"  | grep -v '^ ' | sort | uniq | tr '\n' ' ')
+mod=$(grep -r "require("  src/server/node target_fs/usr/lib/node_modules | cut -d : -f 2 | tr ',' '\n' | sed "s/.*require('\([a-z_A-Z0-9-]*\)').*/\1/"  | grep -v '^ ' | sort | uniq | tr '\n' ' ')
 
 echo buildroot nodejs modules config:
 echo \"$mod\"
 echo "$mod" > required_modules.target
+
+echo you may need to make the following links:
+echo '   ln -s $PWD/target_fs/etc/rxos_config.json /etc/rxos_config.json'
+echo '   ln -s $PWD/target_fs/usr/lib/node_modules/rxos_config.js node_modules/rxos_config.js'
 
 echo run with:
 echo 'node target/usr/lib/node_modules/ui2/server/server.js www --root  $PWD/target/usr/share/'
