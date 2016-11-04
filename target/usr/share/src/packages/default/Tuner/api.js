@@ -21,7 +21,7 @@
   };
 
   module.exports.getOnddStatus = function(args, callback, request, response) {
-    rxos_config.getOnddStatus(args, function (r) {
+    rxos_config.getOnddStatus(function (r) {
         callback(false, r);
     });
   };

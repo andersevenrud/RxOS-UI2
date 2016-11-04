@@ -21,46 +21,42 @@
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
     scheme.render(this, 'TunerWindow', root);
 
-
-    var Beams = {
-        apac: { label: "Asia Pacific (144E)", value: "apac", freq: "1545.9525", symbolrate: "4200",
-                ondd_l: {  'preset': 2, 'frequency': '1545.9525', 'uncertainty': '4000', 'symbolrate': '4200',
-                            'sample_rate': '1', 'rf_filter': '20', 'descrambler': true }
-        },
-        emea: { label: "Europe, West Asia, Africa (25E)", value: "emea", freq: "1545.94", symbolrate: "4200",
-                ondd_l: {  'preset': 1, 'frequency': '1545.94', 'uncertainty': '4000', 'symbolrate': '4200',
-                            'sample_rate': '1', 'rf_filter': '20', 'descrambler': true }
-        },
-        americas: { label: "Americas (98W)", value: "americas", freq: "1539.8725", symbolrate: "4200",
-                ondd_l: {  'preset': 3, 'frequency': '1539.8725', 'uncertainty': '4000', 'symbolrate': '4200',
-                            'sample_rate': '1', 'rf_filter': '20', 'descrambler': true }
-        },
-        custom: { label: "Custom", value: "custom", freq: "1545.94", symbolrate: "8400",
-                ondd_l: {  'preset': 0, 'frequency': '1545.9525', 'uncertainty': '4000', 'symbolrate': '4200',
-                            'sample_rate': '1', 'rf_filter': '20', 'descrambler': true }
-        }
-    };
-
-    var beams_list = Object.keys(Beams).map(function(v) { return Beams[v]; });
     var beams = scheme.find(this, 'Beams');
     var param_table = scheme.find(this, 'BeamParameters');
-    var beamsOnChange = (function (Beams) { return function(ev) {
-        param_table.clear();
-        param_table.add( [
-            { value: 'label', columns: [ {label: "Region"}, {label: Beams[ev.detail]['label'] } ] },
-            { value: 'freq', columns: [ {label: "Frequency"}, {label: Beams[ev.detail]['freq'] } ] },
-            { value: 'symbolrate', columns: [ {label: "Symbol Rate"}, {label: Beams[ev.detail]['symbolrate'] } ] }
-        ]);
-    }}) (Beams);
-    beams.on('change', beamsOnChange);
-    beams.add(beams_list);
-    beamsOnChange({ detail: beams.get('value')});
-
-
     var beamsave = scheme.find(this, 'BeamSave');
-    beamsave.on('click', (function (Beams, beams) { return function() {
-        app._api('setTunerConf', Beams[beams.get('value')]['ondd_l'], console.log);
-    }}) (Beams, beams));
+
+    app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
+        var Beams = TunerConf['beams'];
+        var selected = TunerConf['selectedBeam'];
+        var beams_list = Object.keys(Beams).map(function(v) { return Beams[v]; });
+
+        var beamsOnChange = (function (Beams, param_table) { return function(ev) {
+            param_table.clear();
+            param_table.add( [
+                { value: 'label', columns: [ {label: "Region"}, {label: Beams[ev.detail]['label'] } ] },
+                { value: 'freq', columns: [ {label: "Frequency"}, {label: Beams[ev.detail]['freq'] } ] },
+                { value: 'symbolrate', columns: [ {label: "Symbol Rate"}, {label: Beams[ev.detail]['symbolrate'] } ] }
+            ]);
+        }}) (Beams, param_table);
+
+        var beamsaveOnClick  = (function (Beams, beams, TunerConf) { return function() {
+            TunerConf['selectedBeam'] = beams.get('value');
+            TunerConf['beams'] = Beams;
+            // TODO: replace "console.log" with alert box
+            app._api('setTunerConf', TunerConf , console.log);
+        }}) (Beams, beams, TunerConf);
+
+        beams.on('change', beamsOnChange);
+        beams.add(beams_list);
+
+        beams.set('value', selected);
+        // populate param list on initial load
+        beamsOnChange({ detail: beams.get('value')});
+
+        beamsave.on('click', beamsaveOnClick);
+
+        // TODO: add support for custom beam
+    }}) (beams, param_table, beamsave));
 
     return root;
   };
