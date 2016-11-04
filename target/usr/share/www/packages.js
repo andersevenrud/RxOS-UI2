@@ -322,6 +322,10 @@
             {
                 "src": "scheme.html",
                 "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
             }
         ],
         "type": "application",
