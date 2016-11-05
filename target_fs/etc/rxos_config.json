@@ -135,6 +135,14 @@
 	},
 	"netConf": {
 		"mode": "ap",
+		"modes": [
+			{
+				"ap": "Create a Hotspot"
+			},
+			{
+				"sta": "Connect to a Wifi router"
+			}
+		],
 		"ap": {
 			"ssid": "Outernet",
 			"hidden": false,
