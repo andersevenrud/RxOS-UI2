@@ -38,7 +38,7 @@
     "request": ">=2.74.0",
     "simple-session": ">=0.0.1",
     "unzip": "^0.1.11",
-    "xml2js": "~0.4.17"
+    "x2js": "~3.0.1"
   },
   "devDependencies": {
     "clean-css": ">=3.4.19",
