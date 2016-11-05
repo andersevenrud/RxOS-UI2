@@ -1,0 +1,63 @@
+<application-window data-id="NetconfWindow" data-width="300px" data-height="340px">
+    <gui-tabs data-width="300px" data-height="340px">
+        <!-- mode selection -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true" data-label="Network Mode">
+            <gui-vbox>
+                <gui-vbox-container data-grow="0" data-shrink="0" data-basis="auto" data-expand="true">
+                    <!-- list of modes -->
+                    <gui-select data-id="Mode">
+                    </gui-select>
+                </gui-vbox-container>
+
+                <gui-vbox-container data-grow="0" data-shrink="0" data-basis="30px" data-fill="false">
+                    <!-- save button -->
+                    <gui-button data-id="NetSave">Apply</gui-button>
+                </gui-vbox-container>
+            </gui-vbox>
+        </gui-tab-container>
+
+        <!-- Hotspot conf -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true" data-label="Hotspot Config">
+            <gui-vbox class="block-label">
+                <gui-vbox-container data-shrink="1" data-expand="true">
+
+                    <gui-label>Hotspot Name</gui-label>
+                    <gui-text data-id="HotspotName">Outernet</gui-text>
+
+                    <gui-label>Do not show in scan lists</gui-label>
+                    <gui-checkbox data-id="HotspotHide"></gui-checkbox>
+
+                    <gui-label>Country</gui-label>
+                    <gui-select data-id="HotspotCountry"></gui-select>
+
+                    <gui-label>Channel</gui-label>
+                    <gui-select data-id="HotspotChannel"></gui-select>
+
+                    <gui-label>Enable Security (WPA)</gui-label>
+                    <gui-checkbox data-id="HotspotSecurityEnabled"></gui-checkbox>
+
+                    <gui-label>Password (PSK)</gui-label>
+                   <gui-text data-id="HotspotPassword"></gui-text>
+
+                </gui-vbox-container>
+            </gui-vbox>
+        </gui-tab-container>
+
+        <!-- Sta conf -->
+        <gui-tab-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true" data-label="Wifi Connection">
+            <gui-vbox class="block-label">
+
+                <gui-vbox-container data-shrink="1" data-expand="true">
+                    <gui-label>Access Point Name</gui-label>
+                    <gui-text data-id="SSID"></gui-text>
+                </gui-vbox-container>
+
+                <gui-vbox-container data-shrink="1" data-expand="true">
+                    <gui-label>Password</gui-label>
+                    <gui-text data-id="SSIDPass"></gui-text>
+                </gui-vbox-container>
+
+            </gui-vbox>
+        </gui-tab-container>
+    </gui-tabs>
+</application-window>

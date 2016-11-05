@@ -380,6 +380,31 @@
         "build": {},
         "repo": "default"
     },
+    "default/Network": {
+        "className": "ApplicationNetconf",
+        "name": "Network",
+        "mime": null,
+        "icon": "apps/wifi.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
+            }
+        ],
+        "type": "application",
+        "path": "default/Network",
+        "build": {},
+        "repo": "default"
+    },
     "default/Preview": {
         "className": "ApplicationPreview",
         "name": "Preview",
@@ -624,6 +649,10 @@
             {
                 "src": "scheme.html",
                 "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
             }
         ],
         "type": "application",

@@ -1,8 +1,8 @@
 {
-  "className":  "ApplicationTuner",
-  "name":       "Tuner",
+  "className":  "ApplicationNetconf",
+  "name":       "Network",
   "mime":       null,
-  "icon":       "apps/tuner.png",
+  "icon":       "apps/wifi.png",
   "category": "utilities",
   "preload":    [
     {"src": "main.js", "type": "javascript"},
