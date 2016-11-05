@@ -38,7 +38,8 @@
     "request": ">=2.74.0",
     "simple-session": ">=0.0.1",
     "unzip": "^0.1.11",
-    "x2js": "~3.0.1"
+    "x2js": "~3.0.1",
+    "graceful-fs": "~4.1.10"
   },
   "devDependencies": {
     "clean-css": ">=3.4.19",

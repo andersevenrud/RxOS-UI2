@@ -33,11 +33,9 @@
     },
     "VFS": {
       "Mountpoints": {
-        "applications": true,
         "desktop": {
           "enabled": false
         },
-        "osjs": true,
         "shared": {
           "enabled": false
         },
@@ -48,6 +46,9 @@
         },
         "home": {
           "enabled": true
+        },
+        "osjs": {
+          "description": "RxOS"
         }
       }
     }
