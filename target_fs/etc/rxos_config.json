@@ -1,14 +1,14 @@
 {
 	"ondd": {
 		"controlSocket": "/var/run/ondd.ctrl",
-		"statusQuery": "<get uri=\"/status\" />\\u0000"
+		"statusQuery": "<get uri=\"/status\" />\u0000"
 	},
 	"configfiles": {
 		"tuner": "/mnt/data/librarian/librarian.json"
 	},
 	"cmds": {
 		"tunerRestart": {
-			"cmd": "/etc/etc/init.d/S90sdr",
+			"cmd": "/etc/init.d/S90sdr",
 			"args": [
 				"restart"
 			]

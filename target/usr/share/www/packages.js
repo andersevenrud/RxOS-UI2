@@ -664,7 +664,7 @@
         "className": "ApplicationWeather",
         "name": "Weather",
         "mime": null,
-        "icon": "apps/weather.ico",
+        "icon": "apps/weather.png",
         "preload": [
             {
                 "type": "javascript",
