@@ -381,27 +381,31 @@
                 "enabled": true,
                 "transport": "Applications",
                 "icon": "places/user-bookmarks.png",
-                "description": "Applications"
+                "description": "Applications",
+                "visible": false
             },
             "desktop": {
-                "enabled": false,
+                "enabled": true,
                 "icon": "places/desktop.png",
                 "description": "Desktop",
                 "options": {
-                    "alias": "home:///.desktop",
-                    "path": "home:///.desktop"
-                }
+                    "alias": "downloads://",
+                    "path": "downloads://"
+                },
+                "visible": false
             },
             "osjs": {
                 "enabled": true,
                 "transport": "OSjs",
                 "icon": "devices/harddrive.png",
-                "description": "RxOS"
+                "description": "RxOS",
+                "visible": false
             },
             "home": {
                 "enabled": true,
                 "icon": "places/folder_home.png",
-                "description": "Home"
+                "description": "Home",
+                "visible": false
             },
             "shared": {
                 "enabled": false,

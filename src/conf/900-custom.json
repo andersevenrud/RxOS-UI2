@@ -34,7 +34,12 @@
     "VFS": {
       "Mountpoints": {
         "desktop": {
-          "enabled": false
+          "enabled": true,
+          "visible": false,
+          "options": {
+            "alias": "downloads://",
+            "path": "downloads://"
+          }
         },
         "shared": {
           "enabled": false
@@ -45,10 +50,15 @@
           "icon": "devices/harddrive.png"
         },
         "home": {
-          "enabled": true
+          "enabled": true,
+          "visible": false
         },
         "osjs": {
-          "description": "RxOS"
+          "description": "RxOS",
+          "visible": false
+        },
+        "applications": {
+          "visible": false
         }
       }
     }
