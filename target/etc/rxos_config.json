@@ -79,60 +79,24 @@
 				"value": "apac",
 				"freq": "1545.9525",
 				"symbolrate": "4200",
-				"ondd_l": {
-					"preset": 2,
-					"frequency": "1545.9525",
-					"uncertainty": "4000",
-					"symbolrate": "4200",
-					"sample_rate": "1",
-					"rf_filter": "20",
-					"descrambler": true
-				}
 			},
 			"emea": {
 				"label": "Europe, West Asia, Africa (25E)",
 				"value": "emea",
 				"freq": "1545.94",
 				"symbolrate": "4200",
-				"ondd_l": {
-					"preset": 1,
-					"frequency": "1545.94",
-					"uncertainty": "4000",
-					"symbolrate": "4200",
-					"sample_rate": "1",
-					"rf_filter": "20",
-					"descrambler": true
-				}
 			},
 			"americas": {
 				"label": "Americas (98W)",
 				"value": "americas",
 				"freq": "1539.8725",
 				"symbolrate": "4200",
-				"ondd_l": {
-					"preset": 3,
-					"frequency": "1539.8725",
-					"uncertainty": "4000",
-					"symbolrate": "4200",
-					"sample_rate": "1",
-					"rf_filter": "20",
-					"descrambler": true
-				}
 			},
 			"custom": {
 				"label": "Custom",
 				"value": "custom",
 				"freq": "1545.94",
 				"symbolrate": "8400",
-				"ondd_l": {
-					"preset": 0,
-					"frequency": "1545.9525",
-					"uncertainty": "4000",
-					"symbolrate": "4200",
-					"sample_rate": "1",
-					"rf_filter": "20",
-					"descrambler": true
-				}
 			}
 		},
 		"selectedBeam": "emea"
