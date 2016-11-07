@@ -2,24 +2,6 @@
 
 # (c) 2016 Outernet Inc
 
-# /etc/network/interfaces.d/wlan0
-ap_interface_wlan0() {
-
-INTERFACE_WLAN0='
-auto wlan0
-allow-hotplug wlan0
-iface wlan0 inet static
-  post-up /usr/sbin/ap start
-  pre-down /usr/sbin/ap stop
-  address 10.0.0.1
-  netmask 255.255.255.0
-  dns-nameservers 10.0.0.1
-'
-
-echo "$INTERFACE_WLAN0"
-
-}
-
 # /etc/hostapd.conf
 ap_hostapd() {
 
@@ -65,9 +47,6 @@ echo "$HOSTAPD_wpa"
 fi
 
 }
-
-# /etc/network/interfaces.d/wlan0
-ap_interface_wlan0 > /etc/network/interfaces.d/wlan0
 
 # /etc/hostapd.conf
 ap_hostapd > /etc/hostapd.conf
