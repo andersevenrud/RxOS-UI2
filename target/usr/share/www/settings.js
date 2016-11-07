@@ -10,7 +10,7 @@
     "SettingsManager": {
         "VFS": {
             "scandir": {
-                "showHiddenFiles": true,
+                "showHiddenFiles": false,
                 "showFileExtensions": true,
                 "columns": [
                     "filename",

@@ -18,6 +18,11 @@
         "fontFamily": "Ariel",
         "background": "image-fill",
         "icon": "outernet.png"
+      },
+      "VFS": {
+        "scandir": {
+          "showHiddenFiles": false
+        }
       }
     },
     "BugReporting": {

@@ -110,6 +110,10 @@
       this._checkHasSession(server, callback);
     };
 
+    DemoHandler.prototype.getHomePath = function(server) {
+      return server.config.vfs.homes;
+  };
+
     return new DemoHandler();
   };
 
