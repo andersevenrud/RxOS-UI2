@@ -13,6 +13,10 @@
 				"restart"
 			]
 		},
+		"configureWifi": {
+			"cmd": "/usr/bin/wifi_config.sh",
+			"args": []
+		},
 		"dmesg": {
 			"cmd": "dmesg",
 			"args": []
