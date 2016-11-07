@@ -1,0 +1,4 @@
+#! /bin/sh
+# (c) 2016 Outernet Inc
+
+jq -r "$1" /etc/rxos_config.json

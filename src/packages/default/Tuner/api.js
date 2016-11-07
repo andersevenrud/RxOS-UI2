@@ -2,12 +2,6 @@
 (function(rxos_config) {
   'use strict';
 
-  module.exports.tunerRestart = function(args, callback, request, response) {
-    rxos_config.runTask( 'tunerRestart' , function(r) {
-        callback(false,r);
-    });
-  };
-
   module.exports.getTunerConf = function(args, callback, request, response) {
     rxos_config.getTunerConf( function (r) {
         callback(false, r);

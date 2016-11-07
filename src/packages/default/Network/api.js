@@ -2,26 +2,14 @@
 (function(rxos_config) {
   'use strict';
 
-  module.exports.tunerRestart = function(args, callback, request, response) {
-    rxos_config.runTask( 'tunerRestart' , function(r) {
-        callback(false,r);
-    });
-  };
-
-  module.exports.getTunerConf = function(args, callback, request, response) {
-    rxos_config.getTunerConf( function (r) {
+  module.exports.getNetConf = function(args, callback, request, response) {
+    rxos_config.getNetConf( function (r) {
         callback(false, r);
     });
   };
 
-  module.exports.setTunerConf = function(args, callback, request, response) {
-    rxos_config.setTunerConf(args, function (r) {
-        callback(false, r);
-    });
-  };
-
-  module.exports.getOnddStatus = function(args, callback, request, response) {
-    rxos_config.getOnddStatus(function (r) {
+  module.exports.setNetConf = function(args, callback, request, response) {
+    rxos_config.setNetConf(args, function (r) {
         callback(false, r);
     });
   };

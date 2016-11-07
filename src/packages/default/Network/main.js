@@ -21,42 +21,60 @@
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
     scheme.render(this, 'NetconfWindow', root);
 
-    var beams = scheme.find(this, 'Beams');
-    var param_table = scheme.find(this, 'BeamParameters');
-    var beamsave = scheme.find(this, 'BeamSave');
 
-    app._api('getNetconfConf', null, (function (beams, param_table, beamsave) { return function(err, NetconfConf) {
-        var Beams = NetconfConf['beams'];
-        var selected = NetconfConf['selectedBeam'];
-        var beams_list = Object.keys(Beams).map(function(v) { return Beams[v]; });
+    app._api('getNetConf', null, (function (scheme, me) { return function(err, netConf) {
 
-        var beamsOnChange = (function (Beams, param_table) { return function(ev) {
-            param_table.clear();
-            param_table.add( [
-                { value: 'label', columns: [ {label: "Region"}, {label: Beams[ev.detail]['label'] } ] },
-                { value: 'freq', columns: [ {label: "Frequency"}, {label: Beams[ev.detail]['freq'] } ] },
-                { value: 'symbolrate', columns: [ {label: "Symbol Rate"}, {label: Beams[ev.detail]['symbolrate'] } ] }
-            ]);
-        }}) (Beams, param_table);
+        // populate tabs
 
-        var beamsaveOnClick  = (function (Beams, beams, NetconfConf) { return function() {
-            NetconfConf['selectedBeam'] = beams.get('value');
-            NetconfConf['beams'] = Beams;
+        // modes tab
+        var mode_w = scheme.find(me, 'Mode');
+        var modes = netConf['modes'];
+        var modes_list = Object.keys(modes).map(function(v) { return modes[v]; });
+        mode_w.add(modes_list);
+
+        var selected = netConf['mode'];
+        mode_w.set('value', selected);
+
+        // ap tab
+        scheme.find(me,'HotspotName').set('value', netConf['ap']['ssid']);
+        scheme.find(me,'HotspotHide').set('value', netConf['ap']['hidden']);
+        scheme.find(me,'HotspotCountry').add((netConf['ap']['countries']).map(function(v) { return { "value" : v['code'], "label": v['name']}; } ) );
+        scheme.find(me,'HotspotCountry').set('value', netConf['ap']['selectedCountry']);
+        scheme.find(me,'HotspotChannel').add((netConf['ap']['channels']).map(function(v) { return { "value" : v, "label": v}; } ) );
+        scheme.find(me,'HotspotChannel').set('value', netConf['ap']['selectedChannel']);
+        scheme.find(me,'HotspotSecurityEnabled').set('value', netConf['ap']['securityEnabled']);
+        scheme.find(me,'HotspotPassword').set('value', netConf['ap']['password']);
+
+        // sta tab
+        scheme.find(me,'SSID').set('value', netConf['sta']['ssid']);
+        scheme.find(me,'SSIDPass').set('value', netConf['sta']['password']);
+
+        // setup saving
+        var netsave = scheme.find(me, 'NetSave');
+
+        var netsaveOnClick  = (function (scheme, me, netConf) { return function() {
+            // mode tab
+            netConf['mode'] = scheme.find(me, 'Mode').get('value');
+
+            // ap tab
+            netConf['ap']['ssid'] = scheme.find(me,'HotspotName').get('value');
+            netConf['ap']['hidden'] = scheme.find(me,'HotspotHide').get('value');
+            netConf['ap']['selectedCountry'] = scheme.find(me,'HotspotCountry').get('value');
+            netConf['ap']['selectedChannel'] = scheme.find(me,'HotspotChannel').get('value');
+            netConf['ap']['securityEnabled'] = scheme.find(me,'HotspotSecurityEnabled').get('value');
+            netConf['ap']['password'] = scheme.find(me,'HotspotPassword').get('value');
+
+            // sta tab
+            netConf['sta']['ssid'] = scheme.find(me,'SSID').get('value');
+            netConf['sta']['password'] = scheme.find(me,'SSIDPass').get('value');
+
             // TODO: replace "console.log" with alert box
-            app._api('setNetconfConf', NetconfConf , console.log);
-        }}) (Beams, beams, NetconfConf);
+            app._api('setNetConf', netConf , console.log);
+        }}) (scheme, me , netConf);
 
-        beams.on('change', beamsOnChange);
-        beams.add(beams_list);
+        netsave.on('click', netsaveOnClick);
 
-        beams.set('value', selected);
-        // populate param list on initial load
-        beamsOnChange({ detail: beams.get('value')});
-
-        beamsave.on('click', beamsaveOnClick);
-
-        // TODO: add support for custom beam
-    }}) (beams, param_table, beamsave));
+    }}) (scheme, this));
 
     return root;
   };

@@ -139,14 +139,16 @@
 	},
 	"netConf": {
 		"mode": "ap",
-		"modes": [
-			{
-				"ap": "Create a Hotspot"
+		"modes": {
+			"ap": {
+				"label": "Create a Hotspot",
+				"value": "ap"
 			},
-			{
-				"sta": "Connect to a Wifi router"
+			"sta": {
+				"label": "Connect to a Wifi router",
+				"value": "sta"
 			}
-		],
+		},
 		"ap": {
 			"ssid": "Outernet",
 			"hidden": false,
@@ -1165,7 +1167,7 @@
 					"name": "Åland Islands"
 				}
 			],
-			"selectedChannel": 6,
+			"selectedChannel": "6",
 			"channels": [
 				1,
 				2,
