@@ -1,5 +1,14 @@
 #! /bin/bash
 
+set -e
+set -u
+
+
+# check if rxos_config.json is properly formatted
+echo "checking json config"
+jq --slurp empty /etc/rxos_config.json
+
+
 if type npm 2>&1 | grep -q "not found"
 then
     echo install npm first
@@ -36,7 +45,6 @@ done
 
 # copy over additional target code
 cp -a target_fs/* target/
-
 
 # fix dist name
 sed -i 's/"dist"/"www"/' target/usr/lib/node_modules/ui2/packages.json
