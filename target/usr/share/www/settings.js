@@ -405,7 +405,7 @@
                 "enabled": true,
                 "icon": "places/folder_home.png",
                 "description": "Home",
-                "visible": false
+                "visible": true
             },
             "shared": {
                 "enabled": false,
@@ -421,7 +421,7 @@
     },
     "Connection": {
         "Type": "http",
-        "Handler": "demo",
+        "Handler": "shadow",
         "RootURI": "",
         "APIURI": "API",
         "FSURI": "FS",

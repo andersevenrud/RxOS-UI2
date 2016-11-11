@@ -11360,76 +11360,13 @@ window.OSjs = window.OSjs || {};
 
 (function(API, Utils, VFS) {
   'use strict';
-  function getSettings() {
-    var result = {};
-    var key;
-    for ( var i = 0; i < localStorage.length; i++ ) {
-      key = localStorage.key(i);
-      if ( key.match(/^OSjs\//) ) {
-        try {
-          result[key.replace(/^OSjs\//, '')] = JSON.parse(localStorage.getItem(key));
-        } catch ( e ) {
-          console.warn('DemoHandler::getSetting()', 'exception', e, e.stack);
-        }
-      }
-    }
-    return result;
-  }
-  function DemoHandler() {
+  function ShadowHandler() {
     OSjs.Core._Handler.apply(this, arguments);
-    var curr = API.getConfig('Version');
-    var version = localStorage.getItem('__version__');
-    if ( curr !== version ) {
-      console.warn('DemoHandler()', 'You are running', version, 'version is', curr, 'flushing for compability!');
-      localStorage.clear();
-    }
-    localStorage.setItem('__version__', String(curr));
   }
-  DemoHandler.prototype = Object.create(OSjs.Core._Handler.prototype);
-  DemoHandler.constructor = OSjs.Core._Handler;
-  DemoHandler.prototype.init = function(callback) {
-    var self = this;
-    OSjs.Core._Handler.prototype.init.call(this, function() {
-      function finished(result) {
-        result.userSettings = getSettings();
-        self.onLogin(result, function() {
-          callback();
-        });
-      }
-      if ( API.getConfig('Connection.Type') === 'standalone' || window.location.protocol === 'file:' ) {
-        finished({
-          userData: {
-            id: 0,
-            username: 'demo',
-            name: 'Local Server',
-            groups: ['admin']
-          }
-        });
-      } else {
-        self.login('demo', 'demo', function(error, result) {
-          if ( error ) {
-            callback(error);
-          } else {
-            finished(result);
-          }
-        });
-      }
-    });
-  };
-  DemoHandler.prototype.saveSettings = function(pool, storage, callback) {
-    Object.keys(storage).forEach(function(key) {
-      if ( pool && key !== pool ) {
-        return;
-      }
-      try {
-        localStorage.setItem('OSjs/' + key, JSON.stringify(storage[key]));
-      } catch ( e ) {
-        console.warn('DemoHandler::_save()', 'exception', e, e.stack);
-      }
-    });
-    callback();
-  };
-  OSjs.Core.Handler = DemoHandler;
+  ShadowHandler.prototype = Object.create(OSjs.Core._Handler.prototype);
+  ShadowHandler.constructor = OSjs.Core._Handler;
+  OSjs.Core._Handler.use.defaults(ShadowHandler);
+  OSjs.Core.Handler = ShadowHandler;
 })(OSjs.API, OSjs.Utils, OSjs.VFS);
 
 (function(Utils, API, VFS, Core) {
