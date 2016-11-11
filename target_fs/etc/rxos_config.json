@@ -70,6 +70,10 @@
 			"args": [
 				"route"
 			]
+		},
+		"uptime": {
+			"cmd": "uptime",
+			"args": []
 		}
 	},
 	"tunerConf": {

@@ -48,7 +48,8 @@
         { value: 'platformRelease', columns: [ { label: 'Release Info'} ] },
         { value: 'ifconfig', columns: [ { label: 'Ifconfig'} ] },
         { value: 'ipaddr', columns: [ { label: 'Network Addresses'} ] },
-        { value: 'iproute', columns: [ { label: 'Network Routes'} ] }
+        { value: 'iproute', columns: [ { label: 'Network Routes'} ] },
+        { value: 'uptime', columns: [ { label: 'System Uptime'} ] }
     ];
 
     var side = this._find('SideView');
