@@ -27,9 +27,12 @@
 
         <!-- tuner status -->
         <gui-tab-container data-grow="1" data-shrink="0" data-fill="true" data-label="Status">
-            <gui-vbox><gui-vbox-container data-grow="1" data-shrink="0" data-fill="true">
-                <gui-textarea data-id="Status"></gui-textarea>
-            </gui-vbox-container></gui-vbox>
+            <gui-vbox>
+                <gui-vbox-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true">
+                    <gui-list-view data-id="Status" data-multiple="false">
+                    </gui-list-view>
+                </gui-vbox-container>
+            </gui-vbox>
         </gui-tab-container>
     </gui-tabs>
 </application-window>

@@ -35,10 +35,25 @@
     this.statusInterval = setInterval(function() {
 
       app._api('getOnddStatus', null, function (err, onddStatus) {
-        self.tunserstatus.set('value',onddStatus)
+        if(!err) {
+            tunerstatus.clear();
+            tunerstatus.add( [
+                { columns: [ {label: "SNR"}, {label: onddStatus.response.tuner.snr} ] },
+                { columns: [ {label: "lock"}, {label: onddStatus.response.tuner.lock} ] },
+                { columns: [ {label: "Rssi"}, {label: onddStatus.response.tuner.rssi} ] },
+                { columns: [ {label: "Freq"}, {label: onddStatus.response.tuner.freq} ] },
+                { columns: [ {label: "Offset"}, {label: onddStatus.response.tuner.offset} ] },
+                { columns: [ {label: "Symbol Error Rate"}, {label: onddStatus.response.tuner.ser} ] },
+                { columns: [ {label: "CRC ok packets"}, {label: onddStatus.response.tuner.crc_ok} ] },
+                { columns: [ {label: "CRC fail packets"}, {label: onddStatus.response.tuner.crc_err} ] },
+                { columns: [ {label: "APkMn Ratio"}, {label: onddStatus.response.tuner.alg_pk_mn} ] },
+                { columns: [ {label: "Packets received"}, {label: onddStatus.response.tuner.crc_ok} ] },
+                { columns: [ {label: "Lock State"}, {label: onddStatus.response.tuner.state} ] }
+            ] );
+        } else this.statusInterval = clearInterval(this.statusInterval);
       });
 
-    }, 2000);
+    }, 5000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
         var Beams = TunerConf['beams'];
