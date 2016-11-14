@@ -17,7 +17,7 @@
   ApplicationTunerWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
   ApplicationTunerWindow.constructor = DefaultApplicationWindow.prototype;
 
-  ApplicationWriterWindow.prototype.destroy = function() {
+  ApplicationTunerWindow.prototype.destroy = function() {
     this.statusInterval = clearInterval(this.statusInterval);
     return DefaultApplicationWindow.prototype.destroy.apply(this, arguments);
   };
