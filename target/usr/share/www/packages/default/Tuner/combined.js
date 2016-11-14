@@ -34,26 +34,31 @@
 
     this.statusInterval = setInterval(function() {
 
-      app._api('getOnddStatus', null, function (err, onddStatus) {
+      app._api('getOnddStatus2', null, function (err, onddStatus) {
         if(!err) {
             tunerstatus.clear();
             tunerstatus.add( [
                 { columns: [ {label: "SNR"}, {label: onddStatus.response.tuner.snr} ] },
-                { columns: [ {label: "lock"}, {label: onddStatus.response.tuner.lock} ] },
+                { columns: [ {label: "Lock"}, {label: onddStatus.response.tuner.lock} ] },
                 { columns: [ {label: "Rssi"}, {label: onddStatus.response.tuner.rssi} ] },
                 { columns: [ {label: "Freq"}, {label: onddStatus.response.tuner.freq} ] },
-                { columns: [ {label: "Offset"}, {label: onddStatus.response.tuner.offset} ] },
+                { columns: [ {label: "Freq Offset"}, {label: onddStatus.response.tuner.freq_offset} ] },
                 { columns: [ {label: "Symbol Error Rate"}, {label: onddStatus.response.tuner.ser} ] },
                 { columns: [ {label: "CRC ok packets"}, {label: onddStatus.response.tuner.crc_ok} ] },
                 { columns: [ {label: "CRC fail packets"}, {label: onddStatus.response.tuner.crc_err} ] },
                 { columns: [ {label: "APkMn Ratio"}, {label: onddStatus.response.tuner.alg_pk_mn} ] },
                 { columns: [ {label: "Packets received"}, {label: onddStatus.response.tuner.crc_ok} ] },
-                { columns: [ {label: "Lock State"}, {label: onddStatus.response.tuner.state} ] }
+                { columns: [
+                    {label: "Lock State"},
+                    {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.response.tuner.state] }
+                ] },
+                { columns: [ {label: "Transfers"}, {label: JSON.stringify(onddStatus.response.transfers)} ] }
             ] );
-        } else this.statusInterval = clearInterval(this.statusInterval);
+        } else
+            this.statusInterval = clearInterval(this.statusInterval);
       });
 
-    }, 5000);
+    }, 3000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
         var Beams = TunerConf['beams'];
