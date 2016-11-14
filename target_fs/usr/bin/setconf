@@ -1,0 +1,6 @@
+#!/bin/sh
+
+jq "$1=\"$2\"" /etc/rxos_config.json > /tmp/rxos_config.json
+cat /tmp/rxos_config.json > /etc/rxos_config.json
+rm /tmp/rxos_config.json
+
