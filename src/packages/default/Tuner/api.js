@@ -20,6 +20,12 @@
     });
   };
 
+  module.exports.getOnddTransfers = function(args, callback, request, response) {
+    rxos_config.getOnddTransfers(function (r) {
+        callback(false, r);
+    });
+  };
+
   //
   // This is called whenever the HTTP server starts up
   //

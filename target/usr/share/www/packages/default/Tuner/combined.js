@@ -17,6 +17,11 @@
   ApplicationTunerWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
   ApplicationTunerWindow.constructor = DefaultApplicationWindow.prototype;
 
+  ApplicationWriterWindow.prototype.destroy = function() {
+    this.statusInterval = clearInterval(this.statusInterval);
+    return DefaultApplicationWindow.prototype.destroy.apply(this, arguments);
+  };
+
   ApplicationTunerWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
     scheme.render(this, 'TunerWindow', root);
@@ -24,6 +29,16 @@
     var beams = scheme.find(this, 'Beams');
     var param_table = scheme.find(this, 'BeamParameters');
     var beamsave = scheme.find(this, 'BeamSave');
+
+    var tunerstatus = scheme.find(this, "Status");
+
+    this.statusInterval = setInterval(function() {
+
+      app._api('getOnddStatus', null, function (err, onddStatus) {
+        self.tunserstatus.set('value',onddStatus)
+      });
+
+    }, 2000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
         var Beams = TunerConf['beams'];

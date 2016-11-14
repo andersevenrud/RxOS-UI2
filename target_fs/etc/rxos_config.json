@@ -1,7 +1,8 @@
 {
 	"ondd": {
 		"controlSocket": "/var/run/ondd.ctrl",
-		"statusQuery": "<get uri=\"/status\" />\u0000"
+		"statusQuery": "<get uri=\"/status\" />\u0000",
+		"transfersQuery": "<get uri=\"/transfers\" />\u0000"
 	},
 	"configfiles": {
 		"tuner": "/mnt/data/librarian/librarian.json"
