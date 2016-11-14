@@ -16,13 +16,13 @@
 
   module.exports.getOnddStatus = function(args, callback, request, response) {
     rxos_config.getOnddStatus(function (r) {
-        if (r) callback(false, r) else callback(true, r);
+        if (r) callback(false, r); else callback(true, r);
     });
   };
 
   module.exports.getOnddTransfers = function(args, callback, request, response) {
     rxos_config.getOnddTransfers(function (r) {
-        if (r) callback(false, r) else callback(true, r);
+        if (r) callback(false, r); else callback(true, r);
     });
   };
 
