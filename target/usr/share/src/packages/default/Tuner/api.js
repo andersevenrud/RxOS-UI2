@@ -37,7 +37,8 @@
   module.exports._onServerStart = function(server, instance, metadata) {
     rxos_config.getOnddClient(function(ondd) {
         onddclient = ondd;
-        onddclient.setStatusCallback(console.log);
+        //onddclient.setStatusCallback(console.log);
+        onddclient.start();
         console.log("started ondd client");
     });
   };

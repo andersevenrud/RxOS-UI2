@@ -32,23 +32,24 @@
 
     var tunerstatus = scheme.find(this, "Status");
 
-    this.statusInterval = setInterval(function() {
+
+    var statusInterval = setInterval(function() {
 
       app._api('getOnddStatus2', null, function (err, onddStatus) {
         if(!err) {
           if(onddStatus) {
             tunerstatus.clear();
             tunerstatus.add( [
-                { columns: [ {label: "SNR"}, {label: onddStatus.snr} ] },
-                { columns: [ {label: "Lock"}, {label: onddStatus.lock} ] },
-                { columns: [ {label: "Rssi"}, {label: onddStatus.rssi} ] },
-                { columns: [ {label: "Freq"}, {label: onddStatus.freq} ] },
-                { columns: [ {label: "Freq Offset"}, {label: onddStatus.freq_offset} ] },
-                { columns: [ {label: "Symbol Error Rate"}, {label: onddStatus.ser} ] },
-                { columns: [ {label: "CRC ok packets"}, {label: onddStatus.crc_ok} ] },
-                { columns: [ {label: "CRC fail packets"}, {label: onddStatus.crc_err} ] },
-                { columns: [ {label: "APkMn Ratio"}, {label: onddStatus.alg_pk_mn} ] },
-                { columns: [ {label: "Packets received"}, {label: onddStatus.crc_ok} ] },
+                { columns: [ {label: "SNR"}, {label: '' + onddStatus.snr} ] },
+                { columns: [ {label: "Lock"}, {label: onddStatus.lock? "yes" : "no" } ] },
+                { columns: [ {label: "Rssi"}, {label: '' + onddStatus.rssi} ] },
+                { columns: [ {label: "Freq"}, {label: '' + onddStatus.freq} ] },
+                { columns: [ {label: "Freq Offset"}, {label: '' + onddStatus.freq_offset} ] },
+                { columns: [ {label: "Symbol Error Rate"}, {label: '' + onddStatus.ser} ] },
+                { columns: [ {label: "CRC ok packets"}, {label: '' + onddStatus.crc_ok} ] },
+                { columns: [ {label: "CRC fail packets"}, {label: '' + onddStatus.crc_err} ] },
+                { columns: [ {label: "APkMn Ratio"}, {label: '' + onddStatus.alg_pk_mn} ] },
+                { columns: [ {label: "Packets received"}, {label: '' + onddStatus.crc_ok} ] },
                 { columns: [
                     {label: "Lock State"},
                     {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.state] }
@@ -57,10 +58,10 @@
             ] );
           }
         } else
-            this.statusInterval = clearInterval(this.statusInterval);
+            clearInterval(statusInterval);
       });
 
-    }, 3000);
+    }, 1000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
         var Beams = TunerConf['beams'];
