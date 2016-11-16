@@ -1,6 +1,7 @@
 {
 	"ondd": {
 		"controlSocket": "/var/run/ondd.ctrl",
+		"statusSocket": "/var/run/ondd.status",
 		"statusQuery": "<get uri=\"/status\" />\u0000",
 		"transfersQuery": "<get uri=\"/transfers\" />\u0000"
 	},

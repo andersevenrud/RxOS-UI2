@@ -36,24 +36,26 @@
 
       app._api('getOnddStatus2', null, function (err, onddStatus) {
         if(!err) {
+          if(onddStatus) {
             tunerstatus.clear();
             tunerstatus.add( [
-                { columns: [ {label: "SNR"}, {label: onddStatus.response.tuner.snr} ] },
-                { columns: [ {label: "Lock"}, {label: onddStatus.response.tuner.lock} ] },
-                { columns: [ {label: "Rssi"}, {label: onddStatus.response.tuner.rssi} ] },
-                { columns: [ {label: "Freq"}, {label: onddStatus.response.tuner.freq} ] },
-                { columns: [ {label: "Freq Offset"}, {label: onddStatus.response.tuner.freq_offset} ] },
-                { columns: [ {label: "Symbol Error Rate"}, {label: onddStatus.response.tuner.ser} ] },
-                { columns: [ {label: "CRC ok packets"}, {label: onddStatus.response.tuner.crc_ok} ] },
-                { columns: [ {label: "CRC fail packets"}, {label: onddStatus.response.tuner.crc_err} ] },
-                { columns: [ {label: "APkMn Ratio"}, {label: onddStatus.response.tuner.alg_pk_mn} ] },
-                { columns: [ {label: "Packets received"}, {label: onddStatus.response.tuner.crc_ok} ] },
+                { columns: [ {label: "SNR"}, {label: onddStatus.snr} ] },
+                { columns: [ {label: "Lock"}, {label: onddStatus.lock} ] },
+                { columns: [ {label: "Rssi"}, {label: onddStatus.rssi} ] },
+                { columns: [ {label: "Freq"}, {label: onddStatus.freq} ] },
+                { columns: [ {label: "Freq Offset"}, {label: onddStatus.freq_offset} ] },
+                { columns: [ {label: "Symbol Error Rate"}, {label: onddStatus.ser} ] },
+                { columns: [ {label: "CRC ok packets"}, {label: onddStatus.crc_ok} ] },
+                { columns: [ {label: "CRC fail packets"}, {label: onddStatus.crc_err} ] },
+                { columns: [ {label: "APkMn Ratio"}, {label: onddStatus.alg_pk_mn} ] },
+                { columns: [ {label: "Packets received"}, {label: onddStatus.crc_ok} ] },
                 { columns: [
                     {label: "Lock State"},
-                    {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.response.tuner.state] }
+                    {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.state] }
                 ] },
-                { columns: [ {label: "Transfers"}, {label: JSON.stringify(onddStatus.response.transfers)} ] }
+                { columns: [ {label: "Transfers"}, {label: JSON.stringify(onddStatus.transfers)} ] }
             ] );
+          }
         } else
             this.statusInterval = clearInterval(this.statusInterval);
       });

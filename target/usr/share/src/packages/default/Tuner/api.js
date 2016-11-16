@@ -27,25 +27,19 @@
   };
 
   module.exports.getOnddStatus2 = function(args, callback, request, response) {
-    rxos_config.getOnddStatus(function (s) {
-        if (s && s.response && s.response._code == 200 ) {
-            rxos_config.getOnddTransfers( function(t) {
-                if (t && t.response && t.response._code == 200 && t.response.streams.stream.transfers) {
-                    s.response.transfers = t.response.streams.stream.transfers;
-                    callback(false, s);
-                }
-                else
-                    callback(true, t);
-            });
-        } else
-            callback(true, r);
-    });
+    callback(false, onddclient.getStatus());
   };
 
+  var onddclient;
   //
   // This is called whenever the HTTP server starts up
   //
   module.exports._onServerStart = function(server, instance, metadata) {
+    rxos_config.getOnddClient(function(ondd) {
+        onddclient = ondd;
+        onddclient.setStatusCallback(console.log);
+        console.log("started ondd client");
+    });
   };
 
 })(require('rxos_config'));
