@@ -12,6 +12,8 @@
       width: 400,
       height: 200
     }, app, scheme]);
+
+    this.statusInterval = null;
   }
 
   ApplicationTunerWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
@@ -23,6 +25,7 @@
   };
 
   ApplicationTunerWindow.prototype.init = function(wmRef, app, scheme) {
+    var self = this;
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
     scheme.render(this, 'TunerWindow', root);
 
@@ -33,7 +36,7 @@
     var tunerstatus = scheme.find(this, "Status");
 
 
-    var statusInterval = setInterval(function() {
+    this.statusInterval = setInterval(function() {
 
       app._api('getOnddStatus2', null, function (err, onddStatus) {
         if(!err) {
@@ -58,7 +61,7 @@
             ] );
           }
         } else
-            clearInterval(statusInterval);
+            clearInterval(self.statusInterval);
       });
 
     }, 1000);
