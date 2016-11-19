@@ -23,9 +23,9 @@
             "macid": "last",
             "lanip": "last"
         },
-        "reportingInterval": 10,
+        "reportingInterval": 300,
         "collectionInterval": 1000,
-        "idInterface": "em1",
+        "idInterface": "wlan0",
         "userAgent": "Outernet Telemetry Client - HttpLink/2.0",
         "endPoint": "https://telemetry.outernet.is/Ach3Airie3dahrie9cho/statusdata"
     },
