@@ -5,6 +5,30 @@
 		"statusQuery": "<get uri=\"/status\" />\u0000",
 		"transfersQuery": "<get uri=\"/transfers\" />\u0000"
 	},
+    "telemetry": {
+        "items": {
+            "snr": "avg",
+            "lock": "hist",
+            "rssi": "avg",
+            "freq": "avg",
+            "freq_offset": "avg",
+            "ser": "last",
+            "crc_ok": "last",
+            "crc_err": "last",
+            "alg_pk_mn": "avg",
+            "state": "hist",
+            "transfers": "last",
+            "count": "sum",
+            "version": "last",
+            "macid": "last",
+            "lanip": "last"
+        },
+        "reportingInterval": 10,
+        "collectionInterval": 1000,
+        "idInterface": "em1",
+        "userAgent": "Outernet Telemetry Client - HttpLink/2.0",
+        "endPoint": "https://telemetry.outernet.is/Ach3Airie3dahrie9cho/statusdata"
+    },
 	"configfiles": {
 		"tuner": "/mnt/data/librarian/librarian.json"
 	},

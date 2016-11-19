@@ -26,20 +26,30 @@
     });
   };
 
+  var onddClient;
+
   module.exports.getOnddStatus2 = function(args, callback, request, response) {
-    callback(false, onddclient.getStatus());
+    callback(false, onddClient.getStatus());
   };
 
-  var onddclient;
   //
   // This is called whenever the HTTP server starts up
   //
   module.exports._onServerStart = function(server, instance, metadata) {
+
+    // ondd/tuner status listener
     rxos_config.getOnddClient(function(ondd) {
-        onddclient = ondd;
+        onddClient = ondd;
         //onddclient.setStatusCallback(console.log);
-        onddclient.start();
+        onddClient.start();
         console.log("started ondd client");
+    });
+
+    // telemetry
+    rxos_config.getTelemetryClient( function(telemetryClient) {
+        telemetryClient.attachOnddClient(onddClient);
+        telemetryClient.start();
+        console.log("started telemetry client");
     });
   };
 
