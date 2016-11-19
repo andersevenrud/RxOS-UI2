@@ -43,13 +43,14 @@
         //onddclient.setStatusCallback(console.log);
         onddClient.start();
         console.log("started ondd client");
-    });
 
-    // telemetry
-    rxos_config.getTelemetryClient( function(telemetryClient) {
-        telemetryClient.attachOnddClient(onddClient);
-        telemetryClient.start();
-        console.log("started telemetry client");
+        // telemetry
+        rxos_config.getTelemetryClient( function(telemetryClient) {
+            telemetryClient.attachOnddClient(onddClient);
+            telemetryClient.start();
+            console.log("started telemetry client");
+        });
+
     });
   };
 

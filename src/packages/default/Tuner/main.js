@@ -51,8 +51,8 @@
                 { columns: [ {label: "Symbol Error Rate"}, {label: '' + onddStatus.ser} ] },
                 { columns: [ {label: "CRC ok packets"}, {label: '' + onddStatus.crc_ok} ] },
                 { columns: [ {label: "CRC fail packets"}, {label: '' + onddStatus.crc_err} ] },
+                { columns: [ {label: "Packets received"}, {label: '' + (onddStatus.crc_ok + onddStatus.crc_err) } ] },
                 { columns: [ {label: "APkMn Ratio"}, {label: '' + onddStatus.alg_pk_mn} ] },
-                { columns: [ {label: "Packets received"}, {label: '' + onddStatus.crc_ok} ] },
                 { columns: [
                     {label: "Lock State"},
                     {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.state] }
