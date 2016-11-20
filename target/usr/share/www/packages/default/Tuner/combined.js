@@ -46,19 +46,26 @@
                 { columns: [ {label: "SNR"}, {label: '' + onddStatus.snr} ] },
                 { columns: [ {label: "Lock"}, {label: onddStatus.lock? "yes" : "no" } ] },
                 { columns: [ {label: "Rssi"}, {label: '' + onddStatus.rssi} ] },
+                { columns: [ {label: "APkMn Ratio"}, {label: '' + onddStatus.alg_pk_mn} ] },
                 { columns: [ {label: "Freq"}, {label: '' + onddStatus.freq} ] },
                 { columns: [ {label: "Freq Offset"}, {label: '' + onddStatus.freq_offset} ] },
                 { columns: [ {label: "Symbol Error Rate"}, {label: '' + onddStatus.ser} ] },
-                { columns: [ {label: "CRC ok packets"}, {label: '' + onddStatus.crc_ok} ] },
-                { columns: [ {label: "CRC fail packets"}, {label: '' + onddStatus.crc_err} ] },
                 { columns: [ {label: "Packets received"}, {label: '' + (onddStatus.crc_ok + onddStatus.crc_err) } ] },
-                { columns: [ {label: "APkMn Ratio"}, {label: '' + onddStatus.alg_pk_mn} ] },
+                { columns: [ {label: "Valid packets"}, {label: '' + onddStatus.crc_ok} ] },
+                { columns: [ {label: "Valid packets %"}, {label: '' + Math.round(100*onddStatus.crc_ok/ (onddStatus.crc_ok + onddStatus.crc_err)) } ] },
                 { columns: [
                     {label: "Lock State"},
                     {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.state] }
                 ] },
-                { columns: [ {label: "Transfers"}, {label: JSON.stringify(onddStatus.transfers)} ] }
+                { columns: [ {label: "Transfers:"}, {label: ""} ] }
             ] );
+            onddStatus.transfers.forEach(function(v) {
+                if (v.path) {
+                    var s = Math.round(100*v.block_received/v.block_count) + "%";
+                    if (v.complete) s = "Complete";
+                    tunerstatus.add([ { columns: [ {label: s}, {label: v.path}] } ] );
+                }
+            });
           }
         } else
             clearInterval(self.statusInterval);
@@ -67,8 +74,8 @@
     }, 1000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
-        var Beams = TunerConf['beams'];
-        var selected = TunerConf['selectedBeam'];
+        var Beams = TunerConf.beams;
+        var selected = TunerConf.selectedBeam;
         var beams_list = Object.keys(Beams).map(function(v) { return Beams[v]; });
 
         var beamsOnChange = (function (Beams, param_table) { return function(ev) {
@@ -81,8 +88,8 @@
         }}) (Beams, param_table);
 
         var beamsaveOnClick  = (function (Beams, beams, TunerConf) { return function() {
-            TunerConf['selectedBeam'] = beams.get('value');
-            TunerConf['beams'] = Beams;
+            TunerConf.selectedBeam = beams.get('value');
+            TunerConf.beams = Beams;
             // TODO: replace "console.log" with alert box
             app._api('setTunerConf', TunerConf , console.log);
         }}) (Beams, beams, TunerConf);
