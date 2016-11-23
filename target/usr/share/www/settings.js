@@ -77,10 +77,6 @@
                             "settings": {}
                         },
                         {
-                            "name": "Buttons",
-                            "settings": {}
-                        },
-                        {
                             "name": "WindowList",
                             "settings": {}
                         },

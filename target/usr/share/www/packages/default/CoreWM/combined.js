@@ -3636,12 +3636,14 @@
       menu = this.iconView._getContextMenu(arg);
     }
 
+    /*
     menu.push({
       title: OSjs.Applications.CoreWM._('Open settings'),
       onClick: function(ev) {
         self.showSettings();
       }
     });
+    */
 
     if ( this.getSetting('enableIconView') === true ) {
       menu.push({
