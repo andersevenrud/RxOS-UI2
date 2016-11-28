@@ -43,16 +43,17 @@
           if(onddStatus) {
             tunerstatus.clear();
             tunerstatus.add( [
-                { columns: [ {label: "SNR"}, {label: '' + onddStatus.snr} ] },
+                { columns: [ {label: "SNR (dB)"}, {label: '' + onddStatus.snr} ] },
                 { columns: [ {label: "Lock"}, {label: onddStatus.lock? "yes" : "no" } ] },
-                { columns: [ {label: "Rssi"}, {label: '' + onddStatus.rssi} ] },
+                { columns: [ {label: "Rssi (dBm) "}, {label: '' + onddStatus.rssi} ] },
                 { columns: [ {label: "APkMn Ratio"}, {label: '' + onddStatus.alg_pk_mn} ] },
-                { columns: [ {label: "Freq"}, {label: '' + onddStatus.freq} ] },
-                { columns: [ {label: "Freq Offset"}, {label: '' + onddStatus.freq_offset} ] },
-                { columns: [ {label: "Symbol Error Rate"}, {label: '' + onddStatus.ser} ] },
+                { columns: [ {label: "Frequency (MHz)"}, {label: '' + onddStatus.freq} ] },
+                { columns: [ {label: "Freq Offset (Hz)"}, {label: '' + onddStatus.freq_offset} ] },
+                { columns: [ {label: "Symbol Error Rate (SER)"}, {label: '' + onddStatus.ser} ] },
                 { columns: [ {label: "Packets received"}, {label: '' + (onddStatus.crc_ok + onddStatus.crc_err) } ] },
                 { columns: [ {label: "Valid packets"}, {label: '' + onddStatus.crc_ok} ] },
                 { columns: [ {label: "Valid packets %"}, {label: '' + Math.round(100*onddStatus.crc_ok/ (onddStatus.crc_ok + onddStatus.crc_err)) } ] },
+                { columns: [ {label: "Packet Error Rate (PER)"}, {label: '' + Math.round(1000*onddStatus.crc_err/ (onddStatus.crc_ok + onddStatus.crc_err))/1000 } ] },
                 { columns: [
                     {label: "Lock State"},
                     {   label: [ "Search", "Signal Detect", "Const Lock", "Code Lock", "Frame Lock" ] [onddStatus.state] }
@@ -63,7 +64,7 @@
                 if (v.path) {
                     var s = Math.round(100*v.block_received/v.block_count) + "%";
                     if (v.complete) s = "Complete";
-                    tunerstatus.add([ { columns: [ {label: s}, {label: v.path}] } ] );
+                    tunerstatus.add([ { columns: [ {label: v.path}, {label: s} ] } ] );
                 }
             });
           }
