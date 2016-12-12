@@ -1,6 +1,9 @@
 #!/bin/sh
 
-jq "$1=\"$2\"" /etc/rxos_config.json > /tmp/rxos_config.json
-cat /tmp/rxos_config.json > /etc/rxos_config.json
-rm /tmp/rxos_config.json
+if [ -f /mnt/conf/etc/rxos_config.json ]
+then
+    jq "$1=\"$2\"" /mnt/conf/etc/rxos_config.json > /tmp/rxos_config.json && mv /tmp/rxos_config.json /mnt/conf/etc/rxos_config.json
+else
+    jq "$1=\"$2\"" /etc/rxos_config.json > /tmp/rxos_config.json && mv /tmp/rxos_config.json /mnt/conf/etc/rxos_config.json
+fi
 

@@ -1,4 +1,11 @@
 #! /bin/sh
 # (c) 2016 Outernet Inc
 
-jq -r "$1" /etc/rxos_config.json
+if [ -f /mnt/conf/etc/rxos_config.json ]
+then
+    jq -s '.[0] * .[1]' /etc/rxos_config.json /mnt/conf/etc/rxos_config.json | jq -r "$1"
+else
+    jq -r "$1" /etc/rxos_config.json
+fi
+
+
