@@ -14,11 +14,9 @@ sync_reboot() {
 if [ "$mode" == "ap" ]
 then
     ap_config.sh
-    echo "AP" > /etc/conf.d/wireless
     sync_reboot &
 elif [ "$mode" == "sta" ]
 then
     sta_config.sh
-    echo "STA" > /etc/conf.d/wireless
     sync_reboot &
 fi
