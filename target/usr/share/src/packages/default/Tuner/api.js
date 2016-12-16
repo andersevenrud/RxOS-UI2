@@ -32,6 +32,12 @@
     callback(false, onddClient.getStatus());
   };
 
+  module.exports.getApiNS = function(ns) {
+    ns.getTunerStatus = function(server, args, callback) {
+        callback(false, onddClient.getStatus());
+    }
+  };
+
   //
   // This is called whenever the HTTP server starts up
   //

@@ -333,6 +333,25 @@
       });
     }
 
+    function handleDirectCall(rp) {
+      var body = [];
+      request.on('data', function(data) {
+        body.push(data);
+      });
+
+      request.on('end', function() {
+        try {
+          instance.request(false, rp, null, function(error, result) {
+            respondJSON({result: result, error: error}, response);
+          }, request, response, instance.handler);
+        } catch ( e ) {
+          instance.logger.log(instance.logger.WARNING, 'httpDirectCall exception', e, e.stack);
+
+          respondError(e, response, true, 200);
+        }
+      });
+    }
+
     function handleUpload() {
       var form = new _multipart.IncomingForm({
         uploadDir: instance.config.tmpdir
@@ -421,7 +440,8 @@
 
     (function() {
       var isVfsCall = path.match(/^\/FS/) !== null;
-      var relPath   = path.replace(/^\/(FS|API)\/?/, '');
+      var isDirectCall = path.match(/^\/DIRECT/) !== null;
+      var relPath   = path.replace(/^\/(FS|API|DIRECT)\/?/, '');
 
       if ( request.method === 'POST' ) {
         if ( isVfsCall ) {
@@ -434,7 +454,9 @@
           handleCall(relPath, false);
         }
       } else {
-        if ( isVfsCall ) {
+        if (isDirectCall) {
+          handleDirectCall(relPath);
+        } else if ( isVfsCall ) {
           handleVFSFile(path);
         } else { // dist files
           handleDistFile(path);

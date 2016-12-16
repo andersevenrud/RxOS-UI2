@@ -214,7 +214,8 @@
           if ( instance.setup.logging ) {
             instance.logger.lognt(instance.logger.INFO, '+++', '{ApplicationAPI}', p._apiFile.replace(instance.setup.root, '/'));
           }
-          require(p._apiFile);
+          var a = require(p._apiFile);
+          if (a.getApiNS)  a.getApiNS(apiNamespace);
         }
       });
 
