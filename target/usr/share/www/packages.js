@@ -272,6 +272,27 @@
         "build": {},
         "repo": "default"
     },
+    "default/News": {
+        "className": "ApplicationNews",
+        "name": "News",
+        "mime": [],
+        "icon": "apps/news.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            }
+        ],
+        "type": "application",
+        "path": "default/News",
+        "build": {},
+        "repo": "default"
+    },
     "default/Preview": {
         "className": "ApplicationPreview",
         "name": "Preview",
