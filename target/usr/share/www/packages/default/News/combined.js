@@ -54,7 +54,7 @@
         });
 
         channels = dedupe(channels).sort().reverse();
-        var channel_items = channels.map( function (v) { return { label: v, value: v } });
+        var channel_items = channels.map( function (v) { return { label: v.replace(/-/g,' '), value: v } });
         channels_w.add(channel_items);
 
         var onChannelChange = function(ev) {
