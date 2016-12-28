@@ -57,6 +57,9 @@
         channels = dedupe(channels).sort().reverse();
         var channel_items = channels.map( function (v) { return { columns: [ { label: v } ], value: v } });
         channels_w.clear();
+        channels_w.set('columns', [
+            {label: "Channels", textalign: "left" }
+        ]);
         channels_w.add(channel_items);
 
         var onChannelActivate = function(ev) {
@@ -90,10 +93,10 @@
             }
         }
 
-        articles_w.zebra = true;
+        articles_w.set('zebra', true);
 
         articles_w.set('columns', [
-            {label: "Date", size: "100px", textalign: "center" },
+            {label: "Date", size: "12em", textalign: "center" },
             {label: "Article", textalign: "left" }
         ]);
 
