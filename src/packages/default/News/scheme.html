@@ -1,25 +1,28 @@
 <application-window data-id="NewsWindow">
+ <!--
   <gui-vbox>
-
-    <gui-vbox-container data-grow="0" data-shrink="0" data-basis="auto" data-expand="true">
-            <gui-label>Channel: </gui-label>                                                                                                                
-            <gui-select data-id="Channels"></gui-select>
-    </gui-vbox-container>
-
     <gui-vbox-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true">
+-->
       <gui-paned-view>
-        <!-- SIDE PANEL Entries -->
-        <gui-paned-view-container data-basis="150px" data-grow="0" data-shrink="0" data-multiple="false" data-id="entries">
-          <gui-list-view data-id="Dates" data-single-click="true">
-          </gui-list-view>
+
+        <!-- Channels -->
+        <gui-paned-view-container data-basis="150px" data-grow="0" data-shrink="0" data-multiple="false">
+          <gui-list-view data-id="Channels" data-single-click="true"></gui-list-view>
         </gui-paned-view-container>
 
-        <!-- Data VIEW -->
-        <gui-paned-view-container data-grow="1" data-shrink="0" data-basis="auto" data-fill="true">
-          <gui-iframe data-id="iframe" />
+        <!-- Articles -->
+        <gui-paned-view-container data-basis="300px" data-grow="0" data-shrink="0" data-multiple="false">
+                  <gui-list-view data-id="Articles" data-single-click="true"></gui-list-view>
+        </gui-paned-view-container>
+
+        <!-- Text -->
+        <gui-paned-view-container data-grow="1" data-shrink="1" data-expand="true" data-width="100%" data-multiple="false">
+                <gui-iframe data-id="iframe"></gui-iframe>
         </gui-paned-view-container>
       </gui-paned-view>
-
+<!--
     </gui-vbox-container>
   </gui-vbox>
+-->
+
 </application-window>
