@@ -33,6 +33,14 @@
 		"tuner": "/mnt/data/librarian/librarian.json"
 	},
 	"cmds": {
+		"getAPRS": {
+			"cmd": "/usr/bin/aprs_messages.sh",
+			"args": [
+				"/mnt/downloads/Amateur Radio/APRS/APRSAT",
+                "96",
+                "1000"
+			]
+		},
 		"tunerRestart": {
 			"cmd": "/etc/init.d/S90sdr",
 			"args": [

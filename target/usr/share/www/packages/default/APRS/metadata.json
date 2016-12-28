@@ -1,0 +1,25 @@
+{
+    "className": "ApplicationAPRSViewer",
+    "name": "APRS Viewer",
+    "mime": null,
+    "icon": "apps/aprs.png",
+    "category": "utilities",
+    "preload": [
+        {
+            "type": "javascript",
+            "src": "combined.js"
+        },
+        {
+            "src": "scheme.html",
+            "type": "scheme"
+        },
+        {
+            "type": "stylesheet",
+            "src": "combined.css"
+        }
+    ],
+    "type": "application",
+    "path": "default/APRS",
+    "build": {},
+    "repo": "default"
+}

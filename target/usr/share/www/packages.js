@@ -3,6 +3,31 @@
   OSjs.Core = OSjs.Core || {}
   OSjs.Core.getMetadata = function() {
     return Object.freeze({
+    "default/APRS": {
+        "className": "ApplicationAPRSViewer",
+        "name": "APRS Viewer",
+        "mime": null,
+        "icon": "apps/aprs.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
+            }
+        ],
+        "type": "application",
+        "path": "default/APRS",
+        "build": {},
+        "repo": "default"
+    },
     "default/About": {
         "className": "ApplicationAbout",
         "name": "About Skylark",
