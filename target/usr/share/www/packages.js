@@ -477,6 +477,31 @@
         "path": "default/Weather",
         "build": {},
         "repo": "default"
+    },
+    "default/Wikipedia": {
+        "className": "ApplicationWikireader",
+        "name": "Wikipedia",
+        "mime": null,
+        "icon": "apps/wikireader.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
+            }
+        ],
+        "type": "application",
+        "path": "default/Wikipedia",
+        "build": {},
+        "repo": "default"
     }
 });
   };
