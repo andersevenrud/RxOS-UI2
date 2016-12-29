@@ -38,13 +38,13 @@
 
         if (error) return;
 
-        entries = result.map(function(i) {
+        var entries = result.map(function(i) {
             if(i.mime != 'text/html') {
                 return [];
             }
             var r = {};
             r.title = i.filename.split(".").slice(0,-1).join('.').replace(/_/g, ' ');
-            r.value = r.path;
+            r.value = i.path;
             r.columns =  [ { label: r.title } ];
             r.mtime = i.mtime;
             return r;
@@ -56,7 +56,7 @@
 
         entries.sort(sortBymtime);
         side.clear();
-        size.add(entries);
+        side.add(entries);
 
     });
 
