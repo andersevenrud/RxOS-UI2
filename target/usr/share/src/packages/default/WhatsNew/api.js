@@ -9,9 +9,9 @@
   };
 
   module.exports.getApiNS = function(ns) {
-    ns.getAPRS = function(server, args, callback) {
+    ns.whatsNew = function(server, args, callback) {
         rxos_config.runTask("whatsNew", function(r) {
-        callback(false, r);
+            callback(false, r);
         });
     };
   };
