@@ -64,7 +64,7 @@
         channels_w.add(channel_items);
 
         var onChannelActivate = function(ev) {
-            if( ev && ev.detail && ev.detail.entries ) {
+            if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
                 var selectedChannel = ev.detail.entries[0].data;
                 var selectedEntries = entries
                             .filter( (v) => v.channel == selectedChannel )
@@ -88,7 +88,7 @@
         channels_w.on('activate', onChannelActivate);
 
         var onArticleActivate = function(ev) {
-            if( ev && ev.detail && ev.detail.entries) {
+            if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
                 var selectedEntry = ev.detail.entries[0].data;
                 text_w.set('src', "FS/get/" + selectedEntry);
             }
