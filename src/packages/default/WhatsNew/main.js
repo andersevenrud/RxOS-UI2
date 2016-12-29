@@ -42,6 +42,7 @@
                 var lines=value.split('\n');
                 var entries=lines.map(function(v) {
                     var v_parts = v.split(",");
+                    if (!(v_parts[0]*1000)) return [];
                     var d = new Date(v_parts[0]*1000);
                     return {
                         value: v ,
