@@ -478,6 +478,31 @@
         "build": {},
         "repo": "default"
     },
+    "default/WhatsNew": {
+        "className": "ApplicationWhatsNew",
+        "name": "Whats New",
+        "mime": null,
+        "icon": "apps/whatsnew.png",
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            },
+            {
+                "type": "stylesheet",
+                "src": "combined.css"
+            }
+        ],
+        "type": "application",
+        "path": "default/WhatsNew",
+        "build": {},
+        "repo": "default"
+    },
     "default/Wikipedia": {
         "className": "ApplicationWikireader",
         "name": "Wikipedia",

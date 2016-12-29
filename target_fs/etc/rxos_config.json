@@ -33,6 +33,13 @@
 		"tuner": "/mnt/data/librarian/librarian.json"
 	},
 	"cmds": {
+		"whatsNew": {
+			"cmd": "/usr/bin/whatsnew.sh",
+			"args": [
+				"3",
+                "100"
+			]
+		},
 		"getAPRS": {
 			"cmd": "/usr/bin/aprs_messages.sh",
 			"args": [
