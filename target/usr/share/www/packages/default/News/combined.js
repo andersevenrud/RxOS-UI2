@@ -60,7 +60,7 @@
         channels_w.set('columns', [
             {label: "Channels", textalign: "left" }
         ]);
-        channels_w.set('zebra', true);
+        channels_w.set('zebra', false);
         channels_w.add(channel_items);
 
         var onChannelActivate = function(ev) {
@@ -94,7 +94,7 @@
             }
         }
 
-        articles_w.set('zebra', true);
+        articles_w.set('zebra', false);
 
         articles_w.set('columns', [
             {label: "Date", size: "6em", textalign: "center" },

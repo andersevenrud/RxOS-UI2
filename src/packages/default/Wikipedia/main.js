@@ -31,7 +31,7 @@
             txtarea.set('src', "FS/get/" + ev.detail.entries[0].data);
         }
     });
-    side.set('zebra',true);
+    side.set('zebra',false);
 
 
     VFS.scandir('downloads:///Wikipedia', function(error, result) {

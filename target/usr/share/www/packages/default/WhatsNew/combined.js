@@ -29,7 +29,7 @@
     scheme.render(this, 'WhatsNewWindow', root);
 
     var items = this._find('Items');
-    items.set('zebra', true);
+    items.set('zebra', false);
     items.set('columns', [
         {label: "Date", size: "6em", textalign: "center" },
         {label: "Time", size: "7em", textalign: "center" },
