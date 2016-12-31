@@ -12,10 +12,18 @@
       width: 400,
       height: 200
     }, app, scheme]);
+
+    this.updateInterval = null;
   }
 
   ApplicationWikireaderWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
   ApplicationWikireaderWindow.constructor = DefaultApplicationWindow.prototype;
+
+  ApplicationWikireaderWindow.prototype.destroy = function() {
+    this.updateInterval = clearInterval(this.updateInterval);
+    return DefaultApplicationWindow.prototype.destroy.apply(this, arguments);
+  };
+
 
   ApplicationWikireaderWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
@@ -33,32 +41,35 @@
     });
     side.set('zebra',false);
 
+    var populate = function() {
+        VFS.scandir('downloads:///Wikipedia', function(error, result) {
 
-    VFS.scandir('downloads:///Wikipedia', function(error, result) {
+            if (error) return;
 
-        if (error) return;
+            var entries = result.map(function(i) {
+                if(i.mime != 'text/html') {
+                    return [];
+                }
+                var r = {};
+                r.title = i.filename.split(".").slice(0,-1).join('.').replace(/_/g, ' ');
+                r.value = i.path;
+                r.columns =  [ { label: r.title } ];
+                r.mtime = i.mtime;
+                return r;
+            });
 
-        var entries = result.map(function(i) {
-            if(i.mime != 'text/html') {
-                return [];
-            }
-            var r = {};
-            r.title = i.filename.split(".").slice(0,-1).join('.').replace(/_/g, ' ');
-            r.value = i.path;
-            r.columns =  [ { label: r.title } ];
-            r.mtime = i.mtime;
-            return r;
+            var sortBymtime = function (a,b) {
+                return (a.mtime - b.mtime);
+            };
+
+            entries.sort(sortBymtime);
+            side.clear();
+            side.add(entries);
         });
+    };
 
-        var sortBymtime = function (a,b) {
-            return (a.mtime - b.mtime);
-        };
-
-        entries.sort(sortBymtime);
-        side.clear();
-        side.add(entries);
-
-    });
+    setTimeout(populate, 1);
+    this.updateInterval = setInterval(populate, 2 * 60 * 1000); // 2 minutes
 
     return root;
   };

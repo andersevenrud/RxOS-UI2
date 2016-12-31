@@ -16,10 +16,17 @@
       width: 600,
       height: 300
     }, app, scheme, file]);
+
+    this.updateInterval = null;
   }
 
   ApplicationNewsWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
   ApplicationNewsWindow.constructor = DefaultApplicationWindow.prototype;
+
+  ApplicationNewsWindow.prototype.destroy = function() {
+    this.updateInterval = clearInterval(this.updateInterval);
+    return DefaultApplicationWindow.prototype.destroy.apply(this, arguments);
+  };
 
   ApplicationNewsWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
@@ -37,75 +44,80 @@
     var articles_w = scheme.find(me, 'Articles');
     var text_w = scheme.find(me,'iframe');
 
-    VFS.scandir('downloads:///News', function(error, result) {
+    var populate = function() {
 
-        if (error) return;
+        VFS.scandir('downloads:///News', function(error, result) {
 
-        entries = result.map(function(i) {
-            if(i.mime != 'text/html') {
-                return [];
-            }
-            var r = {};
-            r.date = i.filename.split('.')[0];
-            r.channel = i.filename.split(".")[1];
-            r.title = i.filename.split(".").slice(2,-1).join(' ');
-            channels = channels.concat(r.channel);
-            r.path = i.path;
-            return r;
-        });
+            if (error) return;
 
-        channels = dedupe(channels).sort().reverse();
-        var channel_items = channels.map( function (v) { return { columns: [ { label: v } ], value: v } });
-        channels_w.clear();
-        channels_w.set('columns', [
-            {label: "Channels", textalign: "left" }
-        ]);
-        channels_w.set('zebra', false);
-        channels_w.add(channel_items);
-
-        var onChannelActivate = function(ev) {
-            if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
-                var selectedChannel = ev.detail.entries[0].data;
-                var selectedEntries = entries
-                            .filter( (v) => v.channel == selectedChannel )
-                            .map( function(v) {return { value: v.path , columns: [ { label: v.date }, { label: v.title } ] } } );
-                var sortByDateRev = function(a,b) {
-                    var a_date = a.columns[0].label;
-                    var b_date = b.columns[0].label;
-                    var months = { "Jan" : "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
-                                   "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12" };
-                    Object.keys(months).map( function(v) { a_date = a_date.replace(v,months[v]); });
-                    Object.keys(months).map( function(v) { b_date = b_date.replace(v,months[v]); });
-                    if (a_date > b_date) return -1;
-                    else if (a_date < b_date) return 1;
-                    else return 0;
+            entries = result.map(function(i) {
+                if(i.mime != 'text/html') {
+                    return [];
                 }
-                selectedEntries.sort(sortByDateRev);
-                articles_w.clear(); articles_w.add(selectedEntries);
-            }
-        }
+                var r = {};
+                r.date = i.filename.split('.')[0];
+                r.channel = i.filename.split(".")[1];
+                r.title = i.filename.split(".").slice(2,-1).join(' ');
+                channels = channels.concat(r.channel);
+                r.path = i.path;
+                return r;
+            });
 
-        channels_w.on('activate', onChannelActivate);
+            channels = dedupe(channels).sort().reverse();
+            var channel_items = channels.map( function (v) { return { columns: [ { label: v } ], value: v }; });
+            channels_w.clear();
+            channels_w.set('columns', [
+                {label: "Channels", textalign: "left" }
+            ]);
+            channels_w.set('zebra', false);
+            channels_w.add(channel_items);
 
-        var onArticleActivate = function(ev) {
-            if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
-                var selectedEntry = ev.detail.entries[0].data;
-                text_w.set('src', "FS/get/" + selectedEntry);
-            }
-        }
+            var onChannelActivate = function(ev) {
+                if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
+                    var selectedChannel = ev.detail.entries[0].data;
+                    var selectedEntries = entries
+                                .filter( (v) => v.channel == selectedChannel )
+                                .map( function(v) {return { value: v.path , columns: [ { label: v.date }, { label: v.title } ] }; } );
+                    var sortByDateRev = function(a,b) {
+                        var a_date = a.columns[0].label;
+                        var b_date = b.columns[0].label;
+                        var months = { "Jan" : "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
+                                       "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12" };
+                        Object.keys(months).map( function(v) { a_date = a_date.replace(v,months[v]); });
+                        Object.keys(months).map( function(v) { b_date = b_date.replace(v,months[v]); });
+                        if (a_date > b_date) return -1;
+                        else if (a_date < b_date) return 1;
+                        else return 0;
+                    };
+                    selectedEntries.sort(sortByDateRev);
+                    articles_w.clear(); articles_w.add(selectedEntries);
+                }
+            };
 
-        articles_w.set('zebra', false);
+            channels_w.on('activate', onChannelActivate);
 
-        articles_w.set('columns', [
-            {label: "Date", size: "6em", textalign: "center" },
-            {label: "Article", textalign: "left" }
-        ]);
+            var onArticleActivate = function(ev) {
+                if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
+                    var selectedEntry = ev.detail.entries[0].data;
+                    text_w.set('src', "FS/get/" + selectedEntry);
+                }
+            };
 
-        articles_w.on('activate', onArticleActivate);
-        //channels_w.set('value', channel_items[0].value);
-        onChannelActivate({ detail: { entries: [ { data:  channel_items[0].value } ] } });
+            articles_w.set('zebra', false);
 
-    });
+            articles_w.set('columns', [
+                {label: "Date", size: "6em", textalign: "center" },
+                {label: "Article", textalign: "left" }
+            ]);
+
+            articles_w.on('activate', onArticleActivate);
+            onChannelActivate({ detail: { entries: [ { data:  channel_items[0].value } ] } });
+
+        });
+    };
+
+    setTimeout(populate, 1);
+    this.updateInterval = setInterval(populate, 5 * 60 * 1000); // 5 minutes
 
     return root;
   };
