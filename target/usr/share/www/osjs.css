@@ -477,10 +477,7 @@ application-window.DialogWindow gui-label[data-id="Message"] span {
 application-window[data-focused="false"] iframe {
   pointer-events : none;
 }
-@media all and (max-width: 800px) {
-  body {
-    overflow : hidden;
-  }
+@media all and (min-resolution: 150dpi) {
   application-window {
     width : auto !important;
     height : auto !important;
@@ -492,9 +489,6 @@ application-window[data-focused="false"] iframe {
   application-window-button-maximize,
   application-window-button-minimize {
     display : none !important;
-  }
-  application-window-content {
-    overflow : auto !important;
   }
 }
 

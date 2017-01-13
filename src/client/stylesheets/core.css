@@ -564,11 +564,13 @@ application-window[data-focused="false"] iframe {
  * ===========================================================================
  */
 
-@media all and (max-width: 800px) {
+@media all and (min-resolution: 150dpi) {
 
+/*
   body {
     overflow : hidden;
   }
+*/
 
   application-window {
     width : auto !important;
@@ -584,8 +586,11 @@ application-window[data-focused="false"] iframe {
     display : none !important;
   }
 
+/*
   application-window-content {
     overflow : auto !important;
   }
+*/
+
 
 }

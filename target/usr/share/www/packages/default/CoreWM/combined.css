@@ -388,7 +388,7 @@ corewm-panel-container > .corewm-panel-right {
   }
     corewm-panel-item .corewm-panel-buttons > li {
       margin : 0;
-      padding : 0;
+      padding : 0 2em;
       box-sizing : border-box;
       position : relative;
       min-width : 16px;
@@ -663,10 +663,14 @@ corewm-panel .PanelItemNotificationArea .BusyNotification > div > div:after {
  * ===========================================================================
  */
 
-@media all and (max-width: 800px) {
+@media all and (min-resolution: 150dpi) {
 
   .PanelItemWindowList > ul > li > span {
     display: none;
+  }
+
+  corewm-panel-item .corewm-panel-buttons > li {
+    padding: 0 2em;
   }
 
 }
