@@ -441,7 +441,7 @@
         }
     },
     "ShowQuitWarning": false,
-    "ReloadOnShutdown": false,
+    "ReloadOnShutdown": true,
     "PreloadOnBoot": [],
     "Watermark": {
         "enabled": true,

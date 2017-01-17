@@ -67,7 +67,8 @@
           "visible": false
         }
       }
-    }
+    },
+    "ReloadOnShutdown": true
   },
   "handler": "shadow"
 }

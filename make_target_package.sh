@@ -3,6 +3,11 @@
 set -e
 set -u
 
+# example configuration
+# grunt config:get --name="client.ReloadOnShutdown"
+# grunt config:set --name="client.ReloadOnShutdown" --value=true
+
+
 
 # check if rxos_config.json is properly formatted
 echo "checking json config"
