@@ -28,12 +28,6 @@ echo "${HOSTAPD_base}"
 echo "channel=$(getconf .netConf.ap.selectedChannel)"
 echo "ssid=$(getconf .netConf.ap.ssid)"
 
-country=$(getconf .netConf.ap.selectedCountry)
-if [ "$country" != "null" ]
-then
-echo "country=$country"
-fi
-
 hidden=$(getconf .netConf.ap.hidden)
 if $hidden
 then
