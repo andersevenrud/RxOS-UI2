@@ -578,7 +578,7 @@ application-window[data-focused="false"] iframe {
     left : 0 !important;
     right : 0 !important;
     bottom : 0 !important;
-    top : 0 !important;
+    top : 40px !important;
   }
 
   application-window-button-maximize,
