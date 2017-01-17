@@ -39,7 +39,9 @@
         scheme.find(me,'HotspotName').set('value', netConf['ap']['ssid']);
         scheme.find(me,'HotspotHide').set('value', netConf['ap']['hidden']);
         scheme.find(me,'HotspotCountry').add((netConf['ap']['countries']).map(function(v) { return { "value" : v['code'], "label": v['name']}; } ) );
-        scheme.find(me,'HotspotCountry').set('value', netConf['ap']['selectedCountry']);
+        var selectedCountry = netConf['ap']['selectedCountry'];
+        selectedCountry = selectedCountry === null ? "none" : selectedCountry;
+        scheme.find(me,'HotspotCountry').set('value', selectedCountry);
         scheme.find(me,'HotspotChannel').add((netConf['ap']['channels']).map(function(v) { return { "value" : v, "label": v}; } ) );
         scheme.find(me,'HotspotChannel').set('value', netConf['ap']['selectedChannel']);
         scheme.find(me,'HotspotSecurityEnabled').set('value', netConf['ap']['securityEnabled']);
