@@ -59,7 +59,8 @@
             // ap tab
             netConf['ap']['ssid'] = scheme.find(me,'HotspotName').get('value');
             netConf['ap']['hidden'] = scheme.find(me,'HotspotHide').get('value');
-            netConf['ap']['selectedCountry'] = scheme.find(me,'HotspotCountry').get('value');
+            var selectedCountry = scheme.find(me,'HotspotCountry').get('value');
+            netConf['ap']['selectedCountry'] = selectedCountry == "none" ? null : selectedCountry;
             netConf['ap']['selectedChannel'] = scheme.find(me,'HotspotChannel').get('value');
             netConf['ap']['securityEnabled'] = scheme.find(me,'HotspotSecurityEnabled').get('value');
             netConf['ap']['password'] = scheme.find(me,'HotspotPassword').get('value');

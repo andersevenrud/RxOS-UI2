@@ -164,6 +164,10 @@
 			"selectedCountry": null,
 			"countries": [
 				{
+					"code": "none",
+					"name": "(none/default)"
+				},
+				{
 					"code": "AF",
 					"name": "Afghanistan , Islamic Republic of"
 				},
