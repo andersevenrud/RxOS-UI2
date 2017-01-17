@@ -8322,6 +8322,11 @@ window.OSjs = window.OSjs || {};
             input.value += '\t';
           }
         }, false);
+        Utils.$bind(input, 'mousedown', function() {
+          if ( input ) {
+            input.focus();
+          }
+        });
       }
     }
     function _create() {
