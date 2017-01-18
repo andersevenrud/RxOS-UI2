@@ -37,7 +37,7 @@
 			"cmd": "/usr/bin/whatsnew.sh",
 			"args": [
 				"3",
-                "100"
+                "300"
 			]
 		},
 		"getAPRS": {
