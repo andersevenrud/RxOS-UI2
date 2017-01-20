@@ -42,6 +42,9 @@
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="apple-touch-icon-precomposed" href="favicon.png" />
 
+    <meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
     <!-- Styles -->
     <link type="text/css" rel="stylesheet" href="themes/fonts.css" />
     <link type="text/css" rel="stylesheet" href="osjs.css" />
@@ -61,7 +64,7 @@
       <form method="post" id="LoginForm">
         <div>
           <label for="LoginUsername">Username</label>
-          <input type="text" name="LoginUsername" id="LoginUsername" value="" placeholder="Username" />
+          <input type="text" name="LoginUsername" id="LoginUsername" autocorrect="off" autocapitalize="off" spellcheck="false"  value="" placeholder="Username" />
         </div>
         <div>
           <label for="LoginPassword">Password</label>
