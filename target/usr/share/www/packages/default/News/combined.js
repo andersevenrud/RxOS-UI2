@@ -117,7 +117,7 @@
     };
 
     setTimeout(populate, 1);
-    this.updateInterval = setInterval(populate, 5 * 60 * 1000); // 5 minutes
+    this.updateInterval = setInterval(populate, 30 * 60 * 1000); // 30 minutes
 
     return root;
   };
