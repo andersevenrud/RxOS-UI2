@@ -3,15 +3,23 @@
   'use strict';
 
   module.exports.getNetConf = function(args, callback, request, response) {
-    rxos_config.getNetConf( function (r) {
-        callback(false, r);
-    });
+    if(request.session.get('groups').indexOf("admin")>-1) {
+        rxos_config.getNetConf( function (r) {
+            callback(false, r);
+        });
+    } else {
+       callback("You are not allowed to use this App/API");
+    }
   };
 
   module.exports.setNetConf = function(args, callback, request, response) {
-    rxos_config.setNetConf(args, function (r) {
-        callback(false, r);
-    });
+    if(request.session.get('groups').indexOf("admin")>-1) {
+        rxos_config.setNetConf(args, function (r) {
+            callback(false, r);
+        });
+    } else {
+       callback("You are not allowed to use this App/API");
+    }
   };
 
   //

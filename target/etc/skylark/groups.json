@@ -1,8 +1,4 @@
 {
-    "outernet": [ "admin", "root", "outernet" ],
-    "demo": [ "demo", "fs", "application", "api", "read", "exists", "find", "fileinfo", "scandir", "freeSpace",
-               "ApplicationAbout", "ApplicationCalculator", "ApplicationFileManager", "ApplicationHTMLViewer",
-               "ApplicationNews", "ApplicationPreview", "ApplicationWeather", "ApplicationWhatsNew",
-               "ApplicationWikireader"
-     ]
+    "outernet": [ "admin" ],
+    "demo": [ "demo", "fs", "application", "api", "read", "exists", "find", "fileinfo", "scandir", "freeSpace" ]
 }

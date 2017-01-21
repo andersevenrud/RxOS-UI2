@@ -24,6 +24,10 @@
 
     app._api('getNetConf', null, (function (scheme, me) { return function(err, netConf) {
 
+        if ( err ) {
+                API.error(API._('ERR_GENERIC_APP_FMT', "Network"), API._('ERR_GENERIC_APP_REQUEST'), err);
+                return;
+        }
         // populate tabs
 
         // modes tab

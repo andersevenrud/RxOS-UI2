@@ -75,6 +75,12 @@
     }, 1000);
 
     app._api('getTunerConf', null, (function (beams, param_table, beamsave) { return function(err, TunerConf) {
+
+        if ( err ) {
+                API.error(API._('ERR_GENERIC_APP_FMT', "Tuner"), API._('ERR_GENERIC_APP_REQUEST'), err);
+                return;
+        }
+
         var Beams = TunerConf.beams;
         var selected = TunerConf.selectedBeam;
         var beams_list = Object.keys(Beams).map(function(v) { return Beams[v]; });
