@@ -525,6 +525,14 @@
       return;
     }
 
+    this._checkHasGroup(server, method, function(err, res) {
+      if ( !res && !err ) {
+        err = 'You are not allowed to use this VFS function!';
+      }
+      callback(err, res);
+    });
+
+    return;
     callback(false, true);
   };
 
@@ -546,28 +554,40 @@
       callback(err || 'You are not allowed to load this Package');
     }
 
-    if ( packages && packages[packageName] && packages[packageName].groups ) {
-      this._checkHasGroup(server, packages[packageName].groups, function(err, res) {
-        if ( err ) {
-          notallowed(err);
-        } else {
-          if ( res ) {
-            self._checkHasBlacklistedPackage(server, packageName, function(err, res) {
-              if ( err || !res ) {
-                notallowed(err);
-              } else {
-                callback(false, true);
-              }
-            });
-          } else {
-            notallowed();
-          }
+    this._checkHasGroup(server, packageName, function(err, res) {
+      if ( err ) {
+        notallowed(err);
+      } else {
+        if ( !res ) {
+          notallowed();
         }
-      });
-      return;
-    }
+      }
 
-    callback(false, true);
+      if ( packages && packages[packageName] && packages[packageName].groups ) {
+        this._checkHasGroup(server, packages[packageName].groups, function(err, res) {
+          if ( err ) {
+            notallowed(err);
+          } else {
+            if ( res ) {
+              self._checkHasBlacklistedPackage(server, packageName, function(err, res) {
+                if ( err || !res ) {
+                  notallowed(err);
+                } else {
+                  callback(false, true);
+                }
+              });
+            } else {
+              notallowed();
+            }
+          }
+        });
+        return;
+      } else callback(false, true);
+
+    });
+
+    return;
+    //callback(false, true);
   };
 
   /**

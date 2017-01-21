@@ -3,15 +3,15 @@
     "handlers": {
       "pam": {
         "defaultGroups": ["admin"],
-        "groups": "/etc/osjs/groups.json",
-        "blacklist": "/etc/osjs/blacklist.json",
-        "settings": "/home/%USERNAME%/.osjs/settings.json"
+        "groups": "/etc/skylark/groups.json",
+        "blacklist": "/etc/skylark/blacklist.json",
+        "settings": "/home/%USERNAME%/.skylark/settings.json"
       },
       "shadow": {
         "defaultGroups": ["admin"],
-        "groups": "/etc/osjs/groups.json",
-        "blacklist": "/etc/osjs/blacklist.json",
-        "settings": "/home/%USERNAME%/.osjs/settings.json"
+        "groups": "/etc/skylark/groups.json",
+        "blacklist": "/etc/skylark/blacklist.json",
+        "settings": "/home/%USERNAME%/.skylark/settings.json"
       },
       "mysql": {
         "host": "localhost",
