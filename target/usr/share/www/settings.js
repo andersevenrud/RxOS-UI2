@@ -446,7 +446,7 @@
     "Watermark": {
         "enabled": true,
         "lines": [
-            "Skylark v1.0 (c) 2016 Outernet Inc"
+            "Skylark 1.2 (c) 2017 Outernet Inc"
         ]
     },
     "DropboxAPI": {
