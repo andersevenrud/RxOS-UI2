@@ -1,4 +1,4 @@
 {
     "outernet": [ "admin" ],
-    "demo": [ "demo", "fs", "application", "api", "read", "exists", "find", "fileinfo", "scandir", "freeSpace" ]
+    "guest": [ "demo", "fs", "application", "api", "read", "exists", "find", "fileinfo", "scandir", "freeSpace" ]
 }
