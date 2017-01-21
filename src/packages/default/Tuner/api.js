@@ -3,27 +3,24 @@
   'use strict';
 
   module.exports.getTunerConf = function(args, callback, request, response) {
-    rxos_config.getTunerConf( function (r) {
-        callback(false, r);
-    });
+    if(request.session.get('groups').indexOf("admin")>-1) {
+        rxos_config.getTunerConf( function (r) {
+            callback(false, r);
+        });
+    } else {
+       callback("You are not allowed to use this App/API");
+    }
+
   };
 
   module.exports.setTunerConf = function(args, callback, request, response) {
-    rxos_config.setTunerConf(args, function (r) {
-        callback(false, r);
-    });
-  };
-
-  module.exports.getOnddStatus = function(args, callback, request, response) {
-    rxos_config.getOnddStatus(function (r) {
-        if (r) callback(false, r); else callback(true, r);
-    });
-  };
-
-  module.exports.getOnddTransfers = function(args, callback, request, response) {
-    rxos_config.getOnddTransfers(function (r) {
-        if (r) callback(false, r); else callback(true, r);
-    });
+    if(request.session.get('groups').indexOf("admin")>-1) {
+        rxos_config.setTunerConf(args, function (r) {
+            callback(false, r);
+        });
+    } else {
+       callback("You are not allowed to use this App/API");
+    }
   };
 
   var onddClient;
@@ -46,7 +43,6 @@
     // ondd/tuner status listener
     rxos_config.getOnddClient(function(ondd) {
         onddClient = ondd;
-        //onddclient.setStatusCallback(console.log);
         onddClient.start();
         console.log("started ondd client");
 
