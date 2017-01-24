@@ -358,7 +358,7 @@
         }
     },
     "VFS": {
-        "MaxUploadSize": 2097152,
+        "MaxUploadSize": 64000000,
         "Home": "home:///",
         "GoogleDrive": {
             "Enabled": false
