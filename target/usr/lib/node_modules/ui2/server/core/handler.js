@@ -511,26 +511,27 @@
     var cfg = this.instance.config.vfs.groups;
     var against;
 
-    try {
-      against = cfg[mount.protocol.replace(/\:\/\/$/, '')];
-    } catch ( e ) {}
-
-    if ( against ) {
-      this._checkHasGroup(server, against, function(err, res) {
-        if ( !res && !err ) {
-          err = 'You are not allowed to use this VFS function!';
-        }
-        callback(err, res);
-      });
-      return;
-    }
-
-
     this._checkHasGroup(server, method, function(err, res) {
-      if ( !res && !err ) {
+      if ( !res && !err) {
         err = 'You are not allowed to use this VFS function!';
+      } else {
+        try {
+          against = cfg[mount.protocol.replace(/\:\/\/$/, '')];
+        } catch ( e ) {}
+
+        if ( !err && against ) {
+          this._checkHasGroup(server, against, function(err, res) {
+            if ( !res && !err ) {
+              err = 'You are not allowed to use this VFS function!';
+            }
+            callback(err, res);
+            return;
+          });
+          return;
+        }
       }
       callback(err, res);
+      return;
     });
 
   };
