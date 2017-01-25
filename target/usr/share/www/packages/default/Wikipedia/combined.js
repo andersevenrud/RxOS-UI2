@@ -59,7 +59,7 @@
             });
 
             var sortBymtime = function (a,b) {
-                return (a.mtime - b.mtime);
+                return (Date.parse(b.mtime) - Date.parse(a.mtime));
             };
 
             entries.sort(sortBymtime);
