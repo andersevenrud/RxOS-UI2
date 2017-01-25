@@ -480,7 +480,7 @@
     },
     "default/WhatsNew": {
         "className": "ApplicationWhatsNew",
-        "name": "Whats New",
+        "name": "What's New",
         "mime": null,
         "icon": "apps/whatsnew.png",
         "category": "utilities",
