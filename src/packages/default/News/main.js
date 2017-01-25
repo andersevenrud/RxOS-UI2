@@ -60,10 +60,11 @@
                 r.title = i.filename.split(".").slice(2,-1).join(' ');
                 channels = channels.concat(r.channel);
                 r.path = i.path;
+                r.mtime = i.mtime;
                 return r;
             });
 
-            channels = dedupe(channels).sort().reverse();
+            channels = dedupe(channels).sort();
             var channel_items = channels.map( function (v) { return { columns: [ { label: v } ], value: v }; });
             channels_w.clear();
             channels_w.set('columns', [
@@ -77,19 +78,13 @@
                     var selectedChannel = ev.detail.entries[0].data;
                     var selectedEntries = entries
                                 .filter( (v) => v.channel == selectedChannel )
-                                .map( function(v) {return { value: v.path , columns: [ { label: v.date }, { label: v.title } ] }; } );
-                    var sortByDateRev = function(a,b) {
-                        var a_date = a.columns[0].label;
-                        var b_date = b.columns[0].label;
-                        var months = { "Jan" : "01", "Feb": "02", "Mar": "03", "Apr": "04", "May": "05", "Jun": "06",
-                                       "Jul": "07", "Aug": "08", "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12" };
-                        Object.keys(months).map( function(v) { a_date = a_date.replace(v,months[v]); });
-                        Object.keys(months).map( function(v) { b_date = b_date.replace(v,months[v]); });
-                        if (a_date > b_date) return -1;
-                        else if (a_date < b_date) return 1;
-                        else return 0;
+                                .map( function(v) {return { value: v.path , mtime: v.mtime, columns: [ { label: v.date }, { label: v.title } ] }; } );
+
+                    var sortBymtime = function (a,b) {
+                        return (Date.parse(b.mtime) - Date.parse(a.mtime));
                     };
-                    selectedEntries.sort(sortByDateRev);
+
+                    selectedEntries.sort(sortBymtime);
                     articles_w.clear(); articles_w.add(selectedEntries);
                 }
             };
