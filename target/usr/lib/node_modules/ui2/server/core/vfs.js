@@ -108,6 +108,9 @@
     var protocol = '';
     var fprotocol = '';
 
+    // fix security issue by removing ".." references
+    path = path.replace(/\/\.\.\//g,'/');
+
     if ( path.match(/^osjs\:\/\//) ) {
       path = path.replace(/^osjs\:\/\//, '');
       fullPath = _path.join(server.config.distdir, path);
