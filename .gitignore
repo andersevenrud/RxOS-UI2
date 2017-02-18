@@ -23,8 +23,8 @@ src/server/packages.json
 src/installer/installer.exe
 
 # Builds
-dist/*
-dist-dev/*
+dist/
+dist-dev/
 doc/jsdoc
 
 # Vendor
