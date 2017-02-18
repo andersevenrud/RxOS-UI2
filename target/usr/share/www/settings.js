@@ -433,7 +433,7 @@
     },
     "BugReporting": {
         "enabled": true,
-        "url": "//github.com/os-js/RxOS-UI2/issues/new?title=%TITLE%&body=%BODY%",
+        "url": "//github.com/Outernet-Project/RxOS-UI2/issues/new?title=%TITLE%&body=%BODY%",
         "options": {
             "issue": true,
             "title": "[Automated Bugreport] YOUR TITLE HERE",

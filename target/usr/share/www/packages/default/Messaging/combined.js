@@ -44,25 +44,19 @@
             var l_parts = l.split(",");
             var ts  = l_parts[0];
             var ts_date = new Date(ts*1000);
-            console.log("date");
-            console.log(ts_date);
             if (!ts_date.getYear()) return [];
             var ts_formatted_date = ts_date.toLocaleDateString();
             var ts_formatted_time = ts_date.toLocaleTimeString();
             var source = l_parts[1];
             var uname = "";
             var message = l_parts.slice(2).join(',');
-            //console.log(message);
-            console.log(source);
             var name_tag = "";
 
             if (source == 'Twitter') {
                 var m_parts = message.split(",");
                 uname = m_parts[0];
-                console.log(uname);
                 message = m_parts.slice(1).join(",");
                 name_tag = "@" + uname + " on Twitter";
-                console.log(name_tag);
             } else if (source == 'APRSAT') {
                 uname = message.split(">")[0];
                 name_tag = uname + " via APRS";
@@ -80,7 +74,6 @@
                         { label: message }
                     ]
             }
-            console.log(c);
             return c;
         }
 
@@ -88,7 +81,6 @@
             if (!err) {
                 var messages = r.split("\n");
                 var entries = messages.map(line2entry);
-                console.log(entries);
                 msgarea.clear(); msgarea.add(entries);
             }
         });
