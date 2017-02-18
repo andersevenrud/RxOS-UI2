@@ -26,6 +26,9 @@ then
     echo npm install -g grunt-cli
 fi
 
+# clean up dist
+rm -rf dist dist-dev
+
 # install node modules
 npm install --production
 
