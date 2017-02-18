@@ -48,6 +48,15 @@
                 "1000"
 			]
 		},
+		"getMessages": {
+			"cmd": "/usr/bin/messages.sh",
+			"args": [
+                "96",
+                "1000",
+				"/mnt/downloads/Amateur Radio/APRS/APRSAT",
+				"/mnt/downloads/Messages/Twitter"
+			]
+		},
 		"tunerRestart": {
 			"cmd": "/etc/init.d/S90sdr",
 			"args": [

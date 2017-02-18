@@ -1,8 +1,8 @@
 {
-  "className":  "ApplicationAPRSViewer",
-  "name":       "APRS Viewer",
+  "className":  "ApplicationMessaging",
+  "name":       "Messages",
   "mime":       null,
-  "icon":       "apps/aprs.png",
+  "icon":       "apps/messaging.png",
   "category": "utilities",
   "preload":    [
     {"src": "main.js", "type": "javascript"},
