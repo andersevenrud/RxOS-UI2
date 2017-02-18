@@ -33,6 +33,7 @@ rm -rf dist dist-dev
 npm install --production
 
 # build
+grunt --target=dist
 grunt
 
 [ -d target ] && rm -rf target
