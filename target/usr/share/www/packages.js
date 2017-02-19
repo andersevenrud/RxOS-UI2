@@ -199,29 +199,6 @@
         "build": {},
         "repo": "default"
     },
-    "default/HTMLViewer": {
-        "className": "ApplicationHTMLViewer",
-        "name": "HTML Viewer",
-        "mime": [
-            "text\\/html"
-        ],
-        "icon": "mimetypes/html.png",
-        "category": "utilities",
-        "preload": [
-            {
-                "type": "javascript",
-                "src": "combined.js"
-            },
-            {
-                "src": "scheme.html",
-                "type": "scheme"
-            }
-        ],
-        "type": "application",
-        "path": "default/HTMLViewer",
-        "build": {},
-        "repo": "default"
-    },
     "default/LogViewer": {
         "className": "ApplicationLogViewer",
         "name": "Log Viewer",
@@ -372,6 +349,30 @@
         ],
         "type": "application",
         "path": "default/Preview",
+        "build": {},
+        "repo": "default"
+    },
+    "default/Reader": {
+        "className": "ApplicationReader",
+        "name": "Reader",
+        "icon": "apps/reader.png",
+        "mime": [
+            "text\\/html",
+            "application\\/pdf"
+        ],
+        "category": "utilities",
+        "preload": [
+            {
+                "type": "javascript",
+                "src": "combined.js"
+            },
+            {
+                "src": "scheme.html",
+                "type": "scheme"
+            }
+        ],
+        "type": "application",
+        "path": "default/Reader",
         "build": {},
         "repo": "default"
     },

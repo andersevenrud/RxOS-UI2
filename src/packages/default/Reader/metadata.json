@@ -1,10 +1,10 @@
 {
-  "className":  "ApplicationHTMLViewer",
-  "name":       "HTML Viewer",
-  "mime":       null,
-  "icon":       "mimetypes/html.png",
+  "className":  "ApplicationReader",
+  "name":       "Reader",
+  "icon":       "apps/reader.png",
   "mime": [
-    "text\\/html"
+    "text\\/html",
+    "application\\/pdf"
   ],
   "category": "utilities",
   "preload":    [

@@ -1,10 +1,11 @@
 {
-    "className": "ApplicationHTMLViewer",
-    "name": "HTML Viewer",
+    "className": "ApplicationReader",
+    "name": "Reader",
+    "icon": "apps/reader.png",
     "mime": [
-        "text\\/html"
+        "text\\/html",
+        "application\\/pdf"
     ],
-    "icon": "mimetypes/html.png",
     "category": "utilities",
     "preload": [
         {
@@ -17,7 +18,7 @@
         }
     ],
     "type": "application",
-    "path": "default/HTMLViewer",
+    "path": "default/Reader",
     "build": {},
     "repo": "default"
 }

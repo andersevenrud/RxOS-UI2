@@ -34,8 +34,8 @@
   // WINDOWS
   /////////////////////////////////////////////////////////////////////////////
 
-  function ApplicationHTMLViewerWindow(app, metadata, scheme, file) {
-    DefaultApplicationWindow.apply(this, ['ApplicationHTMLViewerWindow', {
+  function ApplicationReaderWindow(app, metadata, scheme, file) {
+    DefaultApplicationWindow.apply(this, ['ApplicationReaderWindow', {
       icon: metadata.icon,
       title: metadata.name,
       width: 400,
@@ -43,18 +43,50 @@
     }, app, scheme, file]);
   }
 
-  ApplicationHTMLViewerWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
-  ApplicationHTMLViewerWindow.constructor = DefaultApplicationWindow.prototype;
+  ApplicationReaderWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
+  ApplicationReaderWindow.constructor = DefaultApplicationWindow.prototype;
 
-  ApplicationHTMLViewerWindow.prototype.init = function(wmRef, app, scheme) {
+  ApplicationReaderWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'HTMLViewerWindow', root);
+    scheme.render(this, 'ReaderWindow', root);
     return root;
   };
 
-  ApplicationHTMLViewerWindow.prototype.showFile = function(file, url) {
+  ApplicationReaderWindow.prototype.showFile = function(file, url) {
     if ( this._scheme ) {
-      this._find('iframe').set('src', url);
+
+      var base = "packages/default/Reader/";
+
+      var viewerjs = function(f,u) {
+          return base + "ViewerJS/index.html#/" + encodeURIComponent(u);
+      };
+
+      var playerjs = function(f,u) {
+          return encodeURIComponent(u);
+      };
+
+      var mime_map = {
+        "application/pdf" : viewerjs,
+        "^video/" : playerjs,
+        "^audio/" : playerjs
+      };
+
+      var src = encodeURIComponent(url);
+
+      if (mime_map[file.mime]) {
+        src = mime_map[file.mime](file, url);
+      } else {
+        for(var k in mime_map) {
+            if (file.mime.match(k)) {
+                src = mime_map[k](file, url);
+                break;
+            }
+        }
+      }
+
+      console.log(file); console.log(url);
+        console.log(src);
+      this._find('iframe').set('src', src);
     }
     DefaultApplicationWindow.prototype.showFile.apply(this, arguments);
   };
@@ -63,23 +95,23 @@
   // APPLICATION
   /////////////////////////////////////////////////////////////////////////////
 
-  function ApplicationHTMLViewer(args, metadata) {
-    DefaultApplication.apply(this, ['ApplicationHTMLViewer', args, metadata, {
-      extension: 'html',
-      mime: 'text/htm',
+  function ApplicationReader(args, metadata) {
+    DefaultApplication.apply(this, ['ApplicationReader', args, metadata, {
+      extension: [ 'html', 'htm', 'pdf'],
+      mime: [ 'text/htm', 'application/pdf' ],
       filename: 'index.html',
-      fileypes: ['htm', 'html'],
+      fileypes: ['htm', 'html', 'pdf'],
       readData: false
     }]);
   }
 
-  ApplicationHTMLViewer.prototype = Object.create(DefaultApplication.prototype);
-  ApplicationHTMLViewer.constructor = DefaultApplication;
+  ApplicationReader.prototype = Object.create(DefaultApplication.prototype);
+  ApplicationReader.constructor = DefaultApplication;
 
-  ApplicationHTMLViewer.prototype.init = function(settings, metadata, scheme) {
+  ApplicationReader.prototype.init = function(settings, metadata, scheme) {
     Application.prototype.init.call(this, settings, metadata, scheme);
     var file = this._getArgument('file');
-    this._addWindow(new ApplicationHTMLViewerWindow(this, metadata, scheme, file));
+    this._addWindow(new ApplicationReaderWindow(this, metadata, scheme, file));
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -87,7 +119,7 @@
   /////////////////////////////////////////////////////////////////////////////
 
   OSjs.Applications = OSjs.Applications || {};
-  OSjs.Applications.ApplicationHTMLViewer = OSjs.Applications.ApplicationHTMLViewer || {};
-  OSjs.Applications.ApplicationHTMLViewer.Class = Object.seal(ApplicationHTMLViewer);
+  OSjs.Applications.ApplicationReader = OSjs.Applications.ApplicationReader || {};
+  OSjs.Applications.ApplicationReader.Class = Object.seal(ApplicationReader);
 
 })(OSjs.Helpers.DefaultApplication, OSjs.Helpers.DefaultApplicationWindow, OSjs.Core.Application, OSjs.Core.Window, OSjs.Utils, OSjs.API, OSjs.VFS, OSjs.GUI);
