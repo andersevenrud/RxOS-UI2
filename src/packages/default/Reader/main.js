@@ -70,13 +70,20 @@
           }
       };
 
+      var epubjs = function(f,u) {
+          return base + "epub.js/index.html?u=" + encodeURIComponent(u);
+      };
+
+
       var mime_map = {
         "application/pdf" : viewerjs,
         "application/vnd.oasis.opendocument.presentation" : viewerjs,
         "application/vnd.oasis.opendocument.spreadsheet" : viewerjs,
         "application/vnd.oasis.opendocument.text" : viewerjs,
         "^video/" : playerjs,
-        "^audio/" : playerjs
+        "^audio/" : playerjs,
+        "application/epub+zip" : epubjs,
+        "application/epub" : epubjs
       };
 
       var src = encodeURIComponent(url);
@@ -106,7 +113,7 @@
   function ApplicationReader(args, metadata) {
     DefaultApplication.apply(this, ['ApplicationReader', args, metadata, {
       extension: [ 'html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
-                   'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt' ],
+                   'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub' ],
       mime: [
         "text/htm",
         "text/html",
@@ -128,10 +135,13 @@
         // subtitles
         "text/vtt",
         "text/srt",
+        // epub
+        "application/epub+zip",
+        "application/epub"
       ],
       filename: 'index.html',
       fileypes: ['html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
-                  'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt' ],
+                  'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub' ],
       readData: false
     }]);
   }

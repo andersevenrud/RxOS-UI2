@@ -371,7 +371,9 @@
             "audio\\/ogg",
             "audio\\/wav",
             "text\\/vtt",
-            "text\\/srt"
+            "text\\/srt",
+            "application\\/epub+zip",
+            "application\\/epub"
         ],
         "category": "utilities",
         "preload": [
