@@ -36,7 +36,7 @@
     var txtarea = this._find('iframe');
     side.on('activate', function(ev) {
         if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
-            txtarea.set('src', "FS/get/" + ev.detail.entries[0].data);
+            txtarea.set('src', "FS/get/" + encodeURIComponent(ev.detail.entries[0].data));
         }
     });
     side.set('zebra',false);
