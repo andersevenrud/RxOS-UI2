@@ -78,11 +78,11 @@ c;a?(e.title||(e.title=a.replace(/^.*[\\\/]/,"")),e.documentUrl=a,b(a,function(b
 
     <body>
         <div id = "viewer">
-            <div id = "titlebar">
-               <!-- <div id = "documentName"></div>  disabled as document name is displayed on the top of the window -->
+            <div id = "titlebar" >
+               <div id = "documentName" hidden></div>
                 <div id = "titlebarRight">
-                    <!-- <button id = "presentation" class = "toolbarButton presentation" title = "Presentation"></button> disabled as can't switch back -->
-                    <!-- <button id = "fullscreen" class = "toolbarButton fullscreen" title = "Fullscreen"></button> disabled as doesn't work -->
+                    <button id = "presentation" class = "toolbarButton presentation" title = "Presentation" hidden></button>
+                    <button id = "fullscreen" class = "toolbarButton fullscreen" title = "Fullscreen" hidden ></button>
                     <button id = "download" class = "toolbarButton download" title = "Download"></button>
                 </div>
            </div>
