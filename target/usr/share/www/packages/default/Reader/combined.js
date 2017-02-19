@@ -55,6 +55,7 @@
   ApplicationReaderWindow.prototype.showFile = function(file, url) {
     if ( this._scheme ) {
 
+      // TODO: nasty hack, fix this
       var base = "packages/default/Reader/";
 
       var viewerjs = function(f,u) {
@@ -67,6 +68,9 @@
 
       var mime_map = {
         "application/pdf" : viewerjs,
+        "application/vnd.oasis.opendocument.presentation" : viewerjs,
+        "application/vnd.oasis.opendocument.spreadsheet" : viewerjs,
+        "application/vnd.oasis.opendocument.text" : viewerjs,
         "^video/" : playerjs,
         "^audio/" : playerjs
       };
@@ -97,10 +101,17 @@
 
   function ApplicationReader(args, metadata) {
     DefaultApplication.apply(this, ['ApplicationReader', args, metadata, {
-      extension: [ 'html', 'htm', 'pdf'],
-      mime: [ 'text/htm', 'application/pdf' ],
+      extension: [ 'html', 'htm', 'pdf', 'odt', 'ods', 'odp' ],
+      mime: [
+        "text/htm",
+        "text/html",
+        "application/pdf",
+        "application/vnd.oasis.opendocument.presentation",
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.oasis.opendocument.text",
+      ],
       filename: 'index.html',
-      fileypes: ['htm', 'html', 'pdf'],
+      fileypes: ['html', 'htm', 'pdf', 'odt', 'ods', 'odp' ],
       readData: false
     }]);
   }

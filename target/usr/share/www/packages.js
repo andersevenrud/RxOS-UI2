@@ -358,7 +358,10 @@
         "icon": "apps/reader.png",
         "mime": [
             "text\\/html",
-            "application\\/pdf"
+            "application\\/pdf",
+            "application\\/vnd.oasis.opendocument.presentation",
+            "application\\/vnd.oasis.opendocument.spreadsheet",
+            "application\\/vnd.oasis.opendocument.text"
         ],
         "category": "utilities",
         "preload": [

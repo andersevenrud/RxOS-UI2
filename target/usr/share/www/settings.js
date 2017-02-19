@@ -295,6 +295,9 @@
             "video/x-flv": "FLV Video",
             "video/x-matroska": "MKV Video",
             "application/x-ipkg": "Itsy Package",
+            "application/vnd.oasis.opendocument.presentation": "OpenDocument Presentation",
+            "application/vnd.oasis.opendocument.spreadsheet": "OpenDocument Spreadsheet",
+            "application/vnd.oasis.opendocument.text": "OpenDocument Text",
             "osjs/document": "OS.js Document",
             "osjs/draw": "OS.js Image",
             "osjs/project": "OS.js Project"
@@ -348,6 +351,9 @@
             ".odoc": "osjs/document",
             ".odraw": "osjs/draw",
             ".oproj": "osjs/project",
+            ".odp": "application/vnd.oasis.opendocument.presentation",
+            ".ods": "application/vnd.oasis.opendocument.spreadsheet",
+            ".odt": "application/vnd.oasis.opendocument.text",
             "default": "application/octet-stream"
         }
     },
