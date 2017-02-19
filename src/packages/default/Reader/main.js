@@ -74,6 +74,9 @@
           return base + "epub.js/index.html?u=" + encodeURIComponent(u);
       };
 
+      var showdown = function(f,u) {
+          return base + "showdown/index.html?u=" + encodeURIComponent(u);
+      };
 
       var mime_map = {
         "application/pdf" : viewerjs,
@@ -83,7 +86,8 @@
         "^video/" : playerjs,
         "^audio/" : playerjs,
         "application/epub+zip" : epubjs,
-        "application/epub" : epubjs
+        "application/epub" : epubjs,
+        "text/markdown" : showdown
       };
 
       var src = encodeURIComponent(url);
@@ -113,7 +117,7 @@
   function ApplicationReader(args, metadata) {
     DefaultApplication.apply(this, ['ApplicationReader', args, metadata, {
       extension: [ 'html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
-                   'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub' ],
+                   'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub', 'md' ],
       mime: [
         "text/htm",
         "text/html",
@@ -137,11 +141,13 @@
         "text/srt",
         // epub
         "application/epub+zip",
-        "application/epub"
+        "application/epub",
+        // markdown
+        "text/markdown"
       ],
       filename: 'index.html',
       fileypes: ['html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
-                  'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub' ],
+                  'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt', 'epub', 'md' ],
       readData: false
     }]);
   }

@@ -373,7 +373,8 @@
             "text\\/vtt",
             "text\\/srt",
             "application\\/epub+zip",
-            "application\\/epub"
+            "application\\/epub",
+            "text\\/markdown"
         ],
         "category": "utilities",
         "preload": [

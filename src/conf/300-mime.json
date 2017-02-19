@@ -47,6 +47,7 @@
       "application/vnd.oasis.opendocument.text"         : "OpenDocument Text",
 
       "application/epub+zip"    : "Epub",
+      "text/markdown"           : "Markdown",
 
       "osjs/document"           : "OS.js Document",
       "osjs/draw"               : "OS.js Image",
@@ -119,6 +120,8 @@
       ".odt"    : "application/vnd.oasis.opendocument.text",
 
       ".epub"   : "application/epub+zip",
+      ".md"     : "text/markdown",
+
       "default" : "application/octet-stream"
     }
   }

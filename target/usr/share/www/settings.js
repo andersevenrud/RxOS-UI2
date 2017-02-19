@@ -302,6 +302,7 @@
             "application/vnd.oasis.opendocument.spreadsheet": "OpenDocument Spreadsheet",
             "application/vnd.oasis.opendocument.text": "OpenDocument Text",
             "application/epub+zip": "Epub",
+            "text/markdown": "Markdown",
             "osjs/document": "OS.js Document",
             "osjs/draw": "OS.js Image",
             "osjs/project": "OS.js Project"
@@ -344,7 +345,7 @@
             ".mkv": "video/x-matroska",
             ".py": "application/x-python",
             ".xml": "text/xml",
-            ".md": "text/plain",
+            ".md": "text/markdown",
             ".txt": "text/plain",
             ".log": "text/plain",
             ".doc": "text/plain",
