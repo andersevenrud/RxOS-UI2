@@ -56,14 +56,18 @@
     if ( this._scheme ) {
 
       // TODO: nasty hack, fix this
-      var base = "packages/default/Reader/";
+      var base = "/packages/default/Reader/";
 
       var viewerjs = function(f,u) {
           return base + "ViewerJS/index.html#/" + encodeURIComponent(u);
       };
 
       var playerjs = function(f,u) {
-          return encodeURIComponent(u);
+          if (f.mime.match("^audio/")) {
+              return base + "MediaElement/index.html?type=audio&u=" + encodeURIComponent(u);
+          } else {
+              return base + "MediaElement/index.html?type=video&u=" + encodeURIComponent(u);
+          }
       };
 
       var mime_map = {
@@ -101,17 +105,33 @@
 
   function ApplicationReader(args, metadata) {
     DefaultApplication.apply(this, ['ApplicationReader', args, metadata, {
-      extension: [ 'html', 'htm', 'pdf', 'odt', 'ods', 'odp' ],
+      extension: [ 'html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
+                   'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt' ],
       mime: [
         "text/htm",
         "text/html",
         "application/pdf",
+        // OpenDocument
         "application/vnd.oasis.opendocument.presentation",
         "application/vnd.oasis.opendocument.spreadsheet",
         "application/vnd.oasis.opendocument.text",
+        // Video
+        "video/ogg",
+        "video/mp4",
+        "video/webm",
+        "video/ogv",
+        //Audio
+        "audio/mp3",
+        "audio/oga",
+        "audio/ogg",
+        "audio/wav",
+        // subtitles
+        "text/vtt",
+        "text/srt",
       ],
       filename: 'index.html',
-      fileypes: ['html', 'htm', 'pdf', 'odt', 'ods', 'odp' ],
+      fileypes: ['html', 'htm', 'pdf', 'odt', 'ods', 'odp', 'ogv', 'mp4', 'webm', 'ogv',
+                  'mp3', 'oga', 'ogg', 'wav', 'vtt', 'srt' ],
       readData: false
     }]);
   }
