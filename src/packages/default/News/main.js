@@ -94,7 +94,7 @@
             var onArticleActivate = function(ev) {
                 if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
                     var selectedEntry = ev.detail.entries[0].data;
-                    text_w.set('src', "FS/get/" + selectedEntry);
+                    text_w.set('src', "FS/get/" + encodeURIComponent(selectedEntry));
                 }
             };
 
