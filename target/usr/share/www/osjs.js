@@ -98,11 +98,6 @@ window.OSjs = window.OSjs || {};
         }
       }
     },
-    body_touchstart: function(ev) {
-      if ( ev.target.localName !== 'select' ) {
-        ev.preventDefault();
-      }
-    },
     message: function(ev) {
       if ( ev && ev.data && typeof ev.data.message !== 'undefined' && typeof ev.data.pid === 'number' ) {
         var proc = OSjs.API.getProcess(ev.data.pid);
@@ -308,7 +303,6 @@ window.OSjs = window.OSjs || {};
     handler.init(_done);
   }
   function initEvents() {
-    document.body.addEventListener('touchstart', events.body_touchstart);
     document.body.addEventListener('contextmenu', events.body_contextmenu, false);
     document.body.addEventListener('click', events.body_click, false);
     document.addEventListener('keydown', events.keydown, true);
@@ -558,7 +552,6 @@ window.OSjs = window.OSjs || {};
       return;
     }
     signingOut = true;
-    document.body.removeEventListener('touchstart', events.body_touchstart);
     document.body.removeEventListener('contextmenu', events.body_contextmenu, false);
     document.body.removeEventListener('click', events.body_click, false);
     document.removeEventListener('keydown', events.keydown, true);
