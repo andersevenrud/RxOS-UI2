@@ -12,7 +12,7 @@ hw_mode=g
 ieee80211n=1
 "
 
-password=$(getconf .netConf.ap.password)
+password=$(getconf netConf.ap.password)
 
 HOSTAPD_wpa="
 auth_algs=1
@@ -25,16 +25,16 @@ ieee8021x=0
 "
 
 echo "${HOSTAPD_base}"
-echo "channel=$(getconf .netConf.ap.selectedChannel)"
-echo "ssid=$(getconf .netConf.ap.ssid)"
+echo "channel=$(getconf netConf.ap.selectedChannel)"
+echo "ssid=$(getconf netConf.ap.ssid)"
 
-hidden=$(getconf .netConf.ap.hidden)
+hidden=$(getconf netConf.ap.hidden)
 if $hidden
 then
 echo "ignore_broadcast_ssid=1"
 fi
 
-security=$(getconf .netConf.ap.securityEnabled)
+security=$(getconf netConf.ap.securityEnabled)
 if $security
 then
 echo "$HOSTAPD_wpa"

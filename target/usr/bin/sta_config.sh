@@ -13,8 +13,8 @@ fast_reauth=1
 ap_scan=1
 "
 
-ssid=$(getconf .netConf.sta.ssid)
-password=$(getconf .netConf.sta.password)
+ssid=$(getconf netConf.sta.ssid)
+password=$(getconf netConf.sta.password)
 
 WPASUPPLICANT_pwd=$(wpa_passphrase "$ssid" "$password")
 

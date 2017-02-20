@@ -1,9 +1,6 @@
 #!/bin/sh
 
-if [ -f /mnt/conf/etc/rxos_config.json ]
-then
-    jq "$1=\"$2\"" /mnt/conf/etc/rxos_config.json > /tmp/rxos_config.json && mv /tmp/rxos_config.json /mnt/conf/etc/rxos_config.json
-else
-    jq "$1=\"$2\"" /etc/rxos_config.json > /tmp/rxos_config.json && mv /tmp/rxos_config.json /mnt/conf/etc/rxos_config.json
-fi
 
+# this is VERY slow. do not overuse it.
+
+node -e 'r = require("rxos_config"); r.setConf(process.argv[1],process.argv[2],console.log);' "$1" "$2"

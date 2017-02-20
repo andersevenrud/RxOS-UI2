@@ -1,18 +1,6 @@
 #! /bin/sh
 # (c) 2016 Outernet Inc
-set -x
-if [ -f /mnt/conf/etc/rxos_config.json ]
-then
-    q=$(echo "$1" | sed 's/^\.//')
-    while [ -n "$q" ]
-    do
-        if jq -r ".overRides" /etc/rxos_config.json | grep -q ";$q;"
-        then
-            jq -r "$1" /mnt/conf/etc/rxos_config.json
-            exit 0
-        fi
-        q=$(echo "$q" | sed 's/[^.]*$//' | sed 's/\.$//')
-    done
-fi
 
-jq -r "$1" /etc/rxos_config.json
+# this is VERY slow. do not overuse it.
+
+node -e 'r = require("rxos_config"); r.getConf(process.argv[1],console.log);' "$1"

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mode=$(getconf .netConf.mode)
+mode=$(getconf netConf.mode)
 
 sync_reboot() {
     sync
