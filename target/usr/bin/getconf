@@ -1,6 +1,19 @@
-#! /bin/sh
-# (c) 2016 Outernet Inc
+#! /usr/bin/node
 
-# this is VERY slow. do not overuse it.
+//  this is _VERY_ slow. use if with care.
+// given just one query key, it returns the value
+// if more than one query key is given, it returns key=value lines, which can be eval-ed in shell.
+// the keys have their seperator dots replaced with underscores(_) as dots don't work for shell vars
 
-node -e 'r = require("rxos_config"); r.getConf(process.argv[1],console.log);' "$1"
+var r = require('rxos_config');
+
+var q = process.argv.slice(2);
+
+if (q.length>1) {
+    q.forEach(function(k) {
+        r.getConf(k, function(v) { console.log(k.replace(/\./g,'_') + '=' + v); })
+    });
+} else {
+    r.getConf(q[0], console.log);
+}
+

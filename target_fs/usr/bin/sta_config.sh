@@ -6,6 +6,8 @@
 # /etc/wpa_supplicant.conf
 sta_wpasupplicant() {
 
+eval $(getconf netConf.sta.ssid netConf.sta.password)
+
 WPASUPPLICANT_base="
 ctrl_interface=/var/run/wpa_supplicant
 update_config=1
@@ -13,10 +15,7 @@ fast_reauth=1
 ap_scan=1
 "
 
-ssid=$(getconf netConf.sta.ssid)
-password=$(getconf netConf.sta.password)
-
-WPASUPPLICANT_pwd=$(wpa_passphrase "$ssid" "$password")
+WPASUPPLICANT_pwd=$(wpa_passphrase "${netConf_sta_ssid}" "${netConf_sta_password}")
 
 echo "${WPASUPPLICANT_base}"
 
