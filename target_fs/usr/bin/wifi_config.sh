@@ -1,22 +1,29 @@
 #!/bin/sh
 
-mode=$(getconf netConf.mode)
-
-sync_reboot() {
-    sync
-    sync
-    sync
-    sleep 3
-    reboot
+ifdown_chip() {
+    ifdown wlan0
+    rmmod r8723bs
 }
 
+ifup_chip() {
+    modprobe r8723bs
+    ifup wlan0
+}
 
-if [ "$mode" == "ap" ]
-then
-    ap_config.sh
-    sync_reboot &
-elif [ "$mode" == "sta" ]
-then
-    sta_config.sh
-    sync_reboot &
-fi
+# placeholders only.
+
+ifdown_dc() {
+    ifdown wlan0
+    rmmod r8723bs
+}
+
+ifupdown_dc() {
+    modprobe r8723bs
+    ifup wlan0
+}
+
+ifdown_${RXOS_SUBPLATFORM}
+
+/etc/setup.d/wireless.sh
+
+ifup_${RXOS_SUBPLATFORM}
