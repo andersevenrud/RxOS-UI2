@@ -1,10 +1,10 @@
 
-(function(rxos_config) {
+(function(skylark_config) {
   'use strict';
 
   module.exports.getNetConf = function(args, callback, request, response) {
     if(request.session.get('groups').indexOf("admin")>-1) {
-        rxos_config.getNetConf( function (r) {
+        skylark_config.getNetConf( function (r) {
             callback(false, r);
         });
     } else {
@@ -14,7 +14,7 @@
 
   module.exports.setNetConf = function(args, callback, request, response) {
     if(request.session.get('groups').indexOf("admin")>-1) {
-        rxos_config.setNetConf(args, function (r) {
+        skylark_config.setNetConf(args, function (r) {
             callback(false, r);
         });
     } else {
@@ -28,5 +28,5 @@
   module.exports._onServerStart = function(server, instance, metadata) {
   };
 
-})(require('rxos_config'));
+})(require('skylark_config'));
 

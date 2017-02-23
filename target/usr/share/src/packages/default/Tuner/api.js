@@ -1,10 +1,10 @@
 
-(function(rxos_config) {
+(function(skylark_config) {
   'use strict';
 
   module.exports.getTunerConf = function(args, callback, request, response) {
     if(request.session.get('groups').indexOf("admin")>-1) {
-        rxos_config.getTunerConf( function (r) {
+        skylark_config.getTunerConf( function (r) {
             callback(false, r);
         });
     } else {
@@ -15,7 +15,7 @@
 
   module.exports.setTunerConf = function(args, callback, request, response) {
     if(request.session.get('groups').indexOf("admin")>-1) {
-        rxos_config.setTunerConf(args, function (r) {
+        skylark_config.setTunerConf(args, function (r) {
             callback(false, r);
         });
     } else {
@@ -41,13 +41,13 @@
   module.exports._onServerStart = function(server, instance, metadata) {
 
     // ondd/tuner status listener
-    rxos_config.getOnddClient(function(ondd) {
+    skylark_config.getOnddClient(function(ondd) {
         onddClient = ondd;
         onddClient.start();
         console.log("started ondd client");
 
         // telemetry
-        rxos_config.getTelemetryClient( function(telemetryClient) {
+        skylark_config.getTelemetryClient( function(telemetryClient) {
             telemetryClient.attachOnddClient(onddClient);
             telemetryClient.start();
             console.log("started telemetry client");
@@ -56,5 +56,5 @@
     });
   };
 
-})(require('rxos_config'));
+})(require('skylark_config'));
 

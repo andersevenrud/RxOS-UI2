@@ -5,7 +5,7 @@
 // if more than one query key is given, it returns key=value lines, which can be eval-ed in shell.
 // the keys have their seperator dots replaced with underscores(_) as dots don't work for shell vars
 
-var r = require('rxos_config');
+var r = require('skylark_config');
 
 var q = process.argv.slice(2);
 
