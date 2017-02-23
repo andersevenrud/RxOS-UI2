@@ -7,11 +7,9 @@ set -u
 # grunt config:get --name="client.ReloadOnShutdown"
 # grunt config:set --name="client.ReloadOnShutdown" --value=true
 
-
-
-# check if rxos_config.json is properly formatted
+# check if skylark_config.json is properly formatted
 echo "checking json config"
-jq --slurp empty /etc/rxos_config.json
+jq --slurp empty /etc/skylark_config.json
 
 
 if type npm 2>&1 | grep -q "not found"
@@ -67,8 +65,8 @@ echo \"$mod\"
 echo "$mod" > required_modules.target
 
 echo you may need to make the following links:
-echo '   ln -s $PWD/target_fs/etc/rxos_config.json /etc/rxos_config.json'
-echo '   ln -s $PWD/target_fs/usr/lib/node_modules/rxos_config.js node_modules/rxos_config.js'
+echo '   ln -s $PWD/target_fs/etc/skylark_config.json /etc/skylark_config.json'
+echo '   ln -s $PWD/target_fs/usr/lib/node_modules/skylark_config.js node_modules/skylark_config.js'
 
 echo run with:
 echo 'node target/usr/lib/node_modules/ui2/server/server.js www --root  $PWD/target/usr/share/'
