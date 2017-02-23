@@ -16,7 +16,7 @@ ieee80211n=1
 "
 
 HOSTAPD_wpa="
-auth_algs=1
+auth_algs=3
 wpa=2
 wpa_passphrase=${netConf_ap_password}
 wpa_key_mgmt=WPA-PSK
