@@ -76,7 +76,11 @@
             netConf['sta']['password'] = scheme.find(me,'SSIDPass').get('value');
 
             // TODO: replace "console.log" with alert box
-            app._api('setNetConf', netConf , console.log);
+            if (netConf['ap']['password'].length < 8) {
+                API.createDialog('Alert', {title: "AP config", message: "AP password must have 8 or more characters" }, null, me);
+            } else {
+                app._api('setNetConf', netConf , console.log);
+            }
         }}) (scheme, me , netConf);
 
         netsave.on('click', netsaveOnClick);
