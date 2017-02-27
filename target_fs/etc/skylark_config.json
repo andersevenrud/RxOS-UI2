@@ -28,9 +28,6 @@
         "userAgent": "Outernet Telemetry Client - HttpLink/2.1",
         "endPoint": "https://telemetry.outernet.is/Ach3Airie3dahrie9cho/statusdata"
     },
-	"configfiles": {
-		"tuner": "/mnt/data/librarian/librarian.json"
-	},
 	"cmds": {
 		"whatsNew": {
 			"cmd": "/usr/bin/whatsnew.sh",
