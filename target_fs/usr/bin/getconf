@@ -11,7 +11,7 @@ var q = process.argv.slice(2);
 
 if (q.length>1) {
     q.forEach(function(k) {
-        r.getConf(k, function(v) { console.log(k.replace(/\./g,'_') + '=' + v); })
+        r.getConf(k, function(v) { console.log(k.replace(/\./g,'_') + '="' + v + '"' ); })
     });
 } else {
     r.getConf(q[0], console.log);
