@@ -155,7 +155,7 @@
 		"selectedBeam": "emea"
 	},
 	"netConf": {
-        "hostname" : "skylark",
+        "hostname" : "outernet",
 		"mode": "ap",
 		"modes": {
 			"ap": {
