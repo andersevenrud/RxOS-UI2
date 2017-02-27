@@ -39,6 +39,9 @@
         var selected = netConf['mode'];
         mode_w.set('value', selected);
 
+        // hostname
+        scheme.find(me,'Hostname').set('value', netConf['hostname']);
+
         // ap tab
         scheme.find(me,'HotspotName').set('value', netConf['ap']['ssid']);
         scheme.find(me,'HotspotHide').set('value', netConf['ap']['hidden']);
@@ -60,6 +63,7 @@
 
         var netsaveOnClick  = (function (scheme, me, netConf) { return function() {
             // mode tab
+            netConf['hostname'] = scheme.find(me, 'Hostname').get('value');
             netConf['mode'] = scheme.find(me, 'Mode').get('value');
 
             // ap tab

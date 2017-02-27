@@ -155,6 +155,7 @@
 		"selectedBeam": "emea"
 	},
 	"netConf": {
+        "hostname" : "skylark",
 		"mode": "ap",
 		"modes": {
 			"ap": {
@@ -192,5 +193,5 @@
 			"password": ""
 		}
 	},
-    "overRides" : [ "netConf.mode", "netConf.sta", "netConf.ap", "tunerConf.selectedBeam", "tunerConf.beams.custom" ]
+    "overRides" : [ "netConf.hostname", "netConf.mode", "netConf.sta", "netConf.ap", "tunerConf.selectedBeam", "tunerConf.beams.custom" ]
 }
