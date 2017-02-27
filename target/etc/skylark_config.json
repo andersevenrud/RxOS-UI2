@@ -63,7 +63,7 @@
 			]
 		},
 		"configureWifi": {
-			"cmd": "/usr/bin/wifi_config.sh",
+			"cmd": "/usr/sbin/netrestart",
 			"args": []
 		},
 		"dmesg": {
