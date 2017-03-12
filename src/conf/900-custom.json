@@ -1,4 +1,9 @@
 {
+  "build": {
+    "dist": {
+      "template": "skylark"
+    }
+  },
   "server": {
     "http": {
       "port": 8080,
