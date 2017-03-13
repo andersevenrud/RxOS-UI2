@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,329 +27,319 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function() {
-  'use strict';
+/*eslint strict:["error", "global"]*/
+'use strict';
 
-  var _path = require('path');
+const _path = require('path');
+const _fs = require('fs-extra');
+const _glob = require('glob');
 
-  var _utils = require('./utils.js');
-  var _config = require('./config.js');
-  var _core = require('./core.js');
-  var _manifest = require('./manifest.js');
-  var _packages = require('./packages.js');
-  var _themes = require('./themes.js');
-  var _generate = require('./generate.js');
+const _config = require('./config.js');
+const _manifest = require('./manifest.js');
+const _themes = require('./themes.js');
+const _packages = require('./packages.js');
+const _core = require('./core.js');
+const _generate = require('./generate.js');
+const _utils = require('./utils.js');
+const _watcher = require('./watcher.js');
+const _logger = _utils.logger;
 
-  var ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
+const ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
 
-  /////////////////////////////////////////////////////////////////////////////
-  // HELPERS
-  /////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// HELPERS
+///////////////////////////////////////////////////////////////////////////////
 
-  /**
-   * Wrapper for getting build target(s)
-   */
-  function _getTargets(cli, defaults, strict) {
-    var target = cli.option('target');
-    var result = defaults;
+/*
+ * Parses targets from cli input
+ */
+function _getTargets(cli, defaults, strict) {
+  const target = cli.option('target');
 
-    if ( target ) {
-      result = target.split(',').map(function(iter) {
-        var val = iter.trim();
-        return strict ? (defaults.indexOf(val) === -1 ? null : val) : val;
-      }).filter(function(iter) {
-        return !!iter;
-      });
-    }
-    return strict ? (!result.length ? defaults : result) : result;
+  let result = defaults;
+  if ( target ) {
+    result = target.split(',').map((iter) => {
+      const val = iter.trim();
+      return strict ? (defaults.indexOf(val) === -1 ? null : val) : val;
+    }).filter((iter) => {
+      return !!iter;
+    });
   }
 
-  /**
-   * Wrapper for getting name option
-   */
-  function _configAction(cli, cfg, done, cb) {
-    var name = cli.option('name');
-    if ( !name ) {
-      return done('No name provided');
-    }
-    cb(name);
+  return strict ? (!result.length ? defaults : result) : result;
+}
+
+/*
+ * Iterates all given tasks
+ */
+function _eachTask(cli, args, taskName, namespace) {
+  if ( !args ) {
+    return Promise.reject('Not enough arguments');
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // API
-  /////////////////////////////////////////////////////////////////////////////
+  return new Promise((resolve, reject) => {
+    _config.getConfiguration().then((cfg) => {
+      _utils.eachp(args.replace(/\s/, '').split(',').map((iter) => {
+        return function() {
+          iter = (iter || '').replace('-', '_');
+          if ( typeof namespace === 'function' ) {
+            return namespace(cli, cfg, iter);
+          } else {
+            if ( namespace[iter] ) {
+              _logger.log(_logger.color('Running task:', 'bold'), _logger.color([taskName, iter].join(':'), 'green'));
+              return namespace[iter](cli, cfg);
+            }
+          }
 
-  var CONFIG_ACTIONS = {
+          return Promise.reject('Invalid task: ' + iter);
+        };
+      })).then(resolve).catch(reject);
+    }).catch(reject);
+  });
+}
 
-    add_mount: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.addMount(cfg, name, cli.option('description'), cli.option('path'), done);
-      });
-    },
-    add_preload: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.addPreload(cfg, name, cli.option('path'), cli.option('type'), done);
-      });
-    },
-    add_repository: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.addRepository(cfg, name, done);
-      });
-    },
-    remove_repository: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.removeRepository(cfg, name, done);
-      });
-    },
-    enable_package: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.enablePackage(cfg, name, done);
-      });
-    },
-    disable_package: function(cli, cfg, done) {
-      _configAction(cli, cfg, done, function(name) {
-        _config.enablePackage(cfg, name, done);
-      });
-    },
-    list_packages: function(cli, cfg, done) {
-      _config.listPackages(cfg, done);
-    },
-    set: function(cli, cfg, done) {
-      _config.set(cfg, cli.option('name'), cli.option('value'), function(val) {
-        console.log(val);
-        done();
-      });
-    },
-    get: function(cli, cfg, done) {
-      _config.get(cfg, cli.option('name'), function(val) {
-        console.log(val);
-        done();
-      });
-    }
+///////////////////////////////////////////////////////////////////////////////
+// TASKS
+///////////////////////////////////////////////////////////////////////////////
 
-  };
+const TASKS = {
+  build: {
+    config: function(cli, cfg) {
+      const list = _getTargets(cli, ['client', 'server'], true);
 
-  var BUILD_ACTIONS = {
-
-    config: function(cli, cfg, done) {
-      var list = _getTargets(cli, ['client', 'server'], true);
-      _utils.iterate(list, function(target, idx, next) {
-        _config.writeConfiguration({
-          verbose: cli.option('verbose'),
-          nw: cli.option('nw'),
-          standalone: cli.option('standalone'),
-          target: target
-        }, next)
-      }, done)
+      return Promise.all(list.map((target) => {
+        return _config.writeConfiguration(target, cli, cfg);
+      }));
     },
 
-    core: function(cli, cfg, done) {
-      var list = _getTargets(cli, ['dist', 'dist-dev']);
-      _utils.iterate(list, function(target, idx, next) {
-        console.log('Generating files for', target);
-        _core.buildFiles({
-          target: target,
-          verbose: cli.option('verbose'),
-          nw: cli.option('nw'),
-          standalone: cli.option('standalone'),
-          compress: cli.option('compress'),
-          repositories: cfg.repositories,
-          handler: cfg.handler,
-          client: cfg.client,
-          build: cfg.build
-        }, next);
-      }, done);
+    core: function(cli, cfg) {
+      const list = _getTargets(cli, ['dist', 'dist-dev']);
+
+      return Promise.all(list.map((target) => {
+        return _core.buildFiles(target, cli, cfg);
+      }));
     },
 
-    themes: function(cli, cfg, done) {
-      _themes.buildAll(cfg, done)
-    },
-
-    theme: function(cli, cfg, done) {
-      var targets = [
-        [cli.option('style'), function(val, cb) {
-          _themes.buildStyle(cfg, val, cb);
-        }],
-        [cli.option('icons'), function(val, cb) {
-          _themes.buildIcon(cfg, val, cb);
-        }],
-        [cli.option('static'), function(val, cb) {
-          _themes.buildStatic(cfg, cb);
-        }],
-        [cli.option('fonts'), function(val, cb) {
-          _themes.buildFonts(cfg, cb);
-        }]
+    theme: function(cli, cfg) {
+      const targets = [
+        [cli.option('style'), _themes.buildStyle],
+        [cli.option('icons'), _themes.buildIcon],
+        [cli.option('static'), _themes.buildStatic],
+        [cli.option('fonts'), _themes.buildFonts]
       ];
 
-      _utils.iterate(targets, function(iter, idx, next) {
-        if ( typeof iter[0] === 'string' ) {
-          iter[1](iter[0], next);
-        } else {
-          next();
-        }
-      }, function() {
-        done();
+      const list = targets.filter((iter) => {
+        return iter && iter[0];
+      }).map((iter) => {
+        return iter[1](cli, cfg, iter[0]);
       });
+
+      return Promise.all(list);
     },
 
-    manifest: function(cli, cfg, done) {
-      var list = _getTargets(cli, ['dist', 'dist-dev']);
+    themes: function(cli, cfg) {
+      return _themes.buildAll(cli, cfg);
+    },
+
+    manifest: function(cli, cfg) {
+      const list = _getTargets(cli, ['dist', 'dist-dev']);
       list.push('server');
 
-      var forceEnabled = _config.getConfigPath(cfg, 'packages.ForceEnable') || [];
-      var forceDisabled = _config.getConfigPath(cfg, 'packages.ForceDisable') || [];
-
-      _utils.iterate(list, function(key, idx, next) {
-        console.log('Generating manifest for', key);
-        _manifest.writeManifest({
-          standalone: cli.option('standalone'),
-          verbose: cli.option('verbose'),
-          force: {
-            enabled: forceEnabled,
-            disabled: forceDisabled
-          },
-          repositories: cfg.repositories,
-          target: key
-        }, next)
-      }, done)
+      return Promise.all(list.map((target) => {
+        return _manifest.writeManifest(target, cli, cfg);
+      }));
     },
 
-    packages: function(cli, cfg, done) {
-      var list = _getTargets(cli, ['dist', 'dist-dev']);
-      _utils.iterate(list, function(target, idx, next) {
-        _packages.buildPackages({
-          verbose: cli.option('verbose'),
-          compress: cli.option('compress'),
-          standalone: cli.option('standalone'),
-          repositories: cfg.repositories,
-          target: target
-        }, next);
-      }, done);
-    },
+    package: function(cli, cfg) {
+      const list = _getTargets(cli, ['dist', 'dist-dev']);
 
-    package: function(cli, cfg, done, backwardCompability) {
-      backwardCompability = backwardCompability || {};
-
-      var name = backwardCompability.name || cli.option('name');
+      const name = cli.option('name');
       if ( !name || name.indexOf('/') === -1 ) {
         throw new Error('Invalid package name');
       }
 
-      var list = _getTargets(cli, ['dist', 'dist-dev']);
-      _utils.iterate(list, function(target, idx, next) {
-        _packages.buildPackage({
-          name: name,
-          target: target,
-          standalone: cli.option('standalone'),
-          verbose: cli.option('verbose'),
-          compress: cli.option('compress')
-        }, next)
-      }, done);
+      return Promise.all(list.map((target) => {
+        return _packages.buildPackage(target, cli, cfg, name);
+      }));
+    },
+
+    packages: function(cli, cfg) {
+      const list = _getTargets(cli, ['dist', 'dist-dev']);
+      return _utils.eachp(list.map((target) => {
+        return function() {
+          return _packages.buildPackages(target, cli, cfg);
+        };
+      }));
     }
+  },
 
-  };
-
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * cli config:X
-   */
-  module.exports.config = function(cli, arg, done, misc) {
-    arg = arg.replace('-', '_');
-
-    if ( !CONFIG_ACTIONS[arg] ) {
-      console.error('Invalid argument');
-      return done();
+  config: {
+    set: function(cli, cfg) {
+      return _config.set(cfg, cli.option('name'), cli.option('value'), cli.option('import'), cli.option('out'));
+    },
+    get: function(cli, cfg) {
+      return _config.get(cfg, cli.option('name'));
+    },
+    add_mount: function(cli, cfg) {
+      return _config.addMount(cfg, cli.option('name'), cli.option('description') || cli.option('desc'), cli.option('path'), cli.option('transport'), cli.option('ro'));
+    },
+    add_preload: function(cli, cfg) {
+      return _config.addPreload(cfg, cli.option('name'), cli.option('path'), cli.option('type'));
+    },
+    add_repository: function(cli, cfg) {
+      return _config.addRepository(cfg, cli.option('name'));
+    },
+    add_script: function(cli, cfg) {
+      return _config.addOverlayFile(cfg, 'javascript', cli.option('path'), cli.option('overlay', 'custom'));
+    },
+    add_style: function(cli, cfg) {
+      return _config.addOverlayFile(cfg, 'stylesheets', cli.option('path'), cli.option('overlay', 'custom'));
+    },
+    add_locale: function(cli, cfg) {
+      return _config.addOverlayFile(cfg, 'locales', cli.option('path'), cli.option('overlay', 'custom'));
+    },
+    remove_repository: function(cli, cfg) {
+      return _config.removeRepository(cfg, cli.option('name'));
+    },
+    enable_package: function(cli, cfg) {
+      return _config.enablePackage(cfg, cli.option('name'));
+    },
+    disable_package: function(cli, cfg) {
+      return _config.disablePackage(cfg, cli.option('name'));
+    },
+    list_packages: function(cli, cfg) {
+      return _config.listPackages(cfg);
     }
+  },
 
-    _config.getConfiguration({}, function(err, cfg) {
-      CONFIG_ACTIONS[arg](cli, cfg, function(err) {
-        if ( err ) {
-          console.warn(err);
-        }
-        done();
+  generate: function(cli, cfg, task) {
+    if ( _generate[task] ) {
+      return new Promise((resolve, reject) => {
+        _generate[task](cli, cfg).then((arg) => {
+
+          const out = cli.option('out');
+          if ( out ) {
+            _fs.writeFileSync(out, String(arg));
+            return resolve();
+          } else if ( arg ) {
+            _logger.log(arg);
+          }
+
+          resolve();
+        }).catch(reject);
       });
-    });
-  };
-
-  /**
-   * cli build:X
-   */
-  module.exports.build = function build(cli, arg, done, misc) {
-    if ( !arg ) {
-      arg = 'config,core,themes,manifest,packages';
+    } else {
+      return Promise.reject('Invalid generator: ' + task);
     }
+  }
+};
 
-    _utils.iterate(arg.split(','), function(a, idx, next) {
-      a = a.trim();
-
-      if ( BUILD_ACTIONS[a] ) {
-        _config.getConfiguration({}, function(err, cfg) {
-          BUILD_ACTIONS[a](cli, cfg, function(err) {
-            if ( err ) {
-              console.warn(err);
-            }
-
-            next();
-          }, misc);
-        });
-      } else {
-        console.error('Invalid argument ' + a);
-        next();
-      }
-    }, function() {
-      done();
-    });
-  };
-
-  /**
-   * cli generate:X
-   */
-  module.exports.generate = function build(cli, arg, done, misc) {
-    _config.getConfiguration({}, function(err, cfg) {
-      console.log('Generating', arg);
-
-      _generate.generate(cfg, arg, {
-        target: cli.option('target') || 'dist-dev',
-        verbose: cli.option('verbose'),
-        out: cli.option('out'),
-        name: cli.option('name'),
-        type: cli.option('type')
-      }, function(e) {
-        if ( e ) {
-          console.error(e);
-        }
-        done();
-      });
-    });
-  };
-
-  /**
-   * cli run
-   */
-  module.exports.run = function run(cli, arg, done) {
-    var serverRoot = _path.join(ROOT, 'src', 'server', 'node');
-    var _server = require(_path.join(serverRoot, 'http.js'));
-    process.chdir(ROOT);
-
-    process.on('exit', function() {
-      _server.close();
-    });
-
-    process.on('uncaughtException', function(error) {
-      console.log('UNCAUGHT EXCEPTION', error, error.stack);
-    });
-
-    _server.listen({
-      port: cli.option('port'),
-      dirname: serverRoot,
-      root: ROOT,
-      dist: cli.option('target') || 'dist-dev',
-      logging: !cli.option('silent'),
-      nw: false
-    });
-  };
-
+const ORIGINAL_TASKS = (function() {
+  const tmp = {};
+  Object.keys(TASKS).forEach(function(s) {
+    tmp[s] = Object.keys(TASKS[s]);
+  });
+  return tmp;
 })();
+
+///////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Init
+ */
+module.exports._init = function() {
+  _glob.sync(_path.join(__dirname, 'modules/*.js')).forEach((file) => {
+    require(file).register(TASKS);
+  });
+};
+
+/*
+ * Task: `build`
+ */
+module.exports.build = function(cli, args) {
+  if ( !args ) {
+    args = ['config', 'core', 'themes', 'manifest', 'packages'];
+
+    args = args.concat(Object.keys(TASKS.build).filter(function(i) {
+      return ORIGINAL_TASKS.build.indexOf(i) === -1 && args.indexOf(i) === -1;
+    })).join(',');
+  }
+
+  return _eachTask(cli, args, 'build', TASKS.build);
+};
+
+/*
+ * Task: `config`
+ */
+module.exports.config = function(cli, arg) {
+  return new Promise((resolve, reject) => {
+    arg = (arg || '').replace('-', '_');
+
+    if ( TASKS.config[arg] ) {
+      _config.getConfiguration().then((cfg) => {
+        TASKS.config[arg](cli, cfg).then((arg) => {
+          if ( typeof arg !== 'undefined' ) {
+            _logger.log(arg);
+          }
+          resolve();
+        }).catch(reject);
+      });
+    } else {
+      reject('Invalid action: ' + arg);
+    }
+  });
+};
+
+/*
+ * Task: `watch`
+ */
+module.exports.watch = function(cli, args) {
+  return _watcher.watch();
+};
+
+/*
+ * Task: `generate`
+ */
+module.exports.generate = function(cli, args) {
+  return _eachTask(cli, args, 'generate', TASKS.generate);
+};
+
+/*
+ * Task: `run`
+ */
+module.exports.run = function(cli, args) {
+  const instance = require(_path.join(ROOT, 'src/server/node/core/instance.js'));
+  const settings = require(_path.join(ROOT, 'src/server/node/core/settings.js'));
+
+  const opts = {
+    PORT: cli.option('port'),
+    LOGLEVEL: cli.option('loglevel'),
+    DIST: cli.option('target') || 'dist-dev'
+  };
+
+  instance.init(opts).then((env) => {
+    const config = settings.get();
+    if ( config.tz ) {
+      process.env.TZ = config.tz;
+    }
+
+    process.on('exit', () => {
+      instance.destroy();
+    });
+
+    instance.run();
+
+    process.on('uncaughtException', (error) => {
+      _logger.log('UNCAUGHT EXCEPTION', error, error.stack);
+    });
+  }).catch((error) => {
+    _logger.log(error);
+    process.exit(1);
+  });
+
+  return new Promise(() => {
+    // This is one promise we can't keep! :(
+  });
+};

@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -284,8 +284,8 @@
     // DefaultApplication
     'ERR_FILE_APP_OPEN'         : 'Kan ikke åpne filen',
     'ERR_FILE_APP_OPEN_FMT'     : 'Filen {0} ble ikke åpnet fordi MIME {1} ikke er støttet',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Filen {0} ble ikke åpnet',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Filen {0} ble ikke lagret',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Filen {0} ble ikke åpnet: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Filen {0} ble ikke lagret: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Applikasjon Feil',
     'ERR_GENERIC_APP_ACTION_FMT': 'Klarte ikke utføre operasjon \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Ukjent feil',
@@ -448,6 +448,8 @@
     'LBL_OPACITY' : 'Gjennomsiktighet',
     'LBL_ONTOP' : 'Topp',
     'LBL_ITEMS' : 'Objekter',
-    'LBL_GENERAL' : 'Generelt'
+    'LBL_GENERAL' : 'Generelt',
+    'LBL_LOCK': 'Lås',
+    'LBL_UNLOCK': 'Lås opp'
   };
 })();

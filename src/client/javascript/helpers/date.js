@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
  * @licence Simplified BSD License
  */
 
+/*eslint valid-jsdoc: "off"*/
 (function(Utils, VFS, API) {
   'use strict';
 
@@ -44,6 +45,7 @@
   }
 
   function format(fmt, date) {
+    /*eslint no-use-before-define: "off"*/
     var utc;
 
     if ( typeof fmt === 'undefined' || !fmt ) {
@@ -61,6 +63,7 @@
   }
 
   function _now(now) {
+    /*eslint no-use-before-define: "off"*/
     return now ? (now instanceof ExtendedDate ? now.date : now) : new Date();
   }
 

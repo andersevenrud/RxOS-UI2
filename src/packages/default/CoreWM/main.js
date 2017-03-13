@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(WindowManager, GUI, Utils, API, VFS) {
   'use strict';
 
@@ -47,6 +49,14 @@
     return cfg;
   }
 
+  function translate() {
+    var _ = OSjs.Applications.CoreWM._;
+    if ( typeof _ !== 'function' ) {
+      _ = API._;
+    }
+    return _.apply(_, arguments);
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   // APPLICATION
   /////////////////////////////////////////////////////////////////////////////
@@ -60,13 +70,13 @@
     WindowManager.apply(this, ['CoreWM', this, args, metadata, defaultSettings(importSettings)]);
 
     this.panels           = [];
+    this.widgets          = [];
     this.switcher         = null;
     this.iconView         = null;
     this.$themeLink       = null;
     this.$themeScript     = null;
     this.$animationLink   = null;
     this.importedSettings = Utils.mergeObject(API.getConfig('SettingsManager.CoreWM'), importSettings);
-    this.isResponsive     = window.innerWidth <= 800;
 
     this.generatedHotkeyMap = {};
 
@@ -145,8 +155,8 @@
   CoreWM.prototype.init = function() {
     var link = (OSjs.Core.getConfig().Connection.RootURI || '/') + 'blank.css';
 
-    this.setThemeLink(Utils.checkdir(link));
-    this.setAnimationLink(Utils.checkdir(link));
+    this.setThemeLink(link);
+    this.setAnimationLink(link);
 
     WindowManager.prototype.init.apply(this, arguments);
   };
@@ -155,7 +165,7 @@
     var self = this;
 
     function initNotifications() {
-      var user = OSjs.Core.getHandler().getUserData();
+      var user = OSjs.Core.getAuthenticator().getUser();
 
       function displayMenu(ev) {
         OSjs.API.createMenu([{
@@ -174,6 +184,52 @@
         if ( notif ) {
           API.toggleFullscreen(notif.opts._isFullscreen ? document : docElm, !notif.opts._isFullscreen);
         }
+      }
+
+      function displayDevMenu(ev) {
+        var don = Utils.$hasClass(document.body, 'debug');
+        var apps = API.getProcesses().filter(function(iter) {
+          return iter !== null && iter instanceof OSjs.Core.Application;
+        }).map(function(iter) {
+          return {
+            title: iter.__label + ' (pid:' + iter.__pid + ')',
+            onClick: function() {
+              API.relaunch(iter.__pid);
+            }
+          };
+        });
+
+        var mnu = [{
+          title: don ? 'Turn off debug overlay' : 'Turn on debug overlay',
+          onClick: function() {
+            if ( don ) {
+              Utils.$removeClass(document.body, 'debug');
+            } else {
+              Utils.$addClass(document.body, 'debug');
+            }
+          }
+        }, {
+          title: 'Reload manifest',
+          onClick: function() {
+            OSjs.Core.getPackageManager().load(function() {
+              // noop
+            });
+          }
+        }, {
+          title: 'Reload running application',
+          menu: apps
+        }];
+
+        OSjs.API.createMenu(mnu, ev);
+      }
+
+      if ( API.getConfig('Connection.Dist') !== 'dist' ) {
+        self.createNotificationIcon('_DeveloperNotification', {
+          image: API.getIcon('categories/gnome-devel.png', '16x16'),
+          title: 'Developer Tools',
+          onContextMenu: displayDevMenu,
+          onClick: displayDevMenu
+        });
       }
 
       if ( self.getSetting('fullscreen') ) {
@@ -195,36 +251,25 @@
 
     this.applySettings(this._settings.get());
 
-    this._on('vfs', function(msg, obj) {
-      if ( !obj || msg.match(/^vfs:(un)?mount/) ) {
-        return;
-      }
-
-      var wasTouched = false;
-      var desktopPath = self.getSetting('desktopPath');
-
-      function _check(f) {
-        return f.path.substr(0, desktopPath.length) === desktopPath;
-      }
-
-      if ( obj.destination ) {
-        wasTouched = _check(obj.destination);
-        if ( !wasTouched ) {
-          wasTouched = _check(obj.source);
+    try {
+      VFS.watch(VFS.file(this.getSetting('desktopPath'), 'dir'), function(msg, obj) {
+        if ( !obj || msg.match(/^vfs:(un)?mount/) ) {
+          return;
         }
-      } else {
-        wasTouched = _check(obj);
-      }
 
-      if ( wasTouched && self.iconView ) {
-        self.iconView._refresh();
-      }
-    });
+        if ( self.iconView ) {
+          self.iconView._refresh();
+        }
+      });
+    } catch ( e ) {
+      console.warn('Failed to apply CoreWM VFS watch', e, e.stack);
+    }
 
-    self.initSwitcher();
-    self.initDesktop();
-    self.initPanels();
-    self.initIconView();
+    this.initSwitcher();
+    this.initDesktop();
+    this.initPanels();
+    this.initWidgets();
+    this.initIconView();
 
     initNotifications();
 
@@ -234,7 +279,7 @@
   CoreWM.prototype.destroy = function(force) {
     /*eslint new-cap: "warn"*/
 
-    if ( !force && !window.confirm(OSjs.Applications.CoreWM._('Killing this process will stop things from working!')) ) {
+    if ( !force && !window.confirm(translate('Killing this process will stop things from working!')) ) {
       return false;
     }
 
@@ -249,6 +294,8 @@
 
     // Reset
     this.destroyPanels();
+    this.destroyWidgets();
+
     var settings = this.importedSettings;
     try {
       settings.background = 'color';
@@ -272,6 +319,13 @@
       p.destroy();
     });
     this.panels = [];
+  };
+
+  CoreWM.prototype.destroyWidgets = function() {
+    this.widgets.forEach(function(w) {
+      w.destroy();
+    });
+    this.widgets = [];
   };
 
   // Copy from Application
@@ -324,14 +378,6 @@
         self.onDropFile(ev, el, files, args);
       }
     });
-
-    document.addEventListener('contextmenu', function(ev) {
-      return self.onContextMenu(ev);
-    }, true);
-
-    document.addEventListener('click', function(ev) {
-      return self.onGlobalClick(ev);
-    }, true);
   };
 
   CoreWM.prototype.initPanels = function(applySettings) {
@@ -376,7 +422,7 @@
             self.notification({
               icon: 'status/important.png',
               title: 'CoreWM',
-              message: OSjs.Applications.CoreWM._('An error occured while creating PanelItem: {0}', e)
+              message: translate('An error occured while creating PanelItem: {0}', e)
             });
           }
         });
@@ -390,7 +436,7 @@
         timeout : 0,
         icon: 'status/important.png',
         title: 'CoreWM',
-        message: OSjs.Applications.CoreWM._('Your panel has no items. Go to settings to reset default or modify manually\n(This error may occur after upgrades of OS.js)')
+        message: translate('Your panel has no items. Go to settings to reset default or modify manually\n(This error may occur after upgrades of OS.js)')
       });
     }
 
@@ -417,6 +463,32 @@
     setTimeout(function() {
       self.setStyles(self._settings.get());
     }, 1000);
+  };
+
+  CoreWM.prototype.initWidgets = function(applySettings) {
+    var self = this;
+
+    this.destroyWidgets();
+
+    var widgets = this.getSetting('widgets');
+
+    (widgets || []).forEach(function(item) {
+      if ( !item.settings ) {
+        item.settings = {};
+      }
+
+      var settings = new OSjs.Helpers.SettingsFragment(item.settings, 'CoreWM');
+
+      try {
+        var w = new OSjs.Applications.CoreWM.Widgets[item.name](settings);
+        w.init(document.body);
+        self.widgets.push(w);
+
+        w._inited();
+      } catch ( e ) {
+        console.warn('CoreWM::initWidgets()', e, e.stack);
+      }
+    });
   };
 
   CoreWM.prototype.initIconView = function() {
@@ -446,11 +518,11 @@
   //
 
   CoreWM.prototype.resize = function(ev, rect, wasInited) {
+    WindowManager.prototype.resize.apply(this, arguments);
 
     var space = this.getWindowSpace();
     var margin = this.getSetting('desktopMargin');
     var windows = this._windows;
-    var responsive = window.innerWidth <= 800;
 
     function moveIntoView() {
       var i = 0, l = windows.length, iter, wrect;
@@ -497,27 +569,11 @@
       }
     }
 
-    function emitResize() {
-      windows.forEach(function(w) {
-        if ( w ) {
-          w._emit('resize');
-        }
-      });
-    }
-
-    if ( responsive ) {
-      emitResize();
-    } else {
-      if ( this.isResponsive ) { // Emit the resize signal again if we changed view
-        emitResize();
-      }
-
+    if ( !this._isResponsive ) {
       if ( this.getSetting('moveOnResize') ) {
         moveIntoView();
       }
     }
-
-    this.isResponsive = responsive;
   };
 
   CoreWM.prototype.onDropLeave = function() {
@@ -548,18 +604,24 @@
     };
 
     var _openMenu = function(data) {
-      var pos = {x: ev.clientX, y: ev.clientY};
       OSjs.API.createMenu([{
-        title: OSjs.Applications.CoreWM._('Create shortcut'),
+        title: translate('LBL_COPY'),
+        onClick: function() {
+          var dst = Utils.pathJoin(OSjs.Core.getWindowManager().getSetting('desktopPath'), data.filename);
+          VFS.copy(data, dst, function() {});
+        }
+      /*}, {
+        title: translate('Create shortcut'),
         onClick: function() {
           _createShortcut.call(self, data);
         }
+        */
       }, {
-        title: OSjs.Applications.CoreWM._('Set as wallpaper'),
+        title: translate('Set as wallpaper'),
         onClick: function() {
           _applyWallpaper.call(self, data);
         }
-      }], pos);
+      }], ev);
     };
 
     if ( item ) {
@@ -657,6 +719,9 @@
     if ( ev === 'focus' ) {
       if ( this.iconView ) {
         this.iconView.blur();
+        this.widgets.forEach(function(w) {
+          w.blur();
+        });
       }
     }
   };
@@ -762,7 +827,7 @@
 
       var preventTimeout;
       function _onanimationend(ev) {
-        if ( typeof self._animationCallback === 'function') {
+        if ( typeof animationCallback === 'function') {
           clearTimeout(preventTimeout);
           preventTimeout = setTimeout(function() {
             animationCallback(ev);
@@ -844,7 +909,7 @@
 
     /*
     menu.push({
-      title: OSjs.Applications.CoreWM._('Open settings'),
+      title: translate('Open settings'),
       onClick: function(ev) {
         self.showSettings();
       }
@@ -853,14 +918,14 @@
 
     if ( this.getSetting('enableIconView') === true ) {
       menu.push({
-        title: OSjs.Applications.CoreWM._('Hide Icons'),
+        title: translate('Hide Icons'),
         onClick: function(ev) {
           self.applySettings({enableIconView: false}, false, true);
         }
       });
     } else {
       menu.push({
-        title: OSjs.Applications.CoreWM._('Show Icons'),
+        title: translate('Show Icons'),
         onClick: function(ev) {
           self.applySettings({enableIconView: true}, false, true);
         }
@@ -894,6 +959,8 @@
 
     if ( save ) {
       this.initPanels(true);
+      this.initWidgets(true);
+
       if ( settings ) {
         if ( settings.language ) {
           OSjs.Core.getSettingsManager().set('Core', 'Locale', settings.language, triggerWatch);
@@ -995,7 +1062,7 @@
 
     if ( this.$animationLink ) {
       if ( settings.animations ) {
-        this.setAnimationLink(API.getApplicationResource(this, 'animations.css'));
+        this.setAnimationLink(this._getResource('animations.css'));
       } else {
         this.setAnimationLink(API.getThemeCSS(null));
       }
@@ -1048,7 +1115,8 @@
       });
     }
 
-    raw += '@media all and (max-width: 800px) {\n';
+    var mw = this.getDefaultSetting('fullscreenTrigger') || 800;
+    raw += '@media all and (max-width: ' + String(mw) + 'px) {\n';
     raw += 'application-window {\n';
 
     var borderSize = 0;
@@ -1058,10 +1126,10 @@
       borderSize = theme.style.window.border;
     }
 
-    raw += 'top:' + String(space.top + borderSize) + 'px !important;\n';
-    raw += 'left:' + String(space.left + borderSize) + 'px !important;\n';
-    raw += 'right:' + String(borderSize) + 'px !important;\n';
-    raw += 'bottom:' + String(space.bottom + borderSize) + 'px !important;\n';
+    raw += 'top: calc(' + String(space.top) + 'px + ' + borderSize + ') !important;\n';
+    raw += 'left: calc(' + String(space.left) + 'px + ' + borderSize + ') !important;\n';
+    raw += 'right: calc(' + String(borderSize) + ') !important;\n';
+    raw += 'bottom: calc(' + (space.bottom ? String(space.bottom) + 'px + ' : '') + borderSize + ') !important;\n';
     raw += '\n}';
     raw += '\n}';
 
@@ -1188,7 +1256,7 @@
     return this.panels[(idx || 0)];
   };
 
-  CoreWM.prototype.getStyleTheme = function(returnMetadata) {
+  CoreWM.prototype.getStyleTheme = function(returnMetadata, convert) {
     var name = this.getSetting('styleTheme') || null;
     if ( returnMetadata ) {
       var found = null;
@@ -1199,8 +1267,35 @@
           }
         });
       }
+
+      // FIXME: Optimize
+      if ( found && convert === true ) {
+        var tmpEl = document.createElement('div');
+        tmpEl.style.visibility = 'hidden';
+        tmpEl.style.position = 'fixed';
+        tmpEl.style.top = '-10000px';
+        tmpEl.style.left = '-10000px';
+        tmpEl.style.width = '1em';
+        tmpEl.style.height = '1em';
+
+        document.body.appendChild(tmpEl);
+        var wd = tmpEl.offsetWidth;
+        tmpEl.parentNode.removeChild(tmpEl);
+
+        if ( typeof found.style.window.margin === 'string' && found.style.window.margin.match(/em$/) ) {
+          var marginf = parseFloat(found.style.window.margin);
+          found.style.window.margin = marginf * wd;
+        }
+
+        if ( typeof found.style.window.border === 'string' && found.style.window.border.match(/em$/) ) {
+          var borderf = parseFloat(found.style.window.border);
+          found.style.window.border = borderf * wd;
+        }
+      }
+
       return found;
     }
+
     return name;
   };
 
@@ -1225,6 +1320,7 @@
   OSjs.Applications.CoreWM                   = OSjs.Applications.CoreWM || {};
   OSjs.Applications.CoreWM.Class             = Object.seal(CoreWM);
   OSjs.Applications.CoreWM.PanelItems        = OSjs.Applications.CoreWM.PanelItems || {};
+  OSjs.Applications.CoreWM.Widgets           = OSjs.Applications.CoreWM.Widgets || {};
   OSjs.Applications.CoreWM.CurrentTheme      = OSjs.Applications.CoreWM.CurrentTheme || null;
 
 })(OSjs.Core.WindowManager, OSjs.GUI, OSjs.Utils, OSjs.API, OSjs.VFS);

@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,269 +27,267 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(_fs, _path, _utils) {
-  'use strict';
 
-  var ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
+/*eslint strict:["error", "global"]*/
+'use strict';
 
-  /////////////////////////////////////////////////////////////////////////////
-  // HELPERS
-  /////////////////////////////////////////////////////////////////////////////
+const _path = require('path');
+const _glob = require('glob-promise');
+const _fs = require('fs-extra');
 
-  /**
-   * Supresses errors while removing files
-   */
-  function _removeSilent(file) {
-    try {
-      _fs.removeSync(file);
-    } catch (e) {}
-  }
+const _utils = require('./utils.js');
+const _logger = _utils.logger;
 
-  /**
-   * Supresses errors while making directories
-   */
-  function _mkdirSilent(file) {
-    try {
-      _fs.mkdirSync(file);
-    } catch (e) {}
-  }
+const ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
 
-  /**
-   * Gets a list of directories
-   */
-  function _getDirectories(dir) {
-    var list = [];
-    _fs.readdirSync(dir).forEach(function(iter) {
-      if ( !iter.match(/^\./) ) {
-        var s = _fs.lstatSync(_path.join(dir, iter));
-        if ( s.isDirectory() || s.isSymbolicLink() ) {
-          list.push(iter);
-        }
-      }
+///////////////////////////////////////////////////////////////////////////////
+// API
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Reads all theme metadata
+ */
+function readMetadata(cfg) {
+
+  const themes = _path.join(ROOT, 'src', 'client', 'themes');
+
+  const result = {
+    fonts: [],
+    icons: [],
+    sounds: [],
+    styles: []
+  };
+
+  function _readMetadata(dir, whitelist) {
+
+    return new Promise((resolve, reject) => {
+      whitelist = whitelist || [];
+
+      _glob(_path.join(themes, dir, '*', 'metadata.json')).then((files) => {
+        const list = files.filter((check) => {
+          const d = _path.basename(_path.dirname(check));
+          return whitelist.indexOf(d) >= 0;
+        }).map((check) => {
+          return _fs.readJsonSync(check);
+        });
+
+        resolve(list);
+      });
     });
-    return list;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // API
-  /////////////////////////////////////////////////////////////////////////////
+  function _readFonts(dir, whitelist) {
+    return new Promise((resolve, reject) => {
+      _glob(_path.join(themes, dir, '*', 'style.css')).then((files) => {
+        resolve(files.map((check) => {
+          return _path.basename(_path.dirname(check));
+        }));
+      });
+    });
+  }
 
-  /**
-   * Builds all fonts
-   */
-  function buildFonts(cfg, done) {
-    console.log('Building fonts');
-    _mkdirSilent(_path.join(ROOT, 'dist', 'themes', 'fonts'));
+  return new Promise((resolve, reject) => {
+    return Promise.all([
+      new Promise((yes, no) => {
+        _readFonts('fonts', cfg.themes.fonts).then((list) => {
+          result.fonts = list;
+          yes();
+        }).catch(no);
+      }),
+      new Promise((yes, no) => {
+        _readMetadata('icons', cfg.themes.icons).then((list) => {
+          result.icons = list;
+          yes();
+        }).catch(no);
+      }),
+      new Promise((yes, no) => {
+        _readMetadata('sounds', cfg.themes.sounds).then((list) => {
+          result.sounds = list;
+          yes();
+        }).catch(no);
+      }),
+      new Promise((yes, no) => {
+        _readMetadata('styles', cfg.themes.styles).then((list) => {
+          result.styles = list;
+          yes();
+        }).catch(no);
+      })
+    ]).then(() => {
+      resolve(result);
+    }).catch(reject);
+  });
+}
 
-    var rep = cfg.client.Connection.FontURI;
+///////////////////////////////////////////////////////////////////////////////
+// TASKS
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Builds fonts
+ */
+function buildFonts(cli, cfg) {
+  return new Promise((resolve, reject) => {
+    _logger.log('Building fonts');
+    _utils.mkdirSilent(_path.join(ROOT, 'dist', 'themes', 'fonts'));
+
+    let rep = cfg.client.Connection.FontURI;
     if ( !rep.match(/^\//) ) { // Fix for relative paths (CSS)
       rep = rep.replace(/^\w+\//, '');
     }
 
-    var concated = cfg.themes.fonts.map(function(iter) {
-      var src = _path.join(ROOT, 'src', 'client', 'themes', 'fonts', iter);
-      var dst = _path.join(ROOT, 'dist', 'themes', 'fonts', iter);
+    const concated = cfg.themes.fonts.map((iter) => {
+      const src = _path.join(ROOT, 'src', 'client', 'themes', 'fonts', iter);
+      const dst = _path.join(ROOT, 'dist', 'themes', 'fonts', iter);
 
       _fs.copySync(src, dst);
-      _removeSilent(_path.join(dst, 'metadata.json'));
+      _utils.removeSilent(_path.join(dst, 'metadata.json'));
 
-      var file = _path.join(dst, 'style.css');
-      var css = _fs.readFileSync(file).toString();
+      const file = _path.join(dst, 'style.css');
+      const css = _fs.readFileSync(file).toString();
       return css.replace(/\%FONTURI\%/g, rep);
     });
 
-    var dest = _path.join(ROOT, 'dist', 'themes', 'fonts.css');
+    const dest = _path.join(ROOT, 'dist', 'themes', 'fonts.css');
     _fs.writeFileSync(dest, concated.join('\n'));
 
-    done();
-  }
+    resolve();
+  });
+}
 
-  /**
-   * Builds given style
-   */
-  function buildStyle(cfg, name, done) {
-    console.log('Building style', _utils.color(name, 'blue,bold'));
+/*
+ * Builds static files
+ */
+function buildStatic(cli, cfg) {
+  return new Promise((resolve, reject) => {
+    _logger.log('Building statics');
 
-    var src = _path.join(ROOT, 'src', 'client', 'themes', 'styles', name);
-    var dst = _path.join(ROOT, 'dist', 'themes', 'styles');
-
-    _mkdirSilent(dst);
-    _fs.copySync(src, _path.join(dst, name));
-
-    var from = _path.join(src, 'style.less');
-    var to = _path.join(dst, name + '.css');
-    var base = 'theme.less';
-
-    try {
-      base = cfg.themes.styleBase;
-    } catch ( e ) {}
-
-    _utils.compileLess(from, to, {
-      sourceMap: {},
-      paths: [
-        '.',
-        _path.join(ROOT, 'src', 'client', 'themes'),
-        _path.join(ROOT, 'src', 'client', 'stylesheets')
-      ]
-    }, function(err) {
-      if ( !err ) {
-        _removeSilent(_path.join(dst, name, 'metadata.json'));
-        _removeSilent(_path.join(dst, name, 'style.less'));
-      }
-      done();
-    }, function(css) {
-      var header = '@import "' + base + '";\n\n';
-      return header + css;
-    });
-  }
-
-  /**
-   * Builds all styles
-   */
-  function buildStyles(cfg, done) {
-    _utils.iterate(cfg.themes.styles, function(name, idx, next) {
-      buildStyle(cfg, name, next);
-    }, done);
-  }
-
-  /**
-   * Builds all static files
-   */
-  function buildStatic(cfg, done) {
-    console.log('Building statics');
-
-    var src = _path.join(ROOT, 'src', 'client', 'themes', 'wallpapers');
-    var dst = _path.join(ROOT, 'dist', 'themes', 'wallpapers');
+    const src = _path.join(ROOT, 'src', 'client', 'themes', 'wallpapers');
+    const dst = _path.join(ROOT, 'dist', 'themes', 'wallpapers');
     _fs.copySync(src, dst);
 
-    var sdst = _path.join(ROOT, 'dist', 'themes', 'sounds');
-    _mkdirSilent(sdst);
+    const sdst = _path.join(ROOT, 'dist', 'themes', 'sounds');
+    _utils.mkdirSilent(sdst);
 
-    cfg.themes.sounds.forEach(function(i) {
-      var src = _path.join(ROOT, 'src', 'client', 'themes', 'sounds', i);
-      var dst = _path.join(ROOT, 'dist', 'themes', 'sounds', i);
+    cfg.themes.sounds.forEach((i) => {
+      const src = _path.join(ROOT, 'src', 'client', 'themes', 'sounds', i);
+      const dst = _path.join(ROOT, 'dist', 'themes', 'sounds', i);
       _fs.copySync(src, dst);
-      _removeSilent(_path.join(dst, 'metadata.json'));
+      _utils.removeSilent(_path.join(dst, 'metadata.json'));
     });
 
-    done();
-  }
+    resolve();
+  });
+}
 
-  /**
-   * Builds given icon pack
-   */
-  function buildIcon(cfg, name, done) {
-    console.log('Building icon pack', _utils.color(name, 'blue,bold'));
+/*
+ * Builds icon packs
+ */
+function buildIcon(cli, cfg, name) {
 
-    var src = _path.join(ROOT, 'src', 'client', 'themes', 'icons', name);
-    var dst = _path.join(ROOT, 'dist', 'themes', 'icons', name);
-    _mkdirSilent(dst);
+  function _buildIcon(n) {
+    return new Promise((resolve) => {
+      _logger.log('Building icon pack', _logger.color(n, 'blue,bold'));
 
-    function _next() {
-      _removeSilent(_path.join(dst, 'metadata.json'));
-      _fs.copySync(src, dst);
-      done();
-    }
+      const src = _path.join(ROOT, 'src', 'client', 'themes', 'icons', n);
+      const dst = _path.join(ROOT, 'dist', 'themes', 'icons', n);
+      _utils.mkdirSilent(dst);
 
-    var metafile = _path.join(src, 'metadata.json');
-    _utils.readJSON(metafile, function(err, metadata) {
-      if ( err || !metadata || !metadata.parent ) {
+      function _next() {
+        _utils.removeSilent(_path.join(dst, 'metadata.json'));
+        _fs.copySync(src, dst);
+
+        resolve();
+      }
+
+      const metafile = _path.join(src, 'metadata.json');
+      const metadata = _fs.readJsonSync(metafile);
+
+      if ( !metadata.parent ) {
         return _next();
       }
 
-      var psrc = _path.join(ROOT, 'src', 'client', 'themes', 'icons', metadata.parent);
+      const psrc = _path.join(ROOT, 'src', 'client', 'themes', 'icons', metadata.parent);
       _fs.copySync(psrc, dst);
+
       _next();
     });
   }
 
-  /**
-   * Builds all icons
-   */
-  function buildIcons(cfg, done) {
-    _utils.iterate(cfg.themes.icons, function(name, idx, next) {
-      buildIcon(cfg, name, next);
-    }, done);
-  }
+  const list = name ? [name] : cfg.themes.icons;
+  return Promise.all(list.map((n) => {
+    return _buildIcon(n);
+  }));
+}
 
-  /**
-   * grunt build:themes
-   *
-   * Builds all theme files
-   */
-  function buildAll(cfg, done) {
-    var targets = [
-      function(cb) {
-        buildStyles(cfg, cb);
-      },
-      function(cb) {
-        buildFonts(cfg, cb);
-      },
-      function(cb) {
-        buildIcons(cfg, cb);
-      },
-      function(cb) {
-        buildStatic(cfg, cb);
-      }
-    ];
+/*
+ * Builds styles
+ */
+function buildStyle(cli, cfg, name) {
 
-    _utils.iterate(targets, function(iter, idx, next) {
-      iter(next);
-    }, done);
-  }
+  function _buildStyle(n) {
+    return new Promise((resolve) => {
+      _logger.log('Building style', _logger.color(n, 'blue,bold'));
 
-  /**
-   * Reads all theme metadata
-   */
-  function readMetadata(cfg) {
+      const src = _path.join(ROOT, 'src', 'client', 'themes', 'styles', n);
+      const dst = _path.join(ROOT, 'dist', 'themes', 'styles');
 
-    function _readMetadata(dir, i, whitelist) {
-      whitelist = whitelist || [];
+      _utils.mkdirSilent(dst);
+      _fs.copySync(src, _path.join(dst, n));
 
-      var list = [];
-      var root = _path.join(dir, i);
-      _getDirectories(root).forEach(function(d) {
-        if ( whitelist.indexOf(d) >= 0 ) {
-          var check = _path.join(root, d, 'metadata.json');
-          if ( _fs.existsSync(check) ) {
-            var raw = _fs.readFileSync(check);
-            var json = JSON.parse(raw);
-            list.push(json);
-          }
+      const from = _path.join(src, 'style.less');
+      const to = _path.join(dst, n + '.css');
+
+      let base = 'theme.less';
+      try {
+        base = cfg.themes.styleBase;
+      } catch ( e ) {}
+
+      _utils.compileLess(from, to, {
+        sourceMap: {},
+        paths: [
+          '.',
+          _path.join(ROOT, 'src', 'client', 'themes'),
+          _path.join(ROOT, 'src', 'client', 'stylesheets')
+        ]
+      }, (err) => {
+        if ( !err ) {
+          _utils.removeSilent(_path.join(dst, n, 'metadata.json'));
+          _utils.removeSilent(_path.join(dst, n, 'style.less'));
         }
-      });
-      return list;
-    }
 
-    var themes = _path.join(ROOT, 'src', 'client', 'themes');
-    return {
-      fonts: (function() {
-        var list = [];
-        _getDirectories(themes, 'fonts', cfg.themes.fonts).forEach(function(d) {
-          var check = _path.join(themes, 'fonts', d, 'style.css');
-          if ( _fs.existsSync(check) ) {
-            list.push(d);
-          }
-        });
-        return list;
-      })(),
-      icons: _readMetadata(themes, 'icons', cfg.themes.icons),
-      sounds: _readMetadata(themes, 'sounds', cfg.themes.sounds),
-      styles: _readMetadata(themes, 'styles', cfg.themes.styles)
-    };
+        resolve();
+      }, (css) => {
+        const header = '@import "' + base + '";\n\n';
+        return header + css;
+      });
+    });
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+  const list = name ? [name] : cfg.themes.styles;
+  return Promise.all(list.map((n) => {
+    return _buildStyle(n);
+  }));
+}
 
-  module.exports.buildAll = buildAll;
-  module.exports.buildFonts = buildFonts;
-  module.exports.buildStyle = buildStyle;
-  module.exports.buildStyles = buildStyles;
-  module.exports.buildStatic = buildStatic;
-  module.exports.buildIcon = buildIcon;
-  module.exports.buildIcons = buildIcons;
-  module.exports.readMetadata = readMetadata;
+/*
+ * Builds everything
+ */
+function buildAll(cli, cfg) {
+  return Promise.all([
+    buildFonts(cli, cfg),
+    buildStatic(cli, cfg),
+    buildIcon(cli, cfg),
+    buildStyle(cli, cfg)
+  ]);
+}
 
-})(require('node-fs-extra'), require('path'), require('./utils.js'));
+///////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+///////////////////////////////////////////////////////////////////////////////
+
+module.exports.readMetadata = readMetadata;
+module.exports.buildAll = buildAll;
+module.exports.buildStyle = buildStyle;
+module.exports.buildIcon = buildIcon;
+module.exports.buildStatic = buildStatic;
+module.exports.buildFonts = buildFonts;

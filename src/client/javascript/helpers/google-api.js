@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,6 +61,8 @@
    * @memberof OSjs.Helpers.GoogleAPI
    * @see OSjs.Helpers.GoogleAPI.createInsatance
    *
+   * @param {String}  clientId    Client ID (key)
+   *
    * @link https://developers.google.com/api-client-library/javascript/start/start-js
    * @link https://developers.google.com/api-client-library/javascript/
    * @link https://console.developers.google.com/project
@@ -80,13 +82,13 @@
     ];
   }
 
-  /**
+  /*
    * Destroy the class
    */
   GoogleAPI.prototype.destroy = function() {
   };
 
-  /**
+  /*
    * Initializes (preloads) the API
    */
   GoogleAPI.prototype.init = function(callback) {
@@ -105,7 +107,7 @@
     }
   };
 
-  /**
+  /*
    * Loads the API
    */
   GoogleAPI.prototype.load = function(load, scope, client, callback) {
@@ -243,13 +245,14 @@
    * @function revoke
    * @memberof OSjs.Helpers.GoogleAPI.Class#
    *
-   * @param   {Function}    cb      Callback => fn(error, result)
+   * @param   {Function}    callback      Callback => fn(error, result)
    */
   GoogleAPI.prototype.revoke = function(callback) {
     console.info('GoogleAPI::revoke()');
 
     if ( !this.accessToken ) {
-      return callback(false);
+      callback(false);
+      return;
     }
 
     var url = 'https://accounts.google.com/o/oauth2/revoke?token=' + this.accessToken;
@@ -265,7 +268,7 @@
     });
   };
 
-  /**
+  /*
    * Authenticates the user
    */
   GoogleAPI.prototype.authenticate = function(scope, callback) {
@@ -407,7 +410,8 @@
     }
 
     if ( SingletonInstance ) {
-      return _run();
+      _run();
+      return;
     }
 
     var clientId = null;

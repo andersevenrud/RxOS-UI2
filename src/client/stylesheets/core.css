@@ -2,7 +2,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,98 +30,22 @@
  */
 
 html, body {
-  height : 100%;
+  width : 100vw;
+  height : 100vh;
   overflow : hidden;
+  position : fixed;
 }
+
 body {
   margin : 0;
   padding : 0;
   background-color : #089bd2;
 }
+
 body, input, button, textarea, label, select {
   font-size : 12px;
   font-family : Sans-serif, Arial;
 }
-
-/**
- * ===========================================================================
- *                              LOGIN SCREEN
- * ===========================================================================
- */
-
-#Login {
-  background : #fff;
-  width : 400px;
-  height : 230px;
-  padding : 20px;
-  position : absolute;
-  left : 50%;
-  top : 50%;
-  z-index : 9999;
-  margin-left : -200px;
-  margin-top : -155px; /* -40 because of loading bar*/
-  border : 4px solid rgba(0, 0, 0, .1);
-  -webkit-box-shadow: 0 0 5px 4px rgba(0,0,0,0.15);
-  -moz-box-shadow: 0 0 5px 4px rgba(0,0,0,0.15);
-  box-shadow: 0 0 5px 4px rgba(0,0,0,0.15);
-  box-sizing : border-box;
-
-  display : none;
-}
-  #LoginForm > div {
-    margin-bottom : 20px;
-  }
-  #Login label {
-    display : block;
-    font-weight : bold;
-    height : 30px;
-    line-height : 30px;
-  }
-  #Login input[type=text],
-  #Login input[type=password] {
-    display : block;
-    width : 100%;
-    height : 24px;
-    padding : 4px;
-    line-height : 12px;
-    box-sizing : border-box;
-  }
-  #Login input[type=submit] {
-    height : 40px;
-    padding : 10px;
-    padding-left : 20px;
-    padding-right : 20px;
-    box-sizing : border-box;
-    background : rgba(0, 0, 0, .1);
-    border : 0 none;
-    cursor : pointer;
-  }
-  #Login .Submit {
-    text-align : right;
-  }
-
-/**
- * ===========================================================================
- *                             LOADING SCREEN
- * ===========================================================================
- */
-
-#LoadingScreen {
-  position : absolute;
-  width : 320px;
-  height : 182px;
-  top : 50%;
-  left : 50%;
-  margin-top : -91px;
-  margin-left : -160px;
-  z-index : 999;
-}
-  #LoadingScreen span {
-    color : #fff;
-    font-family : sans-serif, Arial;
-    font-size : 30px;
-    display : block;
-  }
 
 /**
  * ===========================================================================
@@ -163,39 +87,6 @@ application-splash {
     right : 5px;
   }
 
-#LoadingScreen application-splash {
-  position : absolute;
-  height : 30px;
-  width : auto;
-  top : auto;
-  left : 0;
-  right : 0;
-  bottom : -40px;
-  margin : 0;
-  background : #fff;
-  z-index : 99999999;
-}
-  #LoadingScreen application-splash > span {
-    display : none;
-  }
-  #LoadingScreen application-splash > gui-progress-bar {
-    top : 5px;
-    left : 5px;
-    right : 5px;
-    bottom : 5px;
-    height : auto;
-  }
-    #LoadingScreen application-splash > gui-progress-bar:before {
-      border : 1px solid #ccc;
-      background : #ddd;
-    }
-    #LoadingScreen application-splash > gui-progress-bar > span {
-      display : none;
-    }
-    #LoadingScreen application-splash > gui-progress-bar > div {
-      background : rgb(87, 42, 121);
-    }
-
 /**
  * ===========================================================================
  *                                 MISC
@@ -221,20 +112,20 @@ body[data-attention="true"]:after {
 
 #DebugNotice {
   position : absolute;
-  bottom : 5px;
-  right : 5px;
-  font-size : 12px;
-  color : #fff;
+  bottom : .5em;
+  right : .5em;
+  font-family : sans-serif;
+  font-size : 1em;
+  color : rgba(250, 250, 250, .8);
   text-shadow: 0 0 2px rgba(34, 34, 34, .5);
   text-align : right;
-  line-height : 20px;
+  line-height : 1.3;
   z-index : 2;
-  opacity : .7;
   cursor : default;
 }
 
   #DebugNotice a {
-    color : #fff;
+    color : inherit;
     text-decoration : underline;
     font-weight : normal;
     cursor : pointer;
@@ -278,7 +169,7 @@ application-window-top {
   top : 0;
   left : 0;
   right : 0;
-  height : 20px;
+  height : 1.666em;
   z-index : 5;
 
   display: -webkit-box;
@@ -294,8 +185,8 @@ application-window-top {
           flex-wrap: nowrap;
 }
   application-window-top > * {
-    min-width : 16px;
-    min-height : 16px;
+    min-width : 1em;
+    min-height : 1em;
 
     display: -webkit-box;
     display: -moz-box;
@@ -323,7 +214,7 @@ application-window-title {
   z-index : 1;
   overflow : hidden;
   white-space : nowrap;
-  line-height : 20px;
+  line-height : 1.666em;
   display : block;
 
   -webkit-text-overflow: ellipsis;
@@ -491,9 +382,9 @@ application-window-warning  {
   top : 0;
   left : 0;
   right : 0;
-  height : 30px;
-  line-height : 20px;
-  margin : 4px;
+  height : 2.5em;
+  line-height : 1.666;
+  margin : 0.333em;
   border : 1px solid transparent;
   z-index : 99999;
   box-sizing : border-box;
@@ -503,16 +394,16 @@ application-window-warning  {
     top : 0;
     right : 0;
     bottom : 0;
-    padding : 4px;
+    padding : 0.333em;
     box-sizing : border-box;
   }
   application-window-warning > div:nth-child(2) {
     position : absolute;
     top : 0;
     left : 0;
-    right : 20px;
+    right : 1.666em;
     bottom : 0;
-    padding : 4px;
+    padding : 0.333em;
     overflow : hidden;
     box-sizing : border-box;
   }
@@ -524,7 +415,7 @@ application-window.DialogWindow gui-label label {
   white-space : inherit;
 }
 application-window.DialogWindow gui-button-bar gui-button {
-  min-width : 80px;
+  min-width : 6.666em;
 }
 application-window.DialogWindow gui-label[data-id="Message"] span {
   font-weight : bold;
@@ -563,12 +454,18 @@ application-window[data-focused="false"] iframe {
  *                               RESPONSIVE
  * ===========================================================================
  */
+@media all and (max-width: 1280px) {
+  html, body {
+    height : 100%;
+  }
+}
 
 @media all and (min-resolution: 150dpi) {
 
 /*
   body {
     overflow : hidden;
+    font-size : 10px;
   }
 */
 

@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,8 @@
    * @param   {String}    name        Event name
    * @param   {Function}  cb          Callback function
    * @param   {Object}    [thisArg]   Set 'this'
+   *
+   * @return  {Number}
    */
   EventHandler.prototype.on = function(name, cb, thisArg) {
     thisArg = thisArg || this;

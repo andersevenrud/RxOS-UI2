@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -281,8 +281,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'باز کردن فايل امکان پذير نيست',
     'ERR_FILE_APP_OPEN_FMT'     : 'فايل {0} قابل باز کردن نمي باشد به دليل اينکه نوع  {1} پشنيباي نميشود',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'فايل {0} را نمي توان باز کرد',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'فايل {0} قادر ذخيره کردن نمي باشد',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'فايل {0} را نمي توان باز کرد: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'فايل {0} قادر ذخيره کردن نمي باشد: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} خطاي برنامه',
     'ERR_GENERIC_APP_ACTION_FMT': 'مشکل در اجراي فرآيند \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'خطاي ناشناخته',

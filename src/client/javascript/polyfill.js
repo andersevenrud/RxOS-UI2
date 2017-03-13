@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,9 +59,10 @@
   //
   (function() {
     function CustomEvent(event, params) {
-      params = params || { bubbles: false, cancelable: false, detail: undefined };
+      params = params || {bubbles: false, cancelable: false, detail: undefined};
+
       var evt = document.createEvent( 'CustomEvent' );
-      evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
       return evt;
     }
 
@@ -69,6 +70,29 @@
       CustomEvent.prototype = window.Event.prototype;
       window.CustomEvent = CustomEvent;
     }
+  })();
+
+  //
+  // MouseEvent
+  //
+  (function() {
+    /*eslint no-new: 0*/
+    try {
+      new window.MouseEvent('test');
+      return;
+    } catch (e) {
+    }
+
+    function MouseEvent(eventType, params) {
+      params = params || {bubbles: false, cancelable: false};
+
+      var mouseEvent = document.createEvent('MouseEvent');
+      mouseEvent.initMouseEvent(eventType, params.bubbles, params.cancelable, window, 0, 0, 0, 0, 0, false, false, false, false, 0, params.relatedTarget);
+      return mouseEvent;
+    }
+
+    MouseEvent.prototype = Event.prototype;
+    window.MouseEvent = MouseEvent;
   })();
 
 })();

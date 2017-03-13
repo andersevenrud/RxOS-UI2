@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,64 +27,62 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(_path, _server) {
-  'use strict';
+/*eslint strict:["error", "global"]*/
+'use strict';
 
-  /**
-   * @namespace Server
-   */
+var ver = process.version.substr(1).split(/\./g);
+if ( parseInt(ver[0], 10) < 4 ) {
+  console.error('You need Node v4 or above to run OS.js');
+  return process.exit(2);
+}
 
-  var DIST = (process && process.argv.length > 2) ? process.argv[2] : 'dist';
-  var ROOT = _path.join(__dirname, '/../../../');
-  var PORT = null;
-  var NOLOG = false;
+const _instance = require('./core/instance.js');
+const _minimist = require('minimist');
 
-  (function() {
-    var i, arg;
-    for ( i = 0; i < process.argv.length; i++ ) {
-      arg = process.argv[i];
+///////////////////////////////////////////////////////////////////////////////
+// MAIN
+///////////////////////////////////////////////////////////////////////////////
 
-      if ( ['-nl', '--no-log'].indexOf(arg) >= 0 ) {
-        NOLOG = true;
-      } else if ( ['-p', '--port'].indexOf(arg) >= 0 ) {
-        i++;
-        PORT = process.argv[i];
-      } else if ( ['-r', '--root'].indexOf(arg) >= 0 ) {
-        i++;
-        ROOT = process.argv[i];
-      }
-    }
-  })();
+const argv = _minimist(process.argv.slice(2));
+const opts = {
+  DIST: argv._[0],
+  ROOT: argv.r || argv.root,
+  PORT: argv.p || argv.port,
+  LOGLEVEL: argv.l || argv.loglevel,
+  AUTH: argv.authenticator,
+  STORAGE: argv.storage
+};
 
-  if ( DIST === 'x11' ) {
-    DIST = 'dist';
-    ROOT = _path.dirname(__dirname);
-  } else {
-    if ( (process.argv[1] || '').match(/(mocha|grunt)$/) ) {
-      DIST = 'dist-dev';
-    }
+_instance.init(opts).then((env) => {
+  const config = require('./core/settings.js').get();
+
+  if ( config.tz ) {
+    process.env.TZ = config.tz;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // MAIN
-  /////////////////////////////////////////////////////////////////////////////
-
-  process.chdir(ROOT);
-
-  process.on('exit', function() {
-    _server.close();
+  ['SIGTERM', 'SIGINT'].forEach((sig) => {
+    process.on(sig, () => {
+      console.log('\n');
+      _instance.destroy((err) => {
+        process.exit(err ? 1 : 0);
+      });
+    });
   });
 
-  process.on('uncaughtException', function(error) {
+  process.on('exit', () => {
+    _instance.destroy();
+  });
+
+  _instance.run();
+
+  process.on('uncaughtException', (error) => {
     console.log('UNCAUGHT EXCEPTION', error, error.stack);
   });
 
-  _server.listen({
-    port: PORT,
-    dirname: __dirname,
-    root: ROOT,
-    dist: DIST,
-    logging: !NOLOG,
-    nw: false
+  process.on('unhandledRejection', (error) => {
+    console.log('UNCAUGHT REJECTION', error);
   });
-})(require('path'), require('./http.js'));
+}).catch((error) => {
+  console.log(error);
+  process.exit(1);
+});

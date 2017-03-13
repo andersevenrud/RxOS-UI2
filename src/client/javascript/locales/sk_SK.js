@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -257,8 +257,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'Nemôžem otvoriť súbor',
     'ERR_FILE_APP_OPEN_FMT'     : 'Súbor {0} sa nedá otvoriť pretože mime typ {1} nie je podporovaný',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Súbor {0} sa nedá otvoriť',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Súbor {0} sa nedá uložiť',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Súbor {0} sa nedá otvoriť: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Súbor {0} sa nedá uložiť: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Chyba Aplikácie',
     'ERR_GENERIC_APP_ACTION_FMT': 'Nepodarilo sa uskutočniť akciu \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Neznáma chyba',

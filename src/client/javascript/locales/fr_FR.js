@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -286,8 +286,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'Impossible d\'ouvrir le fichier',
     'ERR_FILE_APP_OPEN_FMT'     : 'Le fichier {0} n\'a pas pu être ouvert car le type mime {1} m\'est pas supporté',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Le fichier {0} n\'a pas pu être ouvert',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Le fichier {0} n\'a pas pu être enregistré',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Le fichier {0} n\'a pas pu être ouvert: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Le fichier {0} n\'a pas pu être enregistré: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Erreur de l\'application',
     'ERR_GENERIC_APP_ACTION_FMT': 'Impossible d\'effectuer l\'action \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Erreur inconnue',

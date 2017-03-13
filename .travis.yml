@@ -1,10 +1,14 @@
 language: node_js
 node_js:
+  - 7
   - 6
   - 5
-before_script:
+  - 4
+install:
+  - npm install
   - npm install mocha
   - npm install grunt-cli -g
-  - grunt build:config build:manifest build:core
+before_script:
+  - node osjs build:config build:manifest build:core
 after_success:
-  - grunt all
+  - node osjs build

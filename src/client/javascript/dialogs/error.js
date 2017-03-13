@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -91,16 +91,16 @@
     root.setAttribute('role', 'alertdialog');
 
     var msg = DialogWindow.parseMessage(this.args.message);
-    this.scheme.find(this, 'Message').empty().append(msg);
-    this.scheme.find(this, 'Summary').set('value', this.args.error);
-    this.scheme.find(this, 'Trace').set('value', this.traceMessage);
+    this._find('Message').empty().append(msg);
+    this._find('Summary').set('value', this.args.error);
+    this._find('Trace').set('value', this.traceMessage);
     if ( !this.traceMessage ) {
-      this.scheme.find(this, 'Trace').hide();
-      this.scheme.find(this, 'TraceLabel').hide();
+      this._find('Trace').hide();
+      this._find('TraceLabel').hide();
     }
 
     if ( this.args.bugreport ) {
-      this.scheme.find(this, 'ButtonBugReport').on('click', function() {
+      this._find('ButtonBugReport').on('click', function() {
         var title = '';
         var body = [];
 
@@ -113,7 +113,7 @@
 
           title = API.getConfig('BugReporting.options.title');
           body = [
-            '**' + API.getConfig('BugReporting.options.message') +  ':**',
+            '**' + API.getConfig('BugReporting.options.message').replace('%VERSION%', API.getConfig('Version')) +  ':**',
             '\n',
             '> ' + self.args.message,
             '\n',
@@ -142,7 +142,7 @@
         window.open(url);
       });
     } else {
-      this.scheme.find(this, 'ButtonBugReport').hide();
+      this._find('ButtonBugReport').hide();
     }
 
     return root;

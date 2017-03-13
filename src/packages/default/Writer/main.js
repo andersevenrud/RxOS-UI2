@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(DefaultApplication, DefaultApplicationWindow, Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -43,7 +45,8 @@
       icon: metadata.icon,
       title: metadata.name,
       width: 550,
-      height: 400
+      height: 400,
+      translator: OSjs.Applications.ApplicationWriter._
     }, app, scheme, file]);
 
     this.checkChangeLength = -1;
@@ -72,11 +75,9 @@
     var _ = OSjs.Applications.ApplicationWriter._;
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'WriterWindow', root, null, null, {
-      _: _
-    });
+    this._render('WriterWindow');
 
-    var text = scheme.find(this, 'Text');
+    var text = this._find('Text');
 
     var buttons = {
       'text-bold': {
@@ -112,31 +113,31 @@
 
     var menuEntries = {
       'MenuUndo': function() {
-        text._call('command', ['undo', false]);
+        text.command('undo', false);
       },
       'MenuRedo': function() {
-        text._call('command', ['redo', false]);
+        text.command('redo', false);
       },
       'MenuCopy': function() {
-        text._call('command', ['copy', false]);
+        text.command('copy', false);
       },
       'MenuCut': function() {
-        text._call('command', ['cut', false]);
+        text.command('cut', false);
       },
       'MenuDelete': function() {
-        text._call('command', ['delete', false]);
+        text.command('delete', false);
       },
       'MenuPaste': function() {
-        text._call('command', ['paste', false]);
+        text.command('paste', false);
       },
       'MenuUnlink': function() {
-        text._call('command', ['unlink', false]);
+        text.command('unlink', false);
       },
       'MenuInsertOL': function() {
-        text._call('command', ['insertOrderedList', false]);
+        text.command('insertOrderedList', false);
       },
       'MenuInsertUL': function() {
-        text._call('command', ['insertUnorderedList', false]);
+        text.command('insertUnorderedList', false);
       },
       'MenuInsertImage': function() {
         API.createDialog('File', {
@@ -147,19 +148,19 @@
           }
 
           VFS.url(result, function(error, url) {
-            text._call('command', ['insertImage', false, url]);
+            text.command('insertImage', false, url);
           });
         }, self);
       },
       'MenuInsertLink': function() {
         API.createDialog('Input', {
           message: _('Insert URL'),
-          placeholder: 'https://os.js.org'
+          placeholder: 'https://os-js.org'
         }, function(ev, button, result) {
           if ( button !== 'ok' || !result ) {
             return;
           }
-          text._call('command', ['createLink', false, result]);
+          text.command('createLink', false, result);
         }, self);
       }
     };
@@ -170,12 +171,12 @@
       }
     }
 
-    scheme.find(this, 'SubmenuEdit').on('select', menuEvent);
-    scheme.find(this, 'SubmenuInsert').on('select', menuEvent);
+    this._find('SubmenuEdit').on('select', menuEvent);
+    this._find('SubmenuInsert').on('select', menuEvent);
 
     function getSelectionStyle() {
       function _call(cmd) {
-        return text._call('query', [cmd]);
+        return text.query(cmd);
       }
 
       var style = {
@@ -223,25 +224,25 @@
       }, self);
     }
 
-    var back = scheme.find(this, 'Background').on('click', function() {
+    var back = this._find('Background').on('click', function() {
       createColorDialog(self.color.background, function(hex) {
-        text._call('command', ['hiliteColor', false, hex]);
+        text.command('hiliteColor', false, hex);
         self.color.background = hex;
         back.set('value', hex);
       });
     });
-    var front = scheme.find(this, 'Foreground').on('click', function() {
+    var front = this._find('Foreground').on('click', function() {
       createColorDialog(self.color.foreground, function(hex) {
-        text._call('command', ['foreColor', false, hex]);
+        text.command('foreColor', false, hex);
         self.color.foreground = hex;
         front.set('value', hex);
       });
     });
 
-    var font = scheme.find(this, 'Font').on('click', function() {
+    var font = this._find('Font').on('click', function() {
       createFontDialog(null, function(font) {
-        text._call('command', ['fontName', false, font.fontName]);
-        text._call('command', ['fontSize', false, font.fontSize]);
+        text.command('fontName', false, font.fontName);
+        text.command('fontSize', false, font.fontSize);
         self.font.name = font.fontName;
         self.font.size = font.fontSize;
       });
@@ -251,8 +252,8 @@
       var id = b.getAttribute('data-id');
       var button = buttons[id];
       if ( button ) {
-        (new GUI.Element(b)).on('click', function() {
-          text._call('command', [button.command]);
+        GUI.Element.createFromNode(b).on('click', function() {
+          text.command(button.command);
         }).on('mousedown', function(ev) {
           ev.preventDefault();
         });
@@ -303,7 +304,7 @@
     DefaultApplicationWindow.prototype.updateFile.apply(this, arguments);
 
     try {
-      var el = this._scheme.find(this, 'Text');
+      var el = this._find('Text');
       el.$element.focus();
     } catch ( e ) {}
 
@@ -311,17 +312,17 @@
   };
 
   ApplicationWriterWindow.prototype.showFile = function(file, content) {
-    this._scheme.find(this, 'Text').set('value', content || '');
+    this._find('Text').set('value', content || '');
     DefaultApplicationWindow.prototype.showFile.apply(this, arguments);
   };
 
   ApplicationWriterWindow.prototype.getFileData = function() {
-    return this._scheme.find(this, 'Text').get('value');
+    return this._find('Text').get('value');
   };
 
   ApplicationWriterWindow.prototype._focus = function(file, content) {
     if ( DefaultApplicationWindow.prototype._focus.apply(this, arguments) ) {
-      this._scheme.find(this, 'Text').focus();
+      this._find('Text').focus();
       return true;
     }
     return false;

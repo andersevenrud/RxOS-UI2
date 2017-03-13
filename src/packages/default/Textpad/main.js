@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(DefaultApplication, DefaultApplicationWindow, Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -52,8 +54,9 @@
     var self = this;
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'TextpadWindow', root);
-    scheme.find(this, 'Text').on('change', function() {
+    this._render('TextpadWindow');
+
+    this._find('Text').on('change', function() {
       self.hasChanged = true;
     });
 
@@ -62,22 +65,22 @@
 
   ApplicationTextpadWindow.prototype.updateFile = function(file) {
     DefaultApplicationWindow.prototype.updateFile.apply(this, arguments);
-    this._scheme.find(this, 'Text').$element.focus();
+    this._find('Text').$element.focus();
   };
 
   ApplicationTextpadWindow.prototype.showFile = function(file, content) {
-    this._scheme.find(this, 'Text').set('value', content || '');
+    this._find('Text').set('value', content || '');
     DefaultApplicationWindow.prototype.showFile.apply(this, arguments);
   };
 
   ApplicationTextpadWindow.prototype.getFileData = function() {
-    return this._scheme.find(this, 'Text').get('value');
+    return this._find('Text').get('value');
   };
 
   ApplicationTextpadWindow.prototype._focus = function() {
     if ( DefaultApplicationWindow.prototype._focus.apply(this, arguments) ) {
       if ( this._scheme ) {
-        var input = this._scheme.find(this, 'Text').$element;
+        var input = this._find('Text').$element;
         if ( input ) {
           input.focus();
         }

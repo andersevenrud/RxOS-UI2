@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web User Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, User, GUI) {
   'use strict';
 
@@ -45,7 +47,7 @@
     },
 
     update: function(win, scheme, settings, wm) {
-      var user = OSjs.Core.getHandler().getUserData();
+      var user = OSjs.Core.getAuthenticator().getUser();
 
       win._find('UserID').set('value', user.id);
       win._find('UserName').set('value', user.name);

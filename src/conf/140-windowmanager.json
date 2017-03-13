@@ -58,6 +58,8 @@
           "LOGIN": "service-login",
           "ERROR": "dialog-warning"
         },
+        "widgets": [
+        ],
         "panels": [
           {
             "options": {
@@ -96,9 +98,10 @@
             ]
           }
         ],
+        "fullscreenTrigger": 800,
         "mediaQueries": {
-          "mobile": 320,
-          "tablet": 800
+          "mobile": 500,
+          "tablet": 1024
         },
         "menu": {
           "development": {

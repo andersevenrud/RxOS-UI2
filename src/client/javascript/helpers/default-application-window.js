@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
  * @licence Simplified BSD License
  */
 
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, VFS, API, GUI) {
   'use strict';
 
@@ -58,7 +59,7 @@
   DefaultApplicationWindow.prototype = Object.create(Window.prototype);
   DefaultApplicationWindow.constructor = Window;
 
-  /**
+  /*
    * Destroy
    */
   DefaultApplicationWindow.prototype.destroy = function() {
@@ -67,7 +68,7 @@
     this.currentFile = null;
   };
 
-  /**
+  /*
    * Initialize
    */
   DefaultApplicationWindow.prototype.init = function(wm, app, scheme) {
@@ -75,7 +76,7 @@
     return root;
   };
 
-  /**
+  /*
    * Applies default Window GUI stuff
    */
   DefaultApplicationWindow.prototype._inited = function() {
@@ -101,13 +102,13 @@
       }
     };
 
-    this._scheme.find(this, 'SubmenuFile').on('select', function(ev) {
+    this._find('SubmenuFile').on('select', function(ev) {
       if ( menuMap[ev.detail.id] ) {
         menuMap[ev.detail.id]();
       }
     });
 
-    this._scheme.find(this, 'MenuSave').set('disabled', true);
+    this._find('MenuSave').set('disabled', true);
 
     // Load given file
     if ( this.currentFile ) {
@@ -119,7 +120,7 @@
     return result;
   };
 
-  /**
+  /*
    * On Drag-And-Drop Event
    */
   DefaultApplicationWindow.prototype._onDndEvent = function(ev, type, item, args) {
@@ -135,7 +136,7 @@
     }
   };
 
-  /**
+  /*
    * On Close
    */
   DefaultApplicationWindow.prototype._close = function() {
@@ -214,7 +215,7 @@
     this.hasChanged = false;
 
     if ( this._scheme && (this._scheme instanceof GUI.Scheme) ) {
-      this._scheme.find(this, 'MenuSave').set('disabled', !file);
+      this._find('MenuSave').set('disabled', !file);
     }
 
     if ( file ) {

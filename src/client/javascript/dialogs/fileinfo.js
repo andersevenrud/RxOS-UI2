@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@
   FileInfoDialog.prototype.init = function() {
     var root = DialogWindow.prototype.init.apply(this, arguments);
 
-    var txt = this.scheme.find(this, 'Info').set('value', API._('LBL_LOADING'));
+    var txt = this._find('Info').set('value', API._('LBL_LOADING'));
     var file = this.args.file;
 
     function _onError(error) {

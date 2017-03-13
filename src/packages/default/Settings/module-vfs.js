@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web VFS Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,8 +27,25 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
+
+  var TEMPLATES = {
+    WebDAV: {
+      MountName: 'owncloud',
+      MountDescription: 'OwnCloud',
+      MountHost: 'http://localhost/remote.php/webdav/',
+      MountNamespace: 'DAV:',
+      MountUsername: function() {
+        return OSjs.Core.getAuthenticator().getUser().username;
+      }
+    }
+  };
+
+  var removeMounts = [];
+  var addMounts = [];
 
   function createMountWindow(win, scheme, selected, ondone) {
 
@@ -50,73 +67,62 @@
     nwin._on('init', function(root) {
       var self = this;
 
-      function add(conn) {
-        try {
-          OSjs.Core.getMountManager().add(conn);
-        } catch ( e ) {
-          API.error(self._title, 'An error occured while trying to mount', e);
-          console.warn(e.stack, e);
-          return false;
+      function setTemplate(name) {
+        var tpl = TEMPLATES[name];
+        if ( tpl ) {
+          Object.keys(tpl).forEach(function(k) {
+            var val = tpl[k];
+            if ( typeof val === 'function' ) {
+              val = val();
+            }
+            self._find(k).set('value', val);
+          });
         }
-        return true;
       }
 
       function done() {
-        var conn = {
-          transport: scheme.find(self, 'MountType').get('value'),
-          name: scheme.find(self, 'MountName').get('value'),
-          description: scheme.find(self, 'MountDescription').get('value'),
+        ondone({
+          transport: self._find('MountType').get('value'),
+          name: self._find('MountName').get('value'),
+          description: self._find('MountDescription').get('value'),
           options: {
-            host: scheme.find(self, 'MountHost').get('value'),
-            ns: scheme.find(self, 'MountNamespace').get('value'),
-            username: scheme.find(self, 'MountUsername').get('value'),
-            password: scheme.find(self, 'MountPassword').get('value'),
-            cors: scheme.find(self, 'MountCORS').get('value')
+            host: self._find('MountHost').get('value'),
+            ns: self._find('MountNamespace').get('value'),
+            username: self._find('MountUsername').get('value'),
+            password: self._find('MountPassword').get('value'),
+            cors: self._find('MountCORS').get('value')
           }
-        };
-
-        if ( selected ) {
-          try {
-            OSjs.Core.getMountManager().remove(selected.name, function() {
-              if ( add(conn) ) {
-                ondone(conn, selected);
-              }
-              self._close();
-            });
-            return;
-          } catch ( e ) {
-            console.warn('Settings Mount modification failure', e, e.stack);
-          }
-        } else {
-          if ( !add(conn) ) {
-            conn = null;
-          }
-        }
+        }, selected);
 
         self._close();
-        ondone();
       }
 
-      scheme.render(this, this._name, root)
+      this._render(this._name);
 
       if ( selected ) {
-        scheme.find(self, 'MountType').set('value', selected.transport);
-        scheme.find(self, 'MountName').set('value', selected.name);
-        scheme.find(self, 'MountDescription').set('value', selected.description);
+        self._find('MountType').set('value', selected.transport);
+        self._find('MountName').set('value', selected.name);
+        self._find('MountDescription').set('value', selected.description);
+
         if ( selected.options ) {
-          scheme.find(self, 'MountHost').set('value', selected.options.host);
-          scheme.find(self, 'MountNamespace').set('value', selected.options.ns);
-          scheme.find(self, 'MountUsername').set('value', selected.options.username);
-          scheme.find(self, 'MountPassword').set('value', selected.options.password);
-          scheme.find(self, 'MountCORS').set('value', selected.options.cors);
+          self._find('MountHost').set('value', selected.options.host);
+          self._find('MountNamespace').set('value', selected.options.ns);
+          self._find('MountUsername').set('value', selected.options.username);
+          self._find('MountPassword').set('value', selected.options.password);
+          self._find('MountCORS').set('value', selected.options.cors);
         }
+      } else {
+        setTemplate(this._find('MountType').get('value'));
+        this._find('MountType').on('change', function(ev) {
+          setTemplate(ev.detail);
+        });
       }
 
-      scheme.find(this, 'ButtonClose').on('click', function() {
+      this._find('ButtonClose').on('click', function() {
         self._close();
       });
 
-      scheme.find(this, 'ButtonOK').on('click', function() {
+      this._find('ButtonOK').on('click', function() {
         done();
       });
     });
@@ -138,43 +144,6 @@
     });
 
     win._find('MountList').clear().add(entries);
-  }
-
-  function _save(sf, win, scheme, mounts) {
-    win._toggleLoading(true);
-    sf.set(null, {mounts: mounts}, function() {
-      renderMounts(win, scheme);
-      win._toggleLoading(false);
-    }, false);
-  }
-
-  function removeMount(win, scheme, index) {
-    var sm = OSjs.Core.getSettingsManager();
-    var sf = sm.instance('VFS');
-    var mounts = sf.get('mounts', []);
-
-    if ( typeof mounts[index] !== 'undefined' ) {
-      mounts.splice(index, 1);
-      _save(sf, win, scheme, mounts);
-    }
-  }
-
-  function addMount(conn, replace, win, scheme) {
-    if ( !conn ) {
-      return;
-    }
-
-    var sm = OSjs.Core.getSettingsManager();
-    var sf = sm.instance('VFS');
-    var mounts = sf.get('mounts', []).filter(function(iter) {
-      if ( replace && replace.name === iter.name ) {
-        return false;
-      }
-      return true;
-    });
-    mounts.push(conn);
-
-    _save(sf, win, scheme, mounts);
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -203,7 +172,15 @@
 
     render: function(win, scheme, root, settings, wm) {
       function ondone(connection, replace) {
-        addMount(connection, replace, win, scheme);
+        if ( connection ) {
+          if ( replace ) {
+            removeMounts.push(replace);
+          }
+          addMounts.push(connection);
+        }
+
+        win.onButtonOK();
+        win.onModuleSelect(module.name);
       }
 
       win._find('MountList').set('columns', [
@@ -213,8 +190,19 @@
 
       win._find('MountRemove').on('click', function() {
         var sel = win._find('MountList').get('selected');
-        if ( sel && sel.length ) {
-          removeMount(win, scheme, sel[0].data);
+        if ( sel instanceof Array ) {
+          sel.forEach(function(item) {
+            var sm = OSjs.Core.getSettingsManager();
+            var mounts = sm.instance('VFS').get('mounts', []);
+            var idx = item.data;
+
+            if ( mounts[idx] ) {
+              removeMounts.push(mounts[idx]);
+
+              win.onButtonOK();
+              win.onModuleSelect(module.name);
+            }
+          });
         }
       });
 
@@ -236,17 +224,48 @@
     },
 
     save: function(win, scheme, settings, wm) {
+      var mm = OSjs.Core.getMountManager();
+      var sm = OSjs.Core.getSettingsManager();
+      var si = sm.instance('VFS');
+
+      var mounts = si.get('mounts', []).filter(function(iter) {
+        for ( var i = 0; i < removeMounts.length; i++ ) {
+          var name = removeMounts[i].name;
+          if ( name === iter.name ) {
+            mm.remove(name, function() {
+            });
+
+            removeMounts.splice(i, 1);
+            return false;
+          }
+        }
+
+        return true;
+      });
+
+      addMounts.forEach(function(iter) {
+        try {
+          mm.add(iter);
+
+          mounts.push(iter); // FIXME: Move this  down ?
+        } catch ( e ) {
+          API.error('Settings', 'An error occured while trying to mount', e);
+          console.warn(e.stack, e);
+        }
+      });
+
       var vfsSettings = {
+        mounts: mounts,
         scandir: {
           showHiddenFiles: win._find('ShowHiddenFiles').get('value'),
           showFileExtensions: win._find('ShowFileExtensions').get('value')
         }
       };
 
-      return function(cb) {
-        var sm = OSjs.Core.getSettingsManager();
-        sm.instance('VFS').set(null, vfsSettings, cb, false);
-      };
+      si.set(null, vfsSettings, false, false);
+
+      addMounts = [];
+      removeMounts = [];
     }
   };
 

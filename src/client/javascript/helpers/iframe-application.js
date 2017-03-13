@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,9 +61,9 @@
    * @memberof OSjs.Helpers
    * @see OSjs.Core.Window
    *
-   * @link https://os.js.org/doc/tutorials/iframe-application.html
+   * @link https://os-js.org/manual/package/iframe/
    */
-  var IFrameApplicationWindow = function(name, opts, app) {
+  function IFrameApplicationWindow(name, opts, app) {
     opts = Utils.argumentDefaults(opts, {
       src: 'about:blank',
       focus: function() {},
@@ -81,7 +81,7 @@
 
     this._iwin = null;
     this._frame = null;
-  };
+  }
 
   IFrameApplicationWindow.prototype = Object.create(Window.prototype);
 
@@ -194,6 +194,7 @@
    * @memberof OSjs.Helpers.IframeApplicationWindow#
    *
    * @param   {String}      src       Source
+   * @param   {Element}     iframe    Iframe element
    */
   IFrameApplicationWindow.prototype.setLocation = function(src, iframe) {
     iframe = iframe || this._frame;
@@ -233,7 +234,7 @@
    * @memberof OSjs.Helpers
    * @see OSjs.Core.Application
    */
-  var IFrameApplication = function(name, args, metadata, opts) {
+  function IFrameApplication(name, args, metadata, opts) {
     Application.call(this, name, args, metadata);
 
     this.options = Utils.argumentDefaults(opts, {
@@ -241,7 +242,7 @@
       title: 'IframeApplicationWindow'
     });
     this.options.src = OSjs.API.getApplicationResource(this, this.options.src);
-  };
+  }
 
   IFrameApplication.prototype = Object.create(Application.prototype);
 
@@ -252,7 +253,12 @@
   };
 
   /**
+   * When Application receives a message from IFrame
+   *
    * @alias OSjs.Helpers.IframeApplicationWindow#onPostMessage
+   *
+   * @param   {Mixed}       message     The message
+   * @param   {Event}       ev          DOM Event
    */
   IFrameApplication.prototype.onPostMessage = function(message, ev) {
     console.debug('IFrameApplication::onPostMessage()', message);
@@ -278,6 +284,7 @@
   };
 
   /**
+   * @param   {Mixed}       message     The message
    * @alias OSjs.Helpers.IframeApplicationWindow#postMessage
    */
   IFrameApplication.prototype.postMessage = function(message) {

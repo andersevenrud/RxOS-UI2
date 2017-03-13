@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
  * @licence Simplified BSD License
  */
 
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, VFS, API, GUI) {
   'use strict';
 
@@ -63,17 +64,17 @@
   DefaultApplication.prototype = Object.create(Application.prototype);
   DefaultApplication.constructor = Application;
 
-  /**
+  /*
    * Destroy
    */
   DefaultApplication.prototype.destroy = function() {
     Application.prototype.destroy.apply(this, arguments);
   };
 
-  /**
+  /*
    * On Message
    */
-  DefaultApplication.prototype._onMessage = function(obj, msg, args) {
+  DefaultApplication.prototype._onMessage = function(msg, obj, args) {
     Application.prototype._onMessage.apply(this, arguments);
 
     var self = this;
@@ -116,7 +117,7 @@
         API.error(self.__label,
                   API._('ERR_FILE_APP_OPEN'),
                   API._('ERR_FILE_APP_OPEN_ALT_FMT',
-                  file.path));
+                  file.path, error));
         return true;
       }
       return false;
@@ -180,7 +181,7 @@
         API.error(self.__label,
                   API._('ERR_FILE_APP_SAVE'),
                   API._('ERR_FILE_APP_SAVE_ALT_FMT',
-                  file.path));
+                  file.path, error));
         return;
       }
 
@@ -198,8 +199,9 @@
    * @param   {OSjs.VFS.File}       file        File
    * @param   {OSjs.Core.Window}    win         Window reference
    * @param   {Boolean}             saveAs      SaveAs ?
+   * @param   {CallbackDialog}      cb          Called after the user closed the dialog
    */
-  DefaultApplication.prototype.saveDialog = function(file, win, saveAs) {
+  DefaultApplication.prototype.saveDialog = function(file, win, saveAs, cb) {
     var self = this;
     var value = win.getFileData();
 
@@ -221,6 +223,9 @@
       win._toggleDisabled(false);
       if ( button === 'ok' ) {
         self.saveFile(result, value, win);
+      }
+      if (typeof cb === 'function') {
+        cb(ev, button, result);
       }
     }, win);
   };

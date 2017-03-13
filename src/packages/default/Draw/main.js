@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(DefaultApplication, DefaultApplicationWindow, Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -224,7 +226,8 @@
       min_width: 400,
       min_height: 450,
       width: 800,
-      height: 450
+      height: 450,
+      translator: doTranslate
     }, app, scheme, file]);
 
     this.tool = {
@@ -245,16 +248,14 @@
     var self = this;
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'DrawWindow', root, null, null, {
-      _: doTranslate
-    });
+    this._render('DrawWindow');
 
-    var statusbar = scheme.find(this, 'Statusbar');
+    var statusbar = this._find('Statusbar');
 
     //
     // Canvas
     //
-    var canvas = scheme.find(this, 'Canvas').querySelector('canvas');
+    var canvas = this._find('Canvas').querySelector('canvas');
     canvas.width = DEFAULT_WIDTH;
     canvas.height = DEFAULT_HEIGHT;
 
@@ -345,16 +346,16 @@
     //
     // Toolbars
     //
-    scheme.find(this, 'Foreground').on('click', function() {
+    this._find('Foreground').on('click', function() {
       self.openColorDialog('foreground');
     });
-    scheme.find(this, 'Background').on('click', function() {
+    this._find('Background').on('click', function() {
       self.openColorDialog('background');
     });
 
     var ts = Object.keys(tools);
     ts.forEach(function(t) {
-      scheme.find(self, 'tool-' + t).on('click', function() {
+      self._find('tool-' + t).on('click', function() {
         var stats = tools[t].statusText || '';
         statusbar.set('value', doTranslate(stats));
 
@@ -367,13 +368,13 @@
       lineWidths.push({label: i.toString(), value: i});
     }
 
-    scheme.find(this, 'LineWidth').add(lineWidths).on('change', function(ev) {
+    this._find('LineWidth').add(lineWidths).on('change', function(ev) {
       self.setToolProperty('lineWidth', parseInt(ev.detail, 10));
     });
-    scheme.find(this, 'LineJoin').on('change', function(ev) {
+    this._find('LineJoin').on('change', function(ev) {
       self.setToolProperty('lineJoin', ev.detail);
     });
-    scheme.find(this, 'LineStroke').on('change', function(ev) {
+    this._find('LineStroke').on('change', function(ev) {
       self.setToolProperty('lineStroke', ev.detail);
     });
 
@@ -419,18 +420,18 @@
       }
     }
 
-    this._scheme.find(this, 'Foreground').set('value', this.tool.foreground);
-    this._scheme.find(this, 'Background').set('value', this.tool.background);
-    this._scheme.find(this, 'LineJoin').set('value', this.tool.lineJoin);
-    this._scheme.find(this, 'LineWidth').set('value', this.tool.lineWidth);
-    this._scheme.find(this, 'LineStroke').set('value', this.tool.lineStroke);
+    this._find('Foreground').set('value', this.tool.foreground);
+    this._find('Background').set('value', this.tool.background);
+    this._find('LineJoin').set('value', this.tool.lineJoin);
+    this._find('LineWidth').set('value', this.tool.lineWidth);
+    this._find('LineStroke').set('value', this.tool.lineStroke);
   };
 
   ApplicationDrawWindow.prototype.showFile = function(file, result) {
     var self = this;
     DefaultApplicationWindow.prototype.showFile.apply(this, arguments);
 
-    var canvas = this._scheme.find(this, 'Canvas').querySelector('canvas');
+    var canvas = this._find('Canvas').querySelector('canvas');
     var ctx = canvas.getContext('2d');
 
     function open(img) {
@@ -470,7 +471,7 @@
   };
 
   ApplicationDrawWindow.prototype.getFileData = function() {
-    var canvas = this._scheme.find(this, 'Canvas').querySelector('canvas');
+    var canvas = this._find('Canvas').querySelector('canvas');
     if ( canvas ) {
       return new VFS.FileDataURL(canvas.toDataURL('image/png'));
     }

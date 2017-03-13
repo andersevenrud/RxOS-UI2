@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -302,8 +302,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'لا يمكن فتح الملف',
     'ERR_FILE_APP_OPEN_FMT'     : 'الملف {0} غير قابل للفتح لأن التعريف {1} غير مدعوم',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'الملف {0} غير ممكن فتحه',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'الملف {0} غير ممكن حفظه',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'الملف {0} غير ممكن فتحه: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'الملف {0} غير ممكن حفظه: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} خطأ في التطبيق',
     'ERR_GENERIC_APP_ACTION_FMT': 'عدم التمكن من إنجاز العملية \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'خطأ غير معروف',

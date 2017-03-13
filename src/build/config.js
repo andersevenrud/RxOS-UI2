@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,69 +27,337 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
-(function(_fs, _path, _utils, _manifest, _themes) {
-  'use strict';
 
-  var ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
-  var CACHE = false;
+/*eslint strict:["error", "global"]*/
+'use strict';
 
-  /////////////////////////////////////////////////////////////////////////////
-  // HELPERS
-  /////////////////////////////////////////////////////////////////////////////
+const _path = require('path');
+const _glob = require('glob-promise');
+const _fs = require('fs-extra');
+const _sjc = require('simplejsonconf');
 
-  /**
-   * Gets a config value
-   */
-  function _getConfigPath(config, path) {
-    if ( typeof path === 'string' ) {
-      var result = null;
-      var queue = path.split(/\./);
-      var ns = config;
+const _themes = require('./themes.js');
+const _metadata = require('./manifest.js');
+const _utils = require('./utils.js');
+const _logger = _utils.logger;
 
-      queue.forEach(function(k, i) {
-        if ( i >= queue.length - 1 ) {
-          result = ns[k];
-        } else {
-          ns = ns[k];
+const ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
+
+///////////////////////////////////////////////////////////////////////////////
+// HELPERS
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Generates a client-side config file
+ */
+function generateClientConfiguration(target, cli, cfg) {
+  return new Promise((resolve, reject) => {
+    let settings = Object.assign({}, cfg.client);
+
+    const preloads = Object.keys(settings.Preloads || {}).map((k) => {
+      return settings.Preloads[k];
+    });
+
+    if ( !(settings.AutoStart instanceof Array) ) {
+      settings.AutoStart = [];
+    }
+
+    if ( cli.option('standalone') && target === 'dist' ) {
+      settings.Connection.Type = 'standalone';
+      settings.VFS.GoogleDrive.Enabled = false;
+      settings.VFS.OneDrive.Enabled = false;
+      settings.VFS.Dropbox.Enabled = false;
+      settings.VFS.LocalStorage.Enabled = false;
+
+      const valid = ['applications', 'home', 'osjs'];
+      Object.keys(settings.VFS.Mountpoints).forEach((k) => {
+        if ( valid.indexOf(k) === -1 ) {
+          delete settings.VFS.Mountpoints[k];
+        }
+      });
+    }
+
+    settings.Broadway = cfg.broadway;
+
+    if ( cfg.broadway.enabled ) {
+      preloads.push({
+        'type': 'javascript',
+        'src': '/vendor/zlib.js'
+      });
+    }
+
+    _themes.readMetadata(cfg).then((themes) => {
+      settings.Fonts.list = themes.fonts.concat(settings.Fonts.list);
+      settings.Styles = themes.styles;
+      settings.Sounds = _utils.makedict(themes.sounds, (iter) => {
+        return [iter.name, iter.title];
+      });
+      settings.Icons = _utils.makedict(themes.icons, (iter) => {
+        return [iter.name, iter.title];
+      });
+
+      _metadata.getPackages(cfg.repositories, (pkg) => {
+        return pkg && pkg.autostart === true;
+      }).then((list) => {
+        settings.AutoStart = settings.AutoStart.concat(Object.keys(list).map((k) => {
+          return list[k].className;
+        }));
+        settings.MIME = cfg.mime;
+        settings.Preloads = preloads;
+        settings.Connection.Dist = target;
+
+        resolve(settings);
+      });
+    }).catch(reject);
+  });
+}
+
+/*
+ * Generates a server-side config file
+ */
+function generateServerConfiguration(cli, cfg) {
+  let settings = Object.assign({}, cfg.server);
+
+  return new Promise((resolve, reject) => {
+    _metadata.getPackages(cfg.repositories, (pkg) => {
+      return pkg && pkg.type === 'extension';
+    }).then((extensions) => {
+      const src = _path.join(ROOT, 'src');
+      Object.keys(extensions).forEach((e) => {
+
+        if ( extensions[e].conf && extensions[e].conf instanceof Array ) {
+          extensions[e].conf.forEach((c) => {
+            try {
+              const p = _path.join(src, 'packages', extensions[e].path, c);
+              try {
+                const s = _fs.readJsonSync(p);
+                settings = _utils.mergeObject(settings, s);
+              } catch ( e ) {
+                _utils.log(_logger.color('Failed reading:', 'yellow'), p);
+              }
+            } catch ( e ) {
+              _logger.warn('createConfigurationFiles()', e, e.stack);
+            }
+          });
         }
       });
 
-      if ( typeof result === 'undefined' ) {
-        return null;
-      }
-      return result;
-    }
-    return config;
+      settings.mimes = cfg.mime.mapping;
+      settings.broadway = cfg.broadway;
+      settings.vfs.maxuploadsize = cfg.client.VFS.MaxUploadSize;
+
+      resolve(settings);
+    });
+  });
+}
+
+/*
+ * Get a configuration value by path
+ */
+function getConfigPath(config, path, defaultValue) {
+  return _sjc.getJSON(config, path, defaultValue);
+}
+
+/*
+ * Sets a config value
+ */
+function setConfigPath(key, value, isTree, outputFile) {
+  let path = _path.join(ROOT, 'src', 'conf', '900-custom.json');
+  if ( outputFile ) {
+    const confDir = _path.join(ROOT, 'src', 'conf');
+    path = _path.resolve(confDir, outputFile);
   }
 
-  /**
-   * Sets a config value
-   */
-  var _setConfigPath = (function() {
+  let conf = {};
+  try {
+    conf = _fs.readJsonSync(path);
+  } catch ( e ) {}
 
-    function removeNulls(obj) {
-      var isArray = obj instanceof Array;
-      for (var k in obj) {
-        if ( obj[k] === null ) {
-          if ( isArray ) {
-            obj.splice(k, 1);
-          } else {
-            delete obj[k];
-          }
-        } else if ( typeof obj[k] === 'object') {
-          removeNulls(obj[k]);
-        }
-      }
+  try {
+    const result = _sjc.setJSON(conf, isTree ? null : key, value, {
+      prune: true,
+      guess: true
+    });
+
+    _fs.writeFileSync(path, JSON.stringify(result, null, 2));
+  } catch ( e ) {
+    console.error(e.stack, e);
+    return;
+  }
+
+  _logger.info('Changes written to: ' + path.replace(ROOT, ''));
+  _logger.warn(_logger.color('Remember to run \'osjs build:config\' to update your build(s)...', 'green'));
+}
+
+/*
+ * Toggles package enable state
+ */
+function _togglePackage(config, packageName, enable) {
+  const currentEnabled = getConfigPath(config, 'packages.ForceEnable') || [];
+  const currentDisabled = getConfigPath(config, 'packages.ForceDisable') || [];
+
+  let idx;
+  if ( enable ) {
+    if ( currentEnabled.indexOf(packageName) < 0 ) {
+      currentEnabled.push(packageName);
     }
 
-    function getNewTree(key, value) {
-      var queue = key.split(/\./);
-      var resulted = {};
-      var ns = resulted;
+    idx = currentDisabled.indexOf(packageName);
+    if ( idx >= 0 ) {
+      currentDisabled.splice(idx, 1);
+    }
+  } else {
+    idx = currentEnabled.indexOf(packageName);
+    if ( idx >= 0 ) {
+      currentEnabled.splice(idx, 1);
+    }
 
-      queue.forEach(function(k, i) {
+    idx = currentDisabled.indexOf(packageName);
+    if ( idx < 0 ) {
+      currentDisabled.push(packageName);
+    }
+  }
+
+  setConfigPath('packages', {
+    packages: {
+      ForceEnable: currentEnabled,
+      ForceDisable: currentDisabled
+    }
+  }, true);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// API
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Gets currenct configuration(s)
+ */
+function getConfiguration() {
+  const safeWords = [
+    '%VERSION%',
+    '%DIST%',
+    '%DROOT%',
+    '%UID%',
+    '%USERNAME%'
+  ];
+
+  return new Promise((resolve, reject) => {
+    const path = _path.join(ROOT, 'src', 'conf');
+
+    let object = {};
+    _glob(path + '/*.json').then((files) => {
+
+      files.forEach((file) => {
+        try {
+          const json = _fs.readJsonSync(file);
+          object = _utils.mergeObject(object, json);
+        } catch ( e ) {
+          _logger.warn('Failed to read JSON file', _path.basename(file), 'Syntax error ?', e);
+        }
+      });
+
+      // Resolves all "%something%" config entries
+      let tmpFile = JSON.stringify(object).replace(/%ROOT%/g, _utils.fixWinPath(ROOT));
+      const tmpConfig = JSON.parse(tmpFile);
+
+      const words = tmpFile.match(/%([A-z0-9_\-\.]+)%/g).filter((() => {
+        let seen = {};
+        return function(element, index, array) {
+          return !(element in seen) && (seen[element] = 1);
+        };
+      })());
+
+      words.forEach((w) => {
+        const p = w.replace(/%/g, '');
+        const u = /^[A-Z]*$/.test(p);
+        if ( safeWords.indexOf(w) === -1 ) {
+          const value = (u ? process.env[p] : null) || getConfigPath(tmpConfig, p);
+          const re = w.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '$1');
+          tmpFile = tmpFile.replace(new RegExp(re, 'g'), String(value));
+        }
+      });
+
+      resolve(Object.freeze(JSON.parse(tmpFile)));
+    }).catch(reject);
+
+  });
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// TASKS
+///////////////////////////////////////////////////////////////////////////////
+
+const TARGETS = {
+  client: function(cli, cfg) {
+    return _utils.eachp(['dist', 'dist-dev'].map((dist) => {
+      return function() {
+        return new Promise((resolve, reject) => {
+          const src = _path.join(ROOT, 'src', 'templates', 'dist', 'settings.js');
+          const tpl = _fs.readFileSync(src).toString();
+          const dest = _path.join(ROOT, dist, 'settings.js');
+
+          generateClientConfiguration(dist, cli, cfg).then((settings) => {
+            const data = tpl.replace('%CONFIG%', JSON.stringify(settings, null, 4));
+            resolve(_fs.writeFileSync(dest, data));
+          }).catch(reject);
+        });
+      };
+    }));
+  },
+
+  server: function(cli, cfg) {
+    return new Promise((resolve, reject) => {
+      const dest = _path.join(ROOT, 'src', 'server', 'settings.json');
+
+      generateServerConfiguration(cli, cfg).then((settings) => {
+        const data = JSON.stringify(settings, null, 4);
+        resolve(_fs.writeFileSync(dest, data));
+      }).catch(reject);
+    });
+  }
+};
+
+/*
+ * Writes given configuration file(s)
+ */
+function writeConfiguration(target, cli, cfg) {
+  return new Promise((resolve, reject) => {
+    if ( TARGETS[target] ) {
+      _logger.log('Generating configuration for', target);
+      TARGETS[target](cli, cfg).then(resolve).catch(reject);
+    } else {
+      reject('Invalid target ' + target);
+    }
+  });
+}
+
+/*
+ * Gets a configuration option
+ */
+function getConfig(config, key) {
+  let dump = getConfigPath(config, key);
+  try {
+    dump = JSON.stringify(dump, null, 4);
+  } catch ( e ) {}
+  return Promise.resolve(dump);
+}
+
+/*
+ * Sets a configuration option
+ */
+function setConfig(config, key, value, importFile, outputFile) {
+  key = key || '';
+
+  function getNewTree(k, v) {
+    let resulted = {};
+
+    if ( k.length ) {
+      const queue = k.split(/\./);
+      let ns = resulted;
+      queue.forEach((k, i) => {
         if ( i >= queue.length - 1 ) {
-          ns[k] = value;
+          ns[k] = v;
         } else {
           if ( typeof ns[k] === 'undefined' ) {
             ns[k] = {};
@@ -97,478 +365,150 @@
           ns = ns[k];
         }
       });
-
-      return resulted;
     }
 
-    function guessValue(value) {
-      value = String(value);
+    return resulted;
+  }
 
-      if ( value === 'true' ) {
-        return true;
-      } else if ( value === 'false' ) {
-        return false;
-      } else if ( value === 'null' ) {
-        return null;
-      } else {
-        if ( value.match(/^\d+$/) && !value.match(/^0/) ) {
-          return parseInt(value, 10);
-        } else if ( value.match(/^\d{0,2}(\.\d{0,2}){0,1}$/) ) {
-          return parseFloat(value);
-        }
-      }
-      return value;
+  if ( importFile ) {
+    const importJson = _fs.readJsonSync(importFile);
+    const importTree = key.length ? getNewTree(key, importJson) : importJson;
+    return Promise.resolve(setConfigPath(null, importTree, true));
+  }
+
+  if ( typeof value === 'undefined' ) {
+    return Promise.resolve(value);
+  }
+
+  return Promise.resolve(setConfigPath(key, value, false, outputFile));
+}
+
+/*
+ * Add a force enable package to config files
+ */
+function enablePackage(config, name) {
+  return Promise.resolve(_togglePackage(config, name, true));
+}
+
+/*
+ * Add a force disable package to config files
+ */
+function disablePackage(config, name) {
+  return Promise.resolve(_togglePackage(config, name, false));
+}
+
+/*
+ * Adds a file to an overlay
+ */
+function addOverlayFile(config, type, path, overlay) {
+  const play = 'build.overlays.' + overlay;
+
+  let overlays = getConfigPath(config, 'build.overlays');
+  if ( typeof overlays !== 'object' ) {
+    overlays = {};
+  }
+
+  if ( typeof overlays[overlay] !== 'object' ) {
+    overlays[overlay] = {};
+  }
+
+  const files = overlays[overlay][type] || [];
+  if ( files.indexOf(path) === -1 ) {
+    files.push(path);
+  }
+  overlays[overlay][type] = files;
+
+  setConfigPath('build.overlays', {build: {overlays: overlays}}, true);
+  return Promise.resolve(getConfigPath(config, play));
+}
+
+/*
+ * Add a mountpoint to config files
+ */
+function addMount(config, name, description, path, transport, ro) {
+  if ( typeof transport !== 'string' ) {
+    transport = null;
+  }
+
+  if ( !path || !name ) {
+    return Promise.reject('You have to define a path and name for a mountpoint');
+  }
+
+  let iter = path;
+  if ( transport || ro ) {
+    iter = {destination: path};
+    if ( transport ) {
+      iter.transport = transport;
     }
-
-    return function(key, value, isTree) {
-      if ( !isTree ) {
-        value = guessValue(value);
-      }
-
-      var path = _path.join(ROOT, 'src', 'conf', '900-custom.json');
-      var newTree = isTree ? value : getNewTree(key, value);
-      var oldTree = {};
-
-      try {
-        oldTree = JSON.parse(_fs.readFileSync(path).toString());
-      } catch ( e ) {
-        oldTree = {};
-      }
-
-      var result = _utils.mergeObject(oldTree, newTree);
-      removeNulls(result);
-
-      _fs.writeFileSync(path, JSON.stringify(result, null, 2));
-
-      return result;
-    };
-  })();
-
-  /**
-   * Toggles package enable state
-   */
-  function _togglePackage(config, packageName, enable) {
-    var currentEnabled = _getConfigPath(config, 'packages.ForceEnable') || [];
-    var currentDisabled = _getConfigPath(config, 'packages.ForceDisable') || [];
-
-    var idx;
-    if ( enable ) {
-      if ( currentEnabled.indexOf(packageName) < 0 ) {
-        currentEnabled.push(packageName);
-      }
-
-      idx = currentDisabled.indexOf(packageName);
-      if ( idx >= 0 ) {
-        currentDisabled.splice(idx, 1);
-      }
-    } else {
-      idx = currentEnabled.indexOf(packageName);
-      if ( idx >= 0 ) {
-        currentEnabled.splice(idx, 1);
-      }
-
-      idx = currentDisabled.indexOf(packageName);
-      if ( idx < 0 ) {
-        currentDisabled.push(packageName);
-      }
+    if ( ro ) {
+      iter.ro = ro === true;
     }
-
-    _setConfigPath('packages', {
-      packages: {
-        ForceEnable: currentEnabled,
-        ForceDisable: currentDisabled
-      }
-    }, true);
   }
 
-  /**
-   * Reads a settings template
-   */
-  function _readTemplate(cb) {
-    var src = _path.join(ROOT, 'src', 'templates', 'dist', 'settings.js');
-    _fs.readFile(src, function(err, res) {
-      cb(err, err ? false : res.toString());
-    });
-  }
+  let current = getConfigPath(config, 'client.VFS.Mountpoints') || {};
+  current[name] = {description: description || name};
+  setConfigPath('client.VFS.Mountpoints', {client: {VFS: {Mountpoints: current}}}, true);
 
-  /**
-   * Writes a settings template
-   */
-  function _write(config, tpl, dist, cb) {
-    var dest = _path.join(ROOT, dist, 'settings.js');
-    var data = tpl.replace('%CONFIG%', JSON.stringify(config, null, 4));
-    _fs.writeFile(dest, data, function(err) {
-      cb(err, !!err);
-    });
-  }
+  current = getConfigPath(config, 'server.vfs.mounts') || {};
+  current[name] = iter;
+  setConfigPath('server.vfs.mounts', {server: {vfs: {mounts: current}}}, true);
 
-  /**
-   * Clones given object
-   */
-  function _clone(obj) {
-    if ( obj === null || typeof(obj) !== 'object' ) {
-      return obj;
-    }
+  return Promise.resolve(getConfigPath(config, 'server.vfs.mounts'));
+}
 
-    var temp = {};
-    if ( obj instanceof Array ) {
-      temp = obj.map(function(iter) {
-        return _clone(iter);
-      });
-    } else {
-      Object.keys(obj).forEach(function(key) {
-        temp[key] = _clone(obj[key]);
-      });
-    }
+/*
+ * Add a preload to config files
+ */
+function addPreload(config, name, path, type) {
+  type = type || 'javascript';
 
-    return temp;
-  }
+  let current = getConfigPath(config, 'client.Preloads') || {};
+  current[name] = {type: type, src: path};
 
-  /**
-   * Wrapper for getting packages with a filter
-   */
-  function __getPackagesFiltered(cfg, filter, cb) {
-    _manifest.getPackages({
-      repositories: cfg.repositories
-    }, function(err, packages) {
-      packages = packages || {};
+  setConfigPath('client.Preloads', {client: {Preloads: current}}, true);
 
-      var list = {};
-      Object.keys(packages).forEach(function(p) {
-        var pkg = packages[p];
-        if ( filter(pkg) ) {
-          list[p] = _clone(pkg);
-        }
-      });
+  return Promise.resolve(getConfigPath(config, 'client.Preloads'));
+}
 
-      cb(list);
-    });
-  }
-
-  /**
-   * Get packages with autostart set
-   */
-  function _getAutostarted(cfg, cb) {
-    __getPackagesFiltered(cfg, function(pkg) {
-      return pkg && pkg.autostart === true;
-    }, function(list) {
-      cb(Object.keys(list).map(function(i) {
-        return list[i].className;
-      }));
-    });
-  }
-
-  /**
-   * Get packages of the extension type
-   */
-  function _getExtensions(cfg, cb) {
-    __getPackagesFiltered(cfg, function(pkg) {
-      return pkg && pkg.type === 'extension';
-    }, cb)
-  }
-
-  /**
-   * Read and merge JSON objects
-   */
-  function _readAndMerge(iter, config) {
-    try {
-      if ( _fs.existsSync(iter) ) {
-        var json = JSON.parse(_fs.readFileSync(iter).toString());
-        config = _utils.mergeObject(_clone(config), json);
-      }
-    } catch ( e ) {
-      console.log(e.stack);
-    }
-    return config;
-  }
-
-  /**
-   * Make correction to package manifest
-   */
-  function _makeCorrections(cfg, opts, settings, target, cb) {
-    var preloads = Object.keys(settings.Preloads || {}).map(function(k) {
-      return settings.Preloads[k];
-    });
-
-    if ( target === 'dist-dev' ) {
-      preloads.push({
-        type: 'javascript',
-        src: '/' + ['client', 'javascript', 'handlers', cfg.handler, 'handler.js'].join('/')
-      });
-    }
-
-    if ( !(settings.AutoStart instanceof Array) ) {
-      settings.AutoStart = [];
-    }
-
-    if ( opts.standalone && target === 'dist' ) {
-      settings.Connection.Type = 'standalone';
-      settings.VFS.GoogleDrive.Enabled = false;
-      settings.VFS.OneDrive.Enabled = false;
-      settings.VFS.Dropbox.Enabled = false;
-      settings.VFS.LocalStorage.Enabled = false;
-
-      var valid = ['applications', 'home', 'osjs'];
-      Object.keys(settings.VFS.Mountpoints).forEach(function(k) {
-        if ( valid.indexOf(k) === -1 ) {
-          delete settings.VFS.Mountpoints[k];
-        }
-      });
-    }
-
-    var themes = _themes.readMetadata(cfg);
-    settings.Fonts.list = themes.fonts.concat(settings.Fonts.list);
-    settings.Styles = themes.styles;
-    settings.Sounds = _utils.makedict(themes.sounds, function(iter) {
-      return [iter.name, iter.title];
-    });
-    settings.Icons = _utils.makedict(themes.icons, function(iter) {
-      return [iter.name, iter.title];
-    });
-
-    _getAutostarted(cfg, function(list) {
-      settings.AutoStart = settings.AutoStart.concat(list);
-      settings.MIME = cfg.mime;
-      settings.Preloads = preloads;
-      settings.Connection.Dist = target;
-
-      cb(settings);
-    });
-  }
-
-  /////////////////////////////////////////////////////////////////////////////
-  // TARGETS
-  /////////////////////////////////////////////////////////////////////////////
-
-  var TARGETS = {
-    client: function(config, opts, done) {
-      _readTemplate(function(err, tpl) {
-        _utils.iterate(['dist', 'dist-dev'], function(dist, idx, next) {
-          _makeCorrections(config, opts, _clone(config.client), dist, function(settings) {
-            _write(settings, tpl, dist, function() {
-              next();
-            });
-          });
-        }, function() {
-          done(false, true);
-        });
-      });
-    },
-
-    server: function(config, opts, done) {
-      var dest = _path.join(ROOT, 'src', 'server', 'settings.json');
-      var settings = _clone(config.server);
-
-      _getExtensions(config, function(extensions) {
-        var loadExtensions = [];
-        var src = _path.join(ROOT, 'src');
-
-        Object.keys(extensions).forEach(function(e) {
-          (['api.php', 'api.js']).forEach(function(c) {
-            var dir = _path.join(src, 'packages', e, c);
-            if ( _fs.existsSync(dir) ) {
-              var path = '/' + _utils.fixWinPath(dir).replace(_utils.fixWinPath(src), config.server.srcdir);
-              loadExtensions.push(path);
-            }
-          });
-
-          if ( extensions[e].conf && extensions[e].conf instanceof Array ) {
-            extensions[e].conf.forEach(function(c) {
-              try {
-                var p = _path.join(src, 'packages', extensions[e].path, c);
-                settings = _readAndMerge(p, settings);
-              } catch ( e ) {
-                console.warn('createConfigurationFiles()', e, e.stack);
-              }
-            });
-          }
-        });
-
-        settings.extensions = loadExtensions;
-        settings.mimes = config.mime.mapping;
-
-        _fs.writeFile(dest, JSON.stringify(settings, null, 4), function(err) {
-          done(err, !!err);
-        });
-      });
-    }
-  };
-
-  /////////////////////////////////////////////////////////////////////////////
-  // API
-  /////////////////////////////////////////////////////////////////////////////
-
-  /**
-   * Gets entire configuration tree
-   */
-  function getConfiguration(opts, done) {
-    if ( CACHE ) {
-      return done(false, Object.freeze(CACHE));
-    }
-
-    var path = _path.join(ROOT, 'src', 'conf');
-    var data = {};
-
-    _utils.enumFiles(path, function(list) {
-      list = list.filter(function(iter) {
-        return iter.match(/\.json$/);
-      });
-
-      _utils.iterate(list, function(iter, idx, next) {
-        var file = _path.join(path, iter);
-        _utils.readJSON(file, function(err, cfg) {
-          if ( !err && cfg ) {
-            _utils.mergeObject(data, cfg);
-          }
-          next();
-        });
-      }, function() {
-
-        var handler = data.handler || 'demo';
-        var connection = data.connection || 'http';
-
-        var tmp = JSON.stringify(data).replace(/%ROOT%/g, _utils.fixWinPath(ROOT))
-          .replace(/%HANDLER%/g, handler)
-          .replace(/%CONNECTION%/g, connection);
-
-        CACHE = Object.freeze(JSON.parse(tmp));
-        done(false, CACHE);
-      });
-    });
-  }
-
-  /**
-   * grunt build:config
-   *
-   * Generates dist configuration files
-   */
-  function writeConfiguration(opts, done) {
-    console.log('Generating configuration for', opts.target);
-    getConfiguration({
-    }, function(err, config) {
-      if ( err ) {
-        done(err, false);
-      } else {
-        TARGETS[opts.target](config, opts, done);
-      }
-    });
-  }
-
-  /**
-   * grunt config:get
-   *
-   * Gets a configuration option
-   */
-  function getConfig(config, key, done) {
-    done(_getConfigPath(config, key));
-  }
-
-  /**
-   * grunt config:set
-   *
-   * Sets a configuration option
-   */
-  function setConfig(config, key, value, done) {
-    if ( typeof value === 'undefined' ) {
-      return done(value);
-    }
-    done(_setConfigPath(key, value));
-  }
-
-  /**
-   * grunt config:enable-package
-   *
-   * Add a force enable package to config files
-   */
-  function enablePackage(config, name, done) {
-    _togglePackage(config, name, true);
-    done();
-  }
-
-  /**
-   * grunt config:disable-package
-   *
-   * Add a force disable package to config files
-   */
-  function disablePackage(config, name, done) {
-    _togglePackage(config, name, false);
-    done();
-  }
-
-  /**
-   * grunt config:add-mount
-   *
-   * Add a mountpoint to config files
-   */
-  function addMount(config, name, description, path, done) {
-    var current = _getConfigPath(config, 'client.VFS.Mountpoints') || {};
-    current[name] = {description: description || name};
-    _setConfigPath('client.VFS.Mountpoints', {client: {VFS: { Mountpoints: current}}}, true);
-
-    current = _getConfigPath(config, 'server.vfs.mounts') || {};
-    current[name] = path;
-    _setConfigPath('server.vfs.mounts', {server: {vfs: {mounts: current}}}, true);
-
-    done();
-  }
-
-  /**
-   * grunt config:add-preload
-   *
-   * Add a preload to config files
-   */
-  function addPreload(config, name, path, type, done) {
-    type = type || 'javascript';
-
-    var current = _getConfigPath(config, 'client.Preloads') || {};
-    current[name] = {type: type, src: path};
-
-    _setConfigPath('client.Preloads', {client: {Preloads: current}}, true);
-
-    done();
-  }
-
-  /**
-   * grunt config:add-respository
-   *
-   * Add a repository to config files
-   */
-  function addRepository(config, name, done) {
-    var current = _getConfigPath(config, 'repositories') || [];
+/*
+ * Add a repository to config files
+ */
+function addRepository(config, name) {
+  let current = getConfigPath(config, 'repositories') || [];
+  if ( current.indexOf(name) === -1 ) {
     current.push(name);
-    _setConfigPath('repositories', {repositories: current}, true);
-    done();
+  }
+  setConfigPath('repositories', {repositories: current}, true);
+
+  return Promise.resolve(getConfigPath(config, 'repositories'));
+}
+
+/*
+ * Removes a repository from config files
+ */
+function removeRepository(config, name) {
+  let current = getConfigPath(config, 'repositories') || [];
+  let found = current.indexOf(name);
+  if ( found >= 0 ) {
+    current.splice(found, 1);
+  }
+  if ( current.length === 1 && current[0] === 'default' ) {
+    current = null;
   }
 
-  /**
-   * grunt config:remove-respository
-   *
-   * Removes a repository from config files
-   */
-  function removeRepository(config, name, done) {
-    var current = _getConfigPath(config, 'repositories') || [];
-    var found = current.indexOf(name);
-    if ( found >= 0 ) {
-      current.splice(found, 1);
-    }
-    if ( current.length === 1 && current[0] === 'default' ) {
-      current = null;
-    }
-    _setConfigPath('repositories', {repositories: current}, true);
-    done();
-  }
+  setConfigPath('repositories', {repositories: current}, true);
 
-  /**
-   * grunt config:list-packages
-   *
-   * Lists all packages
-   */
-  function listPackages(config, done) {
-    _manifest.getPackages({
-      repositories: config.repositories
-    }, function(err, packages) {
-      var currentEnabled = _getConfigPath(config, 'packages.ForceEnable') || [];
-      var currentDisabled = _getConfigPath(config, 'packages.ForceDisable') || [];
+  return Promise.resolve(getConfigPath(config, 'repositories'));
+}
+
+/*
+ * Lists all packages
+ */
+function listPackages(config) {
+  return new Promise((resolve) => {
+    _metadata.getPackages(config.repositories, null, true).then((packages) => {
+      const currentEnabled = getConfigPath(config, 'packages.ForceEnable') || [];
+      const currentDisabled = getConfigPath(config, 'packages.ForceDisable') || [];
 
       function pl(str, s) {
         if ( str.length > s ) {
@@ -583,51 +523,54 @@
       }
 
       if ( packages ) {
-        Object.keys(packages).forEach(function(pn) {
-          var p = packages[pn];
-          var es = p.enabled !== false;
-          var esc = es ? 'green' : 'red';
-          var prn = pn.split('/', 2)[1];
+        Object.keys(packages).forEach((pn) => {
+          const p = packages[pn];
+
+          let es = String(p.enabled) !== 'false';
+          let esc = es ? 'green' : 'red';
+
           if ( es ) {
-            if ( currentDisabled.indexOf(prn) !== -1 ) {
+            if ( !_metadata.checkEnabledState(currentEnabled, currentDisabled, p) ) {
               es = false;
               esc = 'yellow';
             }
           } else {
-            if ( currentEnabled.indexOf(prn) !== -1 ) {
+            if ( _metadata.checkEnabledState(currentEnabled, currentDisabled, p) ) {
               es = true;
               esc = 'blue';
             }
           }
 
-          var lblenabled = (es ? 'Enabled' : 'Disabled')[esc];
-          var lblname = prn[es ? 'white' : 'grey'];
-          var lblrepo = p.repo[es ? 'white' : 'grey'];
-          var lbltype = p.type[es ? 'white' : 'grey'];
+          const prn = pn.split('/', 2)[1];
+          const lblenabled = (es ? 'Enabled' : 'Disabled')[esc];
+          const lblname = prn[es ? 'white' : 'grey'];
+          const lblrepo = p.repo[es ? 'white' : 'grey'];
+          const lbltype = p.type[es ? 'white' : 'grey'];
 
-          console.log(pl(lblenabled, 20), pl(lblrepo, 30), pl(lbltype, 25), lblname);
+          _logger.log(pl(lblenabled, 20), pl(lblrepo, 30), pl(lbltype, 25), lblname);
         });
       }
 
-      done();
+      resolve();
     });
-  }
+  });
+}
 
-  /////////////////////////////////////////////////////////////////////////////
-  // EXPORTS
-  /////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// EXPORTS
+///////////////////////////////////////////////////////////////////////////////
 
-  module.exports.getConfiguration = getConfiguration;
-  module.exports.writeConfiguration = writeConfiguration;
-  module.exports.enablePackage = enablePackage;
-  module.exports.disablePackage = disablePackage;
-  module.exports.addMount = addMount;
-  module.exports.addPreload = addPreload;
-  module.exports.addRepository = addRepository;
-  module.exports.removeRepository = removeRepository;
-  module.exports.listPackages = listPackages;
-  module.exports.getConfigPath = _getConfigPath;
-  module.exports.get = getConfig;
-  module.exports.set = setConfig;
-
-})(require('node-fs-extra'), require('path'), require('./utils.js'), require('./manifest.js'), require('./themes.js'));
+module.exports.getConfiguration = getConfiguration;
+module.exports.writeConfiguration = writeConfiguration;
+module.exports.getConfigPath = getConfigPath;
+module.exports.enablePackage = enablePackage;
+module.exports.disablePackage = disablePackage;
+module.exports.addOverlayFile = addOverlayFile;
+module.exports.addMount = addMount;
+module.exports.addPreload = addPreload;
+module.exports.addRepository = addRepository;
+module.exports.removeRepository = removeRepository;
+module.exports.listPackages = listPackages;
+module.exports.get = getConfig;
+module.exports.set = setConfig;
+module.exports._set = setConfigPath;

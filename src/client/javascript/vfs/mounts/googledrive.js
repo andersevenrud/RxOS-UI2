@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -105,7 +105,7 @@
     }
   }
 
-  /**
+  /*
    * Scans entire file tree for given path
    */
   function getFileFromPath(dir, type, callback) {
@@ -145,7 +145,7 @@
     });
   }
 
-  /**
+  /*
    * Gets the parent path
    */
   function getParentPathId(item, callback) {
@@ -162,7 +162,7 @@
     });
   }
 
-  /**
+  /*
    * Generate FileView compatible array of scandir()
    */
   function createDirectoryList(dir, list, item, options) {
@@ -206,7 +206,7 @@
     return result ? OSjs.VFS.Helpers.filterScandir(result, options) : [];
   }
 
-  /**
+  /*
    * Get all files in a directory
    */
   function getAllDirectoryFiles(item, callback) {
@@ -276,7 +276,7 @@
         }
       });
 
-      var resolves = Utils.getPathProtocol(root).replace(/^\/+/, '').split('/');
+      var resolves = Utils.getPathFromVirtual(root).replace(/^\/+/, '').split('/');
       resolves = resolves.filter(function(el) {
         return el !== '';
       });
@@ -389,7 +389,7 @@
 
   }
 
-  /**
+  /*
    * Sets the folder for a file
    */
   function setFolder(item, pid, callback) {
@@ -737,7 +737,7 @@
     }
 
     var mm = OSjs.Core.getMountManager();
-    if ( Utils.dirname(dir.path) !== Utils.getPathProtocol(mm.getModuleProperty('GoogleDrive', 'root')) ) {
+    if ( Utils.getPathFromVirtual(Utils.dirname(dir.path)) !== Utils.getPathFromVirtual(mm.getModuleProperty('GoogleDrive', 'root')) ) {
       getParentPathId(dir, function(error, id) {
         console.debug('GoogleDrive::mkdir()->getParentPathId()', id, 'of', dir);
         if ( error || !id ) {
@@ -887,7 +887,7 @@
   // EXPORTS
   /////////////////////////////////////////////////////////////////////////////
 
-  /**
+  /*
    * This is the Google Drive VFS Abstraction for OS.js
    */
   OSjs.Core.getMountManager()._add({

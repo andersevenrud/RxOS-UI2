@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,9 @@
   function SettingsFragment(obj, poolName) {
     this._pool = poolName;
     if ( obj.constructor !== {}.constructor ) {
-      throw new Error('SettingsFragment will not work unless you give it a object to manage.');
+      if ( !(obj instanceof Array) ) {
+        throw new Error('SettingsFragment will not work unless you give it a object to manage.');
+      }
     }
 
     this._settings = obj;

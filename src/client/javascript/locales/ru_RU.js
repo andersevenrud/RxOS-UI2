@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -170,8 +170,8 @@
     // DefaultApplication
     'ERR_FILE_APP_OPEN'         : 'Невозможно открыть файл',
     'ERR_FILE_APP_OPEN_FMT'     : 'Файл {0} не может быть открыт, mime-type {1} не поддерживается',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Файл {0} не может быть открыт',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Файл {0} не может быть сохранен',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Файл {0} не может быть открыт: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Файл {0} не может быть сохранен: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Ошибка приложения',
     'ERR_GENERIC_APP_ACTION_FMT': 'Не удалось выполнить действие \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Неизвестная ошибка',

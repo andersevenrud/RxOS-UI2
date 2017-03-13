@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(WindowManager, Window, GUI, Utils, API, VFS) {
   'use strict';
 
@@ -39,7 +41,7 @@
     this._settings = settings;
     this.scheme = scheme;
 
-    Window.apply(this, [name, args]);
+    Window.apply(this, [name, args, null, scheme]);
   }
 
   PanelItemDialog.prototype = Object.create(Window.prototype);
@@ -48,14 +50,15 @@
   PanelItemDialog.prototype.init = function(wm, app) {
     var self = this;
     var root = Window.prototype.init.apply(this, arguments);
-    this.scheme.render(this, this._name);
 
-    this.scheme.find(this, 'ButtonApply').on('click', function() {
+    this._render(this._name);
+
+    this._find('ButtonApply').on('click', function() {
       self.applySettings();
       self._close('ok');
     });
 
-    this.scheme.find(this, 'ButtonCancel').on('click', function() {
+    this._find('ButtonCancel').on('click', function() {
       self._close();
     });
 
@@ -71,7 +74,6 @@
   };
 
   PanelItemDialog.prototype._destroy = function() {
-    this.scheme = null;
     this._settings = null;
 
     return Window.prototype._destroy.apply(this, arguments);
@@ -321,6 +323,7 @@
 
   PanelItem.prototype.init = function() {
     var self = this;
+    var _ = OSjs.Applications.CoreWM._;
 
     this._$root = document.createElement('corewm-panel-item');
     this._$root.className = this._className;
@@ -330,7 +333,7 @@
     this._$container.className = 'corewm-panel-buttons';
 
     if ( this._settings ) {
-      var title = 'Open ' + this._itemName + ' settings'; // FIXME: Locale
+      var title = _('Open {0} Settings', _(this._itemName));
       Utils.$bind(this._$root, 'contextmenu', function(ev) {
         ev.stopPropagation();
         ev.preventDefault();

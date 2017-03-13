@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,6 +94,9 @@
 
     // API
     'SERVICENOTIFICATION_TOOLTIP' : 'Logged into external services: {0}',
+    'CONNECTION_LOST': 'Connection to the server was lost. Reconnecting...',
+    'CONNECTION_RESTORED': 'Connection to the server was restored',
+    'CONNECTION_RESTORE_FAILED': 'Failed to re-establish connection. Trying again.',
 
     // Utils
     'ERR_UTILS_XHR_FATAL' : 'Fatal Error',
@@ -304,8 +307,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'Cannot open file',
     'ERR_FILE_APP_OPEN_FMT'     : 'The file {0} could not be opened because the mime {1} is not supported',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'The file {0} could not be opened',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'The file {0} could not be saved',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'The file {0} could not be opened: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'The file {0} could not be saved: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Application Error',
     'ERR_GENERIC_APP_ACTION_FMT': 'Failed to perform action \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Unknown Error',
@@ -467,8 +470,14 @@
     'LBL_OTHER': 'Other',
     'LBL_USERS': 'Users',
     'LBL_FONTS': 'Fonts',
-    'LBL_OPEN_LOCATION': 'Open Location'
-
+    'LBL_OPEN_LOCATION': 'Open Location',
+    'LBL_HOME': 'Home',
+    'LBL_WIDGET': 'Widget',
+    'LBL_WIDGETS': 'Widgets',
+    'LBL_LOCK': 'Lock',
+    'LBL_UNLOCK': 'Unlock',
+    'LBL_WARNING': 'Warning',
+    'LBL_INFO': 'Info'
   };
 
 })();

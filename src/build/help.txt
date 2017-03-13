@@ -1,0 +1,45 @@
+=== OS.js Task Runner ===
+
+Below is the list of common tasks.
+Available targets are `dist` and `dist-dev` (with exception of manifest and config with `server` and `client`)
+More information: https://os.js.org/manual/build/cli/
+
+Building:
+  build [--target=] [--compress]                         Builds everything
+  build:config [--target=]                               Builds configuration files
+  build:manifest [--target=]                             Builds package manifest files
+  build:core [--target=]                                 Builds core files
+  build:package --name=REPO/NAME [--target=]             Builds given package
+  build:packages [--target=]                             Builds all packages
+  build:themes                                           Builds all themes
+
+Configuration:
+  config:get --name=KEY                                  Gets a configuration value
+  config:set --name=KEY --value=VALUE [--out=FILE]       Sets a configuration entry
+  config:set [--name=KEY] --import=FILE                  Imports a configuration entry (or tree)
+  config:add-repository --name=NAME                      Adds a repository directory
+  config:remove-repository --name=NAME                   Removes a repository directory
+  config:list-packages                                   Lists all repositories and packages
+  config:enable-package --name=REPO/NAME                 Force-enable given package
+  config:disable-package --name=REPO/NAME                Force-disable given package
+  config:add-script --path=PATH [--overlay=NAME]         Add a script to overlay
+  config:add-style --path=PATH [--overlay=NAME]          Add a stylesheet to overlay
+  config:add-locale --path=PATH [--overlay=NAME]         Add a locale to overlay
+  config:add-preload --name=NAME --path=PATH             Adds a preload file
+  config:add-mount --name=NAME --desc=DESC --path=PATH   Adds a mountpoint
+
+Generators:
+  generate:apache-htaccess [--target=]                   Generates apache htaccess file (PHP)
+  generate:apache-vhost --out=FILENAME [--target=]       Generates apache vhost file (PHP)
+  generate:apache-proxy --out=FILENAME                   Generates apache reverse-proxy (Node)
+  generate:nginx-config --out=FILENAME [--target=]       Generates nginx config (PHP)
+  generate:nginx-proxy --out=FILENAME                    Generates nginx reverse-proxy (Node)
+  generate:lighttpd-config --out=FILENAME [--target=]    Generates lighttpd config (PHP)
+  generate:package --name=REPO/NAME --type=TYPE          Generates a new package
+
+Misc:
+  run --target=DIR [--port=N] [--loglevel=N]             Runs OS.js on given dist
+  watch                                                  Watch and automatically build changes
+
+Use the --verbose argument to get detailed information in build output. Loglevels:
+INFO: 1, WARN: 2, WARNING: 2, ERROR: 3, VERBOSE: 8 (default: 7)

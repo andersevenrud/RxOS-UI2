@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Operating System
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -257,8 +257,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'Não é possível abrir o arquivo',
     'ERR_FILE_APP_OPEN_FMT'     : 'O arquivo {0} não pode ser aberto pois não existe suporte para {1}',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'O arquivo {0} não pode ser aberto',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'O arquivo {0} Não pode ser salvo',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'O arquivo {0} não pode ser aberto: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'O arquivo {0} Não pode ser salvo: {1}',
     'ERR_GENERIC_APP_FMT'       : 'O aplicativo encontrou um erro {0}',
     'ERR_GENERIC_APP_ACTION_FMT': 'Falha em realizar ação \'{0}\'',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Erro desconhecido',

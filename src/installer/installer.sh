@@ -18,15 +18,15 @@ fi
 if [ -e /etc/debian_version ]; then
   if ! which npm | grep -s -q "/npm"
   then
-    apt-get install -y npm
+    sudo apt-get install -y npm
   fi
   if ! which git | grep -s -q "/git"
   then
-    apt-get install -y git
+    sudo apt-get install -y git
   fi
   if ! which node | grep -s -q "/node"
   then
-    apt-get install -y nodejs-legacy
+    sudo apt-get install -y nodejs-legacy
   fi
 else
   if ! which npm | grep -s -q "/npm"
@@ -46,16 +46,14 @@ else
   fi
 fi
 
-echo "Installing 'grunt' (requires sudo)"
-sudo npm install -g grunt-cli
-
 echo "Downloading OS.js"
 git clone --recursive $REPO $DEST
 
 echo "Building"
 cd $DEST
 npm install --production
-grunt
+node osjs build
 
 echo "INSTALLATION COMPLETE :-)"
-echo "Look at INSTALL.md for documentation on how to start the a server"
+echo "Run 'node osjs run' to start the server"
+echo "https://os.js.org/manual/"

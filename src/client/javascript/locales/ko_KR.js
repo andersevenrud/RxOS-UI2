@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -284,8 +284,8 @@
     //
     'ERR_FILE_APP_OPEN'         : '파일을 열 수 없습니다',
     'ERR_FILE_APP_OPEN_FMT'     : '마임(MIME) {1} 이(가) 지원되지 않아 파일 {0} 을(를) 열지 못했습니다',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : '파일 {0} 을(를) 열지 못했습니다',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : '파일 {0} 을(를) 저장하지 못했습니다',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : '파일 {0} 을(를) 열지 못했습니다: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : '파일 {0} 을(를) 저장하지 못했습니다: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} 응용 프로그램 오류',
     'ERR_GENERIC_APP_ACTION_FMT': '\'{0}\' 수행에 실패하였습니다',
     'ERR_GENERIC_APP_UNKNOWN'   : '알 수 없는 오류',

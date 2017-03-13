@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -120,26 +120,41 @@
   FileDialog.prototype.init = function() {
     var self = this;
     var root = DialogWindow.prototype.init.apply(this, arguments);
-    var view = this.scheme.find(this, 'FileView');
+    var view = this._find('FileView');
     view.set('filter', this.args.filter);
     view.set('filetype', this.args.select || '');
     view.set('defaultcolumns', 'true');
 
-    var filename = this.scheme.find(this, 'Filename');
-    var home = this.scheme.find(this, 'HomeButton');
-    var mlist = this.scheme.find(this, 'ModuleSelect');
+    var filename = this._find('Filename');
+    var home = this._find('HomeButton');
+    var mlist = this._find('ModuleSelect');
 
     function checkEmptyInput() {
       var disable = false;
       if ( self.args.select !== 'dir' ) {
         disable = !filename.get('value').length;
       }
-      self.scheme.find(self, 'ButtonOK').set('disabled', disable);
+      self._find('ButtonOK').set('disabled', disable);
     }
 
     this._toggleLoading(true);
     view.set('multiple', this.args.multiple);
     filename.set('value', this.args.filename || '');
+
+    this._find('ButtonMkdir').on('click', function() {
+      API.createDialog('Input', {message: API._('DIALOG_FILE_MKDIR_MSG', self.path), value: 'New folder'}, function(ev, btn, value) {
+        if ( btn === 'ok' && value ) {
+          var path = Utils.pathJoin(self.path, value);
+          VFS.mkdir(VFS.file(path, 'dir'), function(err) {
+            if ( err ) {
+              API.error(API._('DIALOG_FILE_ERROR'), API._('ERR_VFSMODULE_MKDIR'), err);
+            } else {
+              self.changePath(path);
+            }
+          });
+        }
+      }, self);
+    });
 
     home.on('click', function() {
       var dpath = API.getDefaultPath();
@@ -191,7 +206,7 @@
         });
       });
 
-      var ft = this.scheme.find(this, 'Filetype').add(filetypes).on('change', function(ev) {
+      var ft = this._find('Filetype').add(filetypes).on('change', function(ev) {
         var newinput = Utils.replaceFileExtension(filename.get('value'), ev.detail);
         filename.set('value', newinput);
       });
@@ -211,7 +226,12 @@
         checkEmptyInput();
       });
     } else {
-      this.scheme.find(this, 'FileInput').hide();
+
+      if ( this.args.select !== 'dir'  ) {
+        this._find('ButtonMkdir').hide();
+      }
+
+      this._find('FileInput').hide();
     }
 
     var mm = OSjs.Core.getMountManager();
@@ -250,14 +270,14 @@
 
   FileDialog.prototype.changePath = function(dir, fromDropdown) {
     var self = this;
-    var view = this.scheme.find(this, 'FileView');
+    var view = this._find('FileView');
     var lastDir = this.path;
 
     function resetLastSelected() {
       var mm = OSjs.Core.getMountManager();
       var rootPath = mm.getRootFromPath(lastDir);
       try {
-        self.scheme.find(self, 'ModuleSelect').set('value', rootPath);
+        self._find('ModuleSelect').set('value', rootPath);
       } catch ( e ) {
         console.warn('FileDialog::changePath()', 'resetLastSelection()', e);
       }
@@ -265,7 +285,7 @@
 
     this._toggleLoading(true);
 
-    view._call('chdir', {
+    view.chdir({
       path: dir || this.path,
       done: function(error) {
         if ( error ) {
@@ -285,7 +305,7 @@
   };
 
   FileDialog.prototype.checkFileExtension = function() {
-    var filename = this.scheme.find(this, 'Filename');
+    var filename = this._find('Filename');
 
     var mime = this.args.mime;
     var input = filename.get('value');

@@ -46,6 +46,9 @@
   height : 150px;
 }
 
+.ApplicationSettingsWindow application-window-content [data-id="WidgetItems"] {
+  height : 100px;
+}
 .ApplicationSettingsWindow application-window-content [data-id="HotkeysList"] {
   height : 200px;
 }
@@ -63,6 +66,7 @@
   overflow : auto;
   height : 100%;
   width : 100%;
+  box-sizing : border-box;
 }
 
 .ApplicationSettingsWindow application-window-content [data-id="ContainerSelection"] {

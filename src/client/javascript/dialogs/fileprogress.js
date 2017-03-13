@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@
   FileProgressDialog.prototype.init = function() {
     var root = DialogWindow.prototype.init.apply(this, arguments);
     if ( this.args.message ) {
-      this.scheme.find(this, 'Message').set('value', this.args.message, true);
+      this._find('Message').set('value', this.args.message, true);
     }
     return root;
   };
@@ -75,7 +75,7 @@
   };
 
   FileProgressDialog.prototype.setProgress = function(p) {
-    this.scheme.find(this, 'Progress').set('progress', p);
+    this._find('Progress').set('progress', p);
   };
 
   FileProgressDialog.prototype._close = function(force) {

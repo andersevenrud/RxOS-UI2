@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,13 +27,17 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
   function getSelected(view) {
     var selected = [];
     (view.get('value') || []).forEach(function(sub) {
-      selected.push(sub.data);
+      if ( !sub.data.shortcut ) {
+        selected.push(sub.data);
+      }
     });
     return selected;
   }
@@ -50,7 +54,8 @@
       title: metadata.name,
       allow_drop: true,
       width: 650,
-      height: 420
+      height: 420,
+      translator: OSjs.Applications.ApplicationFileManager._
     }, app, scheme]);
 
     this.wasFileDropped = false;
@@ -124,9 +129,7 @@
     var viewExtension = scandirOptions.showFileExtensions === true;
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'FileManagerWindow', root, null, null, {
-      _: OSjs.Applications.ApplicationFileManager._
-    });
+    this._render('FileManagerWindow');
 
     if ( (API.getConfig('Connection.Type') !== 'nw') && window.location.protocol.match(/^file/) ) { // FIXME: Translation
       this._setWarning('VFS does not work when in standalone mode');
@@ -212,10 +215,10 @@
       }
     }
 
-    scheme.find(this, 'SubmenuFile').on('select', menuEvent);
-    var contextMenu = scheme.find(this, 'SubmenuContext').on('select', menuEvent);
-    scheme.find(this, 'SubmenuEdit').on('select', menuEvent);
-    var viewMenu = scheme.find(this, 'SubmenuView').on('select', menuEvent);
+    this._find('SubmenuFile').on('select', menuEvent);
+    var contextMenu = this._find('SubmenuContext').on('select', menuEvent);
+    this._find('SubmenuEdit').on('select', menuEvent);
+    var viewMenu = this._find('SubmenuView').on('select', menuEvent);
 
     viewMenu.set('checked', 'MenuViewList', viewType === 'gui-list-view');
     viewMenu.set('checked', 'MenuViewTree', viewType === 'gui-tree-view');
@@ -228,20 +231,29 @@
     //
     // Toolbar
     //
-    scheme.find(this, 'GoLocation').on('enter', function(ev) {
+    this._find('GoLocation').on('enter', function(ev) {
       self.changePath(ev.detail, null, false, true);
     });
-    scheme.find(this, 'GoBack').on('click', function(ev) {
+    this._find('GoBack').on('click', function(ev) {
       self.changeHistory(-1);
     });
-    scheme.find(this, 'GoNext').on('click', function(ev) {
+    this._find('GoNext').on('click', function(ev) {
       self.changeHistory(1);
+    });
+
+    var pw = this._find('PanedView');
+    this._find('ToggleSideview').on('click', function(ev) {
+      if ( !pw.$element ) {
+        return;
+      }
+      var curr = pw.$element.getAttribute('data-toggled');
+      pw.$element.setAttribute('data-toggled', String(curr === 'true' ? false : true));
     });
 
     //
     // Side View
     //
-    var side = scheme.find(this, 'SideView');
+    var side = this._find('SideView');
     side.on('activate', function(ev) {
       if ( ev && ev.detail && ev.detail.entries ) {
         var entry = ev.detail.entries[0];
@@ -254,7 +266,7 @@
     //
     // File View
     //
-    view = this._scheme.find(this, 'FileView');
+    view = this._find('FileView');
     view.on('activate', function(ev) {
       if ( ev && ev.detail && ev.detail.entries ) {
         self.checkActivation(ev.detail.entries);
@@ -291,6 +303,8 @@
   };
 
   ApplicationFileManagerWindow.prototype.checkSelection = function(files) {
+    files = files || [];
+
     var scheme = this._scheme;
 
     if ( !scheme ) {
@@ -299,12 +313,12 @@
 
     var self = this;
     var content = '';
-    var statusbar = scheme.find(this, 'Statusbar');
+    var statusbar = this._find('Statusbar');
     var doTranslate = OSjs.Applications.ApplicationFileManager._;
 
     var sum, label;
 
-    function toggleMenuItems(isFile, isDirectory) {
+    function toggleMenuItems(isFile, isDirectory, isShort) {
       /*
        * Toggling MenuItems with the bit MODE_F or MODE_FD set by type of selected items
        * MODE_F : Selected items consist of ONLY files
@@ -314,22 +328,23 @@
       var MODE_F = !isFile || !!isDirectory;
       var MODE_FD = !(isFile || isDirectory);
 
-      scheme.find(self, 'MenuRename').set('disabled', MODE_FD);
-      scheme.find(self, 'MenuDelete').set('disabled', MODE_FD);
-      scheme.find(self, 'MenuInfo').set('disabled', MODE_FD);  // TODO: Directory info must be supported
-      scheme.find(self, 'MenuDownload').set('disabled', MODE_F);
-      scheme.find(self, 'MenuOpen').set('disabled', MODE_F);
+      self._find('MenuRename').set('disabled', isShort || MODE_FD);
+      self._find('MenuDelete').set('disabled', isShort || MODE_FD);
+      self._find('MenuInfo').set('disabled', MODE_FD);  // TODO: Directory info must be supported
+      self._find('MenuDownload').set('disabled', MODE_F);
+      self._find('MenuOpen').set('disabled', MODE_F);
 
-      scheme.find(self, 'ContextMenuRename').set('disabled', MODE_FD);
-      scheme.find(self, 'ContextMenuDelete').set('disabled', MODE_FD);
-      scheme.find(self, 'ContextMenuInfo').set('disabled', MODE_FD);  // TODO: Directory info must be supported
-      scheme.find(self, 'ContextMenuDownload').set('disabled', MODE_F);
-      scheme.find(self, 'ContextMenuOpen').set('disabled', MODE_F);
+      self._find('ContextMenuRename').set('disabled', isShort || MODE_FD);
+      self._find('ContextMenuDelete').set('disabled', isShort || MODE_FD);
+      self._find('ContextMenuInfo').set('disabled', MODE_FD);  // TODO: Directory info must be supported
+      self._find('ContextMenuDownload').set('disabled', MODE_F);
+      self._find('ContextMenuOpen').set('disabled', MODE_F);
     }
 
     if ( files && files.length ) {
       sum = {files: 0, directories: 0, size: 0};
-      (files || []).forEach(function(f) {
+
+      files.forEach(function(f) {
         if ( f.data.type === 'dir' ) {
           sum.directories++;
         } else {
@@ -338,10 +353,12 @@
         }
       });
 
+      var isShortcut = files.length === 1 ? files[0].data.shortcut === true : false;
+
       label = 'Selected {0} files, {1} dirs, {2}';
       content = doTranslate(label, sum.files, sum.directories, Utils.humanFileSize(sum.size));
 
-      toggleMenuItems(sum.files, sum.directories);
+      toggleMenuItems(sum.files, sum.directories, isShortcut);
     } else {
       sum = this.currentSummary;
       if ( sum ) {
@@ -349,7 +366,7 @@
         content = doTranslate(label, sum.files, sum.hidden, sum.directories, Utils.humanFileSize(sum.size));
       }
 
-      toggleMenuItems(false, false);
+      toggleMenuItems(false, false, false);
     }
 
     statusbar.set('value', content);
@@ -387,7 +404,7 @@
       }
     });
 
-    var view = this._scheme.find(this, 'SideView');
+    var view = this._find('SideView');
     view.set('selected', found, 'root');
   };
 
@@ -424,7 +441,7 @@
       });
     });
 
-    var side = this._scheme.find(this, 'SideView');
+    var side = this._find('SideView');
     side.clear();
     side.add(sideViewItems);
   };
@@ -473,12 +490,12 @@
     dir = dir || this.currentPath;
 
     var self = this;
-    var view = this._scheme.find(this, 'FileView');
+    var view = this._find('FileView');
 
     function updateNavigation() {
-      self._scheme.find(self, 'GoLocation').set('value', dir);
-      self._scheme.find(self, 'GoBack').set('disabled', self.historyIndex <= 0);
-      self._scheme.find(self, 'GoNext').set('disabled', self.historyIndex < 0 || self.historyIndex >= (self.history.length - 1));
+      self._find('GoLocation').set('value', dir);
+      self._find('GoBack').set('disabled', self.historyIndex <= 0);
+      self._find('GoNext').set('disabled', self.historyIndex < 0 || self.historyIndex >= (self.history.length - 1));
     }
 
     function updateHistory(dir) {
@@ -508,7 +525,7 @@
 
     this._toggleLoading(true);
 
-    view._call('chdir', {
+    view.chdir({
       path: dir,
       done: function(error, summary) {
         if ( self._destroyed || !self._scheme ) {
@@ -545,7 +562,7 @@
       return;
     }
 
-    var view = this._scheme.find(this, 'FileView');
+    var view = this._find('FileView');
     view.set('type', viewType, !!set);
 
     if ( set ) {
@@ -560,7 +577,7 @@
 
     this.viewOptions.ViewSide = toggle;
 
-    var container = this._scheme.find(this, 'SideContainer');
+    var container = this._find('SideContainer');
     var handle = new GUI.Element(container.$element.parentNode.querySelector('gui-paned-view-handle'));
     if ( toggle ) {
       container.show();
@@ -580,7 +597,7 @@
       return;
     }
 
-    var view = this._scheme.find(this, 'FileView');
+    var view = this._find('FileView');
     var vfsOptions = OSjs.Core.getSettingsManager().instance('VFS');
 
     var opts = {scandir: {}};
@@ -615,7 +632,7 @@
 
     this.viewOptions.ViewNavigation = toggle;
 
-    var viewNav  = this._scheme.find(this, 'ToolbarContainer');
+    var viewNav  = this._find('ToolbarContainer');
     if ( toggle ) {
       viewNav.show();
     } else {
@@ -651,7 +668,7 @@
       OSjs.Core.getSettingsManager().set('VFS', 'scandir', scandirOptions, set);
     }
 
-    var viewMenu = this._scheme.find(this, 'SubmenuView');
+    var viewMenu = this._find('SubmenuView');
     viewMenu.set('checked', 'MenuColumnFilename', viewColumns.indexOf('filename') >= 0);
     viewMenu.set('checked', 'MenuColumnMIME', viewColumns.indexOf('mime') >= 0);
     viewMenu.set('checked', 'MenuColumnCreated', viewColumns.indexOf('ctime') >= 0);
@@ -700,17 +717,24 @@
   };
 
   ApplicationFileManager.prototype.download = function(items) {
+    if ( !items.length ) {
+      return;
+    }
+
     items.forEach(function(item) {
       VFS.url(new VFS.File(item), function(error, result) {
         if ( result ) {
           window.open(result);
         }
-      });
+      }, {download: true});
     });
   };
 
   ApplicationFileManager.prototype.rm = function(items, win) {
     var self = this;
+    if ( !items.length ) {
+      return;
+    }
 
     // TODO: These must be async
     var files = [];
@@ -740,6 +764,10 @@
   };
 
   ApplicationFileManager.prototype.info = function(items, win) {
+    if ( !items.length ) {
+      return;
+    }
+
     items.forEach(function(item) {
       if ( item.type === 'file' ) {
         API.createDialog('FileInfo', {
@@ -750,6 +778,10 @@
   };
 
   ApplicationFileManager.prototype.open = function(items) {
+    if ( !items.length ) {
+      return;
+    }
+
     items.forEach(function(item) {
       if ( item.type === 'file' ) {
         API.open(new VFS.File(item), {forceList: true});
@@ -760,6 +792,9 @@
   ApplicationFileManager.prototype.rename = function(items, win) {
     // TODO: These must be async
     var self = this;
+    if ( !items.length ) {
+      return;
+    }
 
     function rename(item, newName) {
       item = new VFS.File(item);
@@ -841,7 +876,7 @@
         return;
       }
 
-      var item = new VFS.File(dir + '/' + result);
+      var item = new VFS.File(Utils.pathJoin(dir, result));
       self._action('mkdir', [item], function() {
         win._toggleDisabled(false);
         win.changePath(null, item);
@@ -878,19 +913,25 @@
     function upload() {
       win._toggleLoading(true);
 
-      VFS.upload({
-        files: files,
-        destination: dest,
-        win: win,
-        app: self
-      }, function(error, file) {
+      function done(error, file) {
         win._toggleLoading(false);
         if ( error ) {
           API.error(API._('ERR_GENERIC_APP_FMT', self.__label), API._('ERR_GENERIC_APP_REQUEST'), error);
-          return;
+        } else {
+          //win.changePath(null, file, false, false, true);
         }
-        win.changePath(null, file, false, false, true);
-      });
+      }
+
+      if ( files ) {
+        VFS.upload({
+          files: files,
+          destination: dest
+        }, done, self);
+      } else {
+        VFS.Helpers.createUploadDialog({
+          destination: dest
+        }, done, self);
+      }
     }
 
     if ( files ) {

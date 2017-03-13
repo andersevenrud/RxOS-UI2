@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(CoreWM, Panel, PanelItem, PanelItemDialog, Utils, API, VFS, GUI, Window) {
   'use strict';
 
@@ -48,18 +50,18 @@
 
   ClockSettingsDialog.prototype.init = function(wm, app) {
     var root = PanelItemDialog.prototype.init.apply(this, arguments);
-    this.scheme.find(this, 'InputUseUTC').set('value', this._settings.get('utc'));
-    this.scheme.find(this, 'InputInterval').set('value', String(this._settings.get('interval')));
-    this.scheme.find(this, 'InputTimeFormatString').set('value', this._settings.get('format'));
-    this.scheme.find(this, 'InputTooltipFormatString').set('value', this._settings.get('tooltip'));
+    this._find('InputUseUTC').set('value', this._settings.get('utc'));
+    this._find('InputInterval').set('value', String(this._settings.get('interval')));
+    this._find('InputTimeFormatString').set('value', this._settings.get('format'));
+    this._find('InputTooltipFormatString').set('value', this._settings.get('tooltip'));
     return root;
   };
 
   ClockSettingsDialog.prototype.applySettings = function() {
-    this._settings.set('utc', this.scheme.find(this, 'InputUseUTC').get('value'));
-    this._settings.set('interval', parseInt(this.scheme.find(this, 'InputInterval').get('value'), 10));
-    this._settings.set('format', this.scheme.find(this, 'InputTimeFormatString').get('value'), true);
-    this._settings.set('tooltip', this.scheme.find(this, 'InputTooltipFormatString').get('value'), true);
+    this._settings.set('utc', this._find('InputUseUTC').get('value'));
+    this._settings.set('interval', parseInt(this._find('InputInterval').get('value'), 10));
+    this._settings.set('format', this._find('InputTimeFormatString').get('value'));
+    this._settings.set('tooltip', this._find('InputTooltipFormatString').get('value'), true);
   };
 
   /////////////////////////////////////////////////////////////////////////////

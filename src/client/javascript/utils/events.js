@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -94,7 +94,7 @@
 
     // Add all ASCII chacters to the map
     for ( var n = 33; n <= 126; n++ ) {
-      list[String.fromCharCode(n).toUpperCase()] = n;
+      list[String.fromCharCode(n)] = n;
     }
 
     return Object.freeze(list);
@@ -110,10 +110,12 @@
    * @example
    * Utils.mousePosition(ev); // -> {x:1, y:1}
    *
+   * @param {Event}   ev    DOM Event
+   *
    * @return {(Event|Object)}   ev      DOM Event or an Object
    * @return Object
    */
-  OSjs.Utils.mousePosition = function(ev) {
+  OSjs.Utils.mousePosition = function Utils_mousePosition(ev) {
     // If this is a custom event containing position
     if ( ev.detail && typeof ev.detail.x !== 'undefined' && typeof ev.detail.y !== 'undefined' ) {
       return {x: ev.detail.x, y: ev.detail.y};
@@ -138,7 +140,7 @@
    *
    * @return  {String}          The mouse button (left/middle/right)
    */
-  OSjs.Utils.mouseButton = function(ev) {
+  OSjs.Utils.mouseButton = function Utils_mouseButton(ev) {
     if ( typeof ev.button !== 'undefined' ) {
       if ( ev.button === 0 ) {
         return 'left';
@@ -266,7 +268,7 @@
     var TOUCH_CLICK_MAX = 1000;
     var TOUCH_DBLCLICK = 400;
 
-    /**
+    /*
      * This is the wrapper for using addEventListener
      */
     function addEventHandler(el, n, t, callback, handler, useCapture, realType) {
@@ -281,7 +283,7 @@
       });
     }
 
-    /**
+    /*
      * Creates mousewheel handler
      */
     function createWheelHandler(el, n, t, callback, useCapture) {
@@ -298,10 +300,11 @@
       addEventHandler(el, n, 'DOMMouseScroll', callback, _wheel, useCapture, 'DOMMouseScroll');
     }
 
-    /**
+    /*
      * Creates touch gestures for emulating mouse input
      */
     function createGestureHandler(el, n, t, callback, useCapture) {
+      /*eslint no-use-before-define: "off"*/
       var started;
       var contextTimeout;
       var dblTimeout;
@@ -406,7 +409,7 @@
       addEventHandler(el, n, 'touchstart', callback, _touchstart, false, 'touchstart');
     }
 
-    /**
+    /*
      * Emits a normal mouse event from touches
      *
      * This basically emulates mouse behaviour on touch events
@@ -442,7 +445,7 @@
       ev.currentTarget.dispatchEvent(new MouseEvent(type, evtArgs));
     }
 
-    /**
+    /*
      * Map of touch events
      */
     var customEvents = {
@@ -455,7 +458,7 @@
       dblclick: createGestureHandler
     };
 
-    return function(el, evName, callback, useCapture, noBind) {
+    return function Utils_$bind(el, evName, callback, useCapture, noBind) {
       useCapture = (useCapture === true);
 
       if ( arguments.length < 3 ) {
@@ -539,11 +542,11 @@
    * @see OSjs.Utils.$bind
    *
    * @param   {Node}          el            DOM Element to attach event to
-   * @param   {String}        [ev]          DOM Event Name
+   * @param   {String}        [evName]      DOM Event Name
    * @param   {Function}      [callback]    Callback on event
    * @param   {Boolean}       [useCapture]  Use capture mode
    */
-  OSjs.Utils.$unbind = function(el, evName, callback, param) {
+  OSjs.Utils.$unbind = function Utils_$unbind(el, evName, callback, useCapture) {
 
     function unbindAll() {
       if ( el._boundEvents ) {

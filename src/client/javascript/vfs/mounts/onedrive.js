@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,7 +48,7 @@
   // HELPERS
   /////////////////////////////////////////////////////////////////////////////
 
-  /**
+  /*
    * Perform a REST call to WL API
    */
   function onedriveCall(args, callback) {
@@ -66,7 +66,7 @@
     );
   }
 
-  /**
+  /*
    * Gets OS.js VFS File Metadata type from OneDrive item
    */
   function getItemType(iter) {
@@ -77,7 +77,7 @@
     return type;
   }
 
-  /**
+  /*
    * Get OS.js VFS File Metadata from OneDrive item
    */
   function getMetadataFromItem(dir, item) {
@@ -94,7 +94,7 @@
     return itemFile;
   }
 
-  /**
+  /*
    * Get MIME type from file extension of a file
    * Yeah... it's pretty rough, but OneDrive does
    * not support mimes yet
@@ -117,7 +117,7 @@
     return mime;
   }
 
-  /**
+  /*
    * Create an Array filled with OS.js VFS file metadata
    */
   function createDirectoryList(dir, list, item, options) {
@@ -140,7 +140,7 @@
     return result;
   }
 
-  /**
+  /*
    * Get files inside given folder
    */
   function getFilesInFolder(folderId, callback) {
@@ -158,7 +158,7 @@
     });
   }
 
-  /**
+  /*
    * Check if file is existent inside given folder
   function isFileInFolder(folderId, file, callback, returnIter) {
     getFilesInFolder(folderId, function(error, list) {
@@ -192,7 +192,7 @@
   }
   */
 
-  /**
+  /*
    * Resolve normal /path/to/file to OneDrive ID
    */
   function resolvePath(item, callback, useParent) {
@@ -203,7 +203,7 @@
       }
     }
 
-    var path = Utils.getPathProtocol(item.path).replace(/\/+/, '/');
+    var path = Utils.getPathFromVirtual(item.path).replace(/\/+/, '/');
     if ( useParent ) {
       path = Utils.dirname(path);
     }
@@ -286,7 +286,7 @@
 
     console.info('OneDrive::scandir()', item);
 
-    var relativePath = Utils.getPathProtocol(item.path);
+    var relativePath = Utils.getPathFromVirtual(item.path);
 
     function _finished(error, result) {
       console.groupEnd();
@@ -642,7 +642,7 @@
   // EXPORTS
   /////////////////////////////////////////////////////////////////////////////
 
-  /**
+  /*
    * This is the Microsoft OneDrive VFS Abstraction for OS.js
    */
   OSjs.Core.getMountManager()._add({

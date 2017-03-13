@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -50,8 +52,8 @@
     var root = Window.prototype.init.apply(this, arguments);
     var self = this;
 
-    // Load and render `scheme.html` file
-    scheme.render(this, 'EXAMPLEWindow', root);
+    // Render our Scheme file fragment into this Window
+    this._render('EXAMPLEWindow');
 
     // Put your GUI code here (or make a new prototype function and call it):
 
@@ -90,6 +92,11 @@
   ApplicationEXAMPLE.prototype.init = function(settings, metadata, scheme) {
     Application.prototype.init.apply(this, arguments);
     this._addWindow(new ApplicationEXAMPLEWindow(this, metadata, scheme));
+
+    // Example on how to call `api.js` methods
+    this._api('test', {}, function(err, res) {
+      console.log('Result from your server API method', err, res);
+    });
   };
 
   /////////////////////////////////////////////////////////////////////////////

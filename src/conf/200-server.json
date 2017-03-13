@@ -1,11 +1,13 @@
 {
   "server" : {
-    "tmpdir": "/tmp",
-    "srcdir": "src",
+    "tz": "",
     "vfs": {
-      "proxy": false,
-      "homes":  "%DROOT%/vfs/home",
       "mounts": {
+        "home": "%DROOT%/vfs/home/%USERNAME%",
+        "osjs": {
+          "ro": true,
+          "destination": "%DROOT%/%DIST%"
+        },
         "shared": "%DROOT%/vfs/public"
       },
       "groups": {
@@ -13,6 +15,7 @@
       }
     },
     "api": {
+      "defaultGroups": ["api", "application", "upload", "fs"],
       "groups": {
         "users": "admin",
         "curl": "curl",
@@ -25,8 +28,43 @@
     },
     "http": {
       "mode": "http",
-      "connection": "%CONNECTION%",
+      "authenticator": "%authenticator%",
+      "storage": "%storage%",
+      "connection": "%connection%",
       "port" : 8000,
+      "compression": {
+        "memLevel": 8,
+        "level": -1
+      },
+      "cache": {
+        "static": {
+          "Cache-Control": "private, max-age=86400000"
+        }
+      },
+      "session": {
+        "module": "memory",
+        "secret": "YOU SHOULD GENERATE YOUR OWN KEY",
+        "name": null,
+        "options": {
+          "memory": {
+          },
+          "file": {
+            "path": "%ROOT%/src/server/sessions"
+          }
+        },
+        "cookie": {
+          "sameSite": null,
+          "domain": null,
+          "proxy": null,
+          "maxAge": 86400000,
+          "httpOnly": true,
+          "path": "/"
+        }
+      },
+      "ws": {
+        "port": "upgrade",
+        "path": ""
+      },
       "cert": {
         "path": null,
         "name": "localhost",
@@ -36,7 +74,44 @@
         }
       }
     },
-    "handler" : "%HANDLER%",
-    "basedir": ""
+    "modules": {
+      "auth": {
+        "pam": {
+        },
+        "shadow": {
+        },
+        "database": {
+          "driver": "mysql",
+          "sqlite": {
+            "database": "%ROOT%/src/server/authstorage.sqlite"
+          },
+          "mysql": {
+            "host": "localhost",
+            "user": "osjs",
+            "password": "osjs",
+            "database": "osjs"
+          }
+        }
+      },
+      "storage": {
+        "system": {
+          "groups": "/etc/osjs/groups.json",
+          "blacklist": "/etc/osjs/blacklist.json",
+          "settings": "/home/%USERNAME%/.osjs/settings.json"
+        },
+        "database": {
+          "driver": "mysql",
+          "sqlite": {
+            "database": "%ROOT%/src/server/authstorage.sqlite"
+          },
+          "mysql": {
+            "host": "localhost",
+            "user": "osjs",
+            "password": "osjs",
+            "database": "osjs"
+          }
+        }
+      }
+    }
   }
 }

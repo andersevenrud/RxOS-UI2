@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -45,12 +47,17 @@
       }, app, scheme);
 
       win._on('init', function(root, scheme) {
-        // Window was inited
-        scheme.render(this, this._name, root);
+        // Window was inited. Render our scheme file fragment into window
+        this._render(this._name);
       });
 
       win._on('inited', function(scheme) {
         // Window inited and rendered
+
+        // Example on how to call `api.js` methods
+        app._api('test', {}, function(err, res) {
+          console.log('Result from your server API method', err, res);
+        });
       });
 
       app._addWindow(win);

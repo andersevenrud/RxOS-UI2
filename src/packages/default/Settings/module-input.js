@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -62,7 +64,7 @@
       }
 
       renderList(win, scheme);
-    })
+    });
   }
 
   /////////////////////////////////////////////////////////////////////////////
@@ -70,7 +72,7 @@
   /////////////////////////////////////////////////////////////////////////////
 
   var module = {
-    group: 'personal',
+    group: 'system',
     name: 'Input',
     label: 'LBL_INPUT',
     icon: 'apps/key_bindings.png',

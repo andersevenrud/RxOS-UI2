@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(DefaultApplication, DefaultApplicationWindow, Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -64,14 +66,14 @@
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'PreviewWindow', root);
+    this._render('PreviewWindow');
 
     this._find('ZoomIn').son('click', this, this.onZoomIn);
     this._find('ZoomOut').son('click', this, this.onZoomOut);
     this._find('ZoomFit').son('click', this, this.onZoomFit);
     this._find('ZoomOriginal').son('click', this, this.onZoomOriginal);
 
-    this._scheme.find(this, 'SubmenuFile').on('select', function(ev) {
+    this._find('SubmenuFile').on('select', function(ev) {
       if ( ev.detail.id === 'MenuOpenLocation' ) {
         API.createDialog('Input', {
           value: 'http://'
@@ -93,7 +95,7 @@
               }
             });
           }
-        })
+        });
       }
     });
 
@@ -111,7 +113,7 @@
 
   ApplicationPreviewWindow.prototype.showFile = function(file, result) {
     var self = this;
-    var root = this._scheme.find(this, 'Content').$element;
+    var root = this._find('Content').$element;
     Utils.$empty(root);
 
     if ( result ) {
@@ -119,7 +121,7 @@
 
       if ( file.mime.match(/^image/) ) {
         this.isImage = true;
-        this.$view = this._scheme.create(self, 'gui-image', {src: result}, root, {
+        this.$view = this._create('gui-image', {src: result}, root, {
           onload: function() {
             self.origWidth = this.offsetWidth;
             self.origHeight = this.offsetHeight;
@@ -128,7 +130,7 @@
         });
       } else if ( file.mime.match(/^video/) ) {
         this.isImage = false;
-        this.$view = this._scheme.create(self, 'gui-video', {src: result, controls: true, autoplay: true}, root, {
+        this.$view = this._create('gui-video', {src: result, controls: true, autoplay: true}, root, {
           onload: function() {
             self._resizeTo(this.offsetWidth, this.offsetHeight, true, false, this);
           }
@@ -182,7 +184,7 @@
 
     this.$view.$element.setAttribute('data-zoom', attr);
     this.$view.$element.firstChild.style.width = (w === null ? 'auto' : String(w) + 'px');
-  }
+  };
 
   ApplicationPreviewWindow.prototype.onZoomIn = function() {
     this._onZoom('in');

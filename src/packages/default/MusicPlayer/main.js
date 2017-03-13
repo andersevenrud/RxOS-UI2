@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(DefaultApplication, DefaultApplicationWindow, Application, Window, Utils, API, VFS, GUI) {
   'use strict';
   // TODO: Playlist
@@ -59,10 +61,12 @@
       allow_resize: false,
       allow_maximize: false,
       width: 370,
-      height: 260
+      height: 260,
+      translator: OSjs.Applications.ApplicationMusicPlayer._
     }, app, scheme, file]);
 
     this.updated = false;
+    this.seeking = false;
   }
 
   ApplicationMusicPlayerWindow.prototype = Object.create(DefaultApplicationWindow.prototype);
@@ -73,28 +77,27 @@
     var self = this;
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'MusicPlayerWindow', root, null, null, {
-      _: OSjs.Applications.ApplicationMusicPlayer._
-    });
+    this._render('MusicPlayerWindow');
 
-    var label = this._scheme.find(this, 'LabelTime');
-    var seeker = this._scheme.find(this, 'Seek');
+    var label = this._find('LabelTime');
+    var seeker = this._find('Seek');
 
-    var player = scheme.find(this, 'Player');
+    var player = this._find('Player');
     var audio = player.$element.firstChild;
 
-    scheme.find(this, 'ButtonStart').set('disabled', true);
-    scheme.find(this, 'ButtonRew').set('disabled', true);
-    var buttonPlay = scheme.find(this, 'ButtonPlay').set('disabled', true).on('click', function() {
+    this._find('ButtonStart').set('disabled', true);
+    this._find('ButtonRew').set('disabled', true);
+    var buttonPlay = this._find('ButtonPlay').set('disabled', true).on('click', function() {
       audio.play();
     });
-    var buttonPause = scheme.find(this, 'ButtonPause').set('disabled', true).on('click', function() {
+    var buttonPause = this._find('ButtonPause').set('disabled', true).on('click', function() {
       audio.pause();
     });
-    scheme.find(this, 'ButtonFwd').set('disabled', true);
-    scheme.find(this, 'ButtonEnd').set('disabled', true);
+    this._find('ButtonFwd').set('disabled', true);
+    this._find('ButtonEnd').set('disabled', true);
 
     seeker.on('change', function(ev) {
+      self.seeking = false;
       if ( audio && !audio.paused ) {
         try {
           audio.pause();
@@ -167,23 +170,30 @@
     }
 
     var self = this;
-    var scheme = this._scheme;
-    var player = scheme.find(this, 'Player');
-    var seeker = this._scheme.find(this, 'Seek');
+    var player = this._find('Player');
+    var seeker = this._find('Seek');
     var audio = player.$element.firstChild;
+
+    seeker.on('mousedown', function() {
+      self.seeking = true;
+    });
+    seeker.on('mouseup', function() {
+      self.seeking = false;
+    });
 
     var artist = file ? file.filename : '';
     var album = file ? Utils.dirname(file.path) : '';
 
-    var labelArtist = this._scheme.find(this, 'LabelArtist').set('value', '');
-    var labelTitle  = this._scheme.find(this, 'LabelTitle').set('value', artist);
-    var labelAlbum  = this._scheme.find(this, 'LabelAlbum').set('value', album);
-    this._scheme.find(this, 'LabelTime').set('value', '');
+    var labelArtist = this._find('LabelArtist').set('value', '');
+    var labelTitle  = this._find('LabelTitle').set('value', artist);
+    var labelAlbum  = this._find('LabelAlbum').set('value', album);
+    this._find('LabelTime').set('value', '');
     seeker.set('min', 0);
     seeker.set('max', 0);
     seeker.set('value', 0);
 
     this.updated = false;
+    this.seeking = false;
 
     function getInfo() {
       self._app._api('info', {filename: file.path}, function(err, info) {
@@ -211,7 +221,7 @@
       return; // Important because async
     }
 
-    var player = this._scheme.find(this, 'Player');
+    var player = this._find('Player');
     var audio = player.$element.firstChild;
 
     var total   = audio.duration;
@@ -235,7 +245,9 @@
     }
 
     label.set('value', time);
-    seeker.set('value', current);
+    if ( !this.seeking ) {
+      seeker.set('value', current);
+    }
 
     this.updated = true;
   };
@@ -261,6 +273,15 @@
     Application.prototype.init.call(this, settings, metadata, scheme);
     var file = this._getArgument('file');
     this._addWindow(new ApplicationMusicPlayerWindow(this, metadata, scheme, file));
+  };
+
+  ApplicationMusicPlayer.prototype._onMessage = function(msg, obj, args) {
+    Application.prototype._onMessage.apply(this, arguments);
+
+    if ( msg === 'attention' && obj && obj.file ) {
+      var win = this._getMainWindow();
+      this.openFile(new VFS.File(obj.file), win);
+    }
   };
 
   /////////////////////////////////////////////////////////////////////////////

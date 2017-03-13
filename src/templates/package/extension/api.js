@@ -1,8 +1,7 @@
-
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,17 +27,18 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function() {
   'use strict';
 
-  //
-  // Here you can extend the API and VFS namespaces
-  //
-  // `instance` holds the running OS.js server environment variables and such.
-  // For more information on this, look up `src/server/node/node_modules/osjs/osjs.js`
-  //
-
-  exports.register = function(API, VFS, instance) {
+  /**
+   * Registers your Extension API methods
+   */
+  module.exports.api = {
+    test: function(http, data) {
+      return Promise.resolve('This is a response from your extension');
+    }
   };
 
 })();

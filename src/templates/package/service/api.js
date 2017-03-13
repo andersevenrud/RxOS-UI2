@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,24 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function() {
   'use strict';
 
-  // See http://os.js.org/doc/tutorials/application-with-server-api.html
-  module.exports = {
+  /**
+   * Registers your package when OS.js server starts.
+   */
+  module.exports.register = function(env, metadata, servers) {
+  };
+
+  /**
+   * Registers your Application API methods
+   */
+  module.exports.api = {
+    test: function(env, http, resolve, reject, args) {
+      resolve('This is a response from your application');
+    }
   };
 
 })();

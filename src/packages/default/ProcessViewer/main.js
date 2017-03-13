@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -52,9 +54,9 @@
     var root = Window.prototype.init.apply(this, arguments);
 
     // Load and set up scheme (GUI) here
-    scheme.render(this, 'ProcessViewerWindow', root);
+    this._render('ProcessViewerWindow');
 
-    var view = scheme.find(this, 'View');
+    var view = this._find('View');
 
     function update() {
       var now = new Date();
@@ -85,7 +87,7 @@
       {label: 'Alive', size: '60px', textalign: 'right'}
     ]);
 
-    scheme.find(this, 'ButtonKill').on('click', function() {
+    this._find('ButtonKill').on('click', function() {
       var selected = view.get('selected');
       if ( selected && selected[0] && typeof selected[0].data !== 'undefined' ) {
         API.kill(selected[0].data);

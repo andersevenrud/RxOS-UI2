@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -57,8 +57,10 @@
    * @param   {Function}   [args.onfailed]             onfailed callback => fn(evt)
    * @param   {Function}   [args.oncanceled]           oncanceled callback => fn(evt)
    * @param   {Function}   [args.ontimeout]            ontimeout callback => fn(evt)
+   *
+   * @return {void}
    */
-  OSjs.Utils.ajax = function(args) {
+  OSjs.Utils.ajax = function Utils_ajax(args) {
     var request;
     args = OSjs.Utils.argumentDefaults(args, {
       onerror          : function() {},
@@ -158,18 +160,18 @@
         request.addEventListener('progress', args.onprogress, false);
       }
 
-      request.ontimeout = function(evt) {
+      request.ontimeout = function XHR_timeout(evt) {
         args.ontimeout(evt);
       };
 
       if ( args.responseType === 'arraybuffer' ) { // Binary
-        request.onerror = function(evt) {
+        request.onerror = function XHR_onerror(evt) {
           var error = request.response || OSjs.API._('ERR_UTILS_XHR_FATAL');
           args.onerror(error, evt, request, args.url);
 
           cleanup();
         };
-        request.onload = function(evt) {
+        request.onload = function XHR_onload(evt) {
           if ( args.acceptcodes.indexOf(request.status) >= 0 ) {
             args.onsuccess(request.response, request, args.url);
           } else {
@@ -413,7 +415,12 @@
           item = {src: item};
         }
 
-        item._src = item.src;
+        var src = item.src;
+        if ( !src.match(/^(\/|file|https?)/) ) {
+          src = OSjs.API.getBrowserPath(item.src);
+        }
+        item._src = src;
+        item.src = src;
         item.type = item.type ? getTypeCorrected(item.type) : getType(item.src);
 
         return item;
@@ -422,7 +429,7 @@
       console.group('Utils::preload()', len);
 
       var data = [];
-      OSjs.Utils.asyncp(list, {max: args.max || 1}, function(item, index, next) {
+      OSjs.Utils.asyncp(list, {max: args.max || 1}, function asyncIter(item, index, next) {
         function _onentryloaded(state, src, setData) {
           total++;
           (state ? succeeded : failed).push(src);
@@ -452,7 +459,7 @@
           failed.push(item.src);
         }
         return next();
-      }, function() {
+      }, function asyncDone() {
         console.groupEnd();
 
         ondone(len, failed, succeeded, data);

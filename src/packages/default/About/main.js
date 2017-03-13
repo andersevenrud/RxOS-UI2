@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,7 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, VFS, GUI) {
   'use strict';
 
@@ -53,8 +54,10 @@
 
   ApplicationAboutWindow.prototype.init = function(wm, app, scheme) {
     var root = Window.prototype.init.apply(this, arguments);
-    scheme.render(this, 'AboutWindow', root);
-    root.getElementsByTagName('img')[0].src = API.getApplicationResource(app, 'about.png');
+
+    this._render('AboutWindow');
+
+    root.getElementsByTagName('img')[0].src = app._getResource('about.png');
     return root;
   };
 

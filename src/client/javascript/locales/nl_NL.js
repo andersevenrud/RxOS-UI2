@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -285,8 +285,8 @@
     //
     'ERR_FILE_APP_OPEN'         : 'Kan het bestand niet openen',
     'ERR_FILE_APP_OPEN_FMT'     : 'Het bestand {0} kan niet worden geopend {1} wordt niet ondersteund',
-    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Het bestand {0} kan niet worden geopend',
-    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Het bestand {0} kan niet worden opgeslagen',
+    'ERR_FILE_APP_OPEN_ALT_FMT' : 'Het bestand {0} kan niet worden geopend: {1}',
+    'ERR_FILE_APP_SAVE_ALT_FMT' : 'Het bestand {0} kan niet worden opgeslagen: {1}',
     'ERR_GENERIC_APP_FMT'       : '{0} Toepassing Fout',
     'ERR_GENERIC_APP_ACTION_FMT': 'Kan de actie \'{0}\' niet voltooien',
     'ERR_GENERIC_APP_UNKNOWN'   : 'Onbekende Fout',

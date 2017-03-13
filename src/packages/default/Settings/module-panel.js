@@ -1,7 +1,7 @@
 /*!
  * OS.js - JavaScript Cloud/Web Panel Platform
  *
- * Copyright (c) 2011-2016, Anders Evenrud <andersevenrud@gmail.com>
+ * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,8 @@
  * @author  Anders Evenrud <andersevenrud@gmail.com>
  * @licence Simplified BSD License
  */
+
+/*eslint valid-jsdoc: "off"*/
 (function(Application, Window, Utils, API, Panel, GUI) {
   'use strict';
 
@@ -34,67 +36,6 @@
   var items = [];
   var max = 0;
   var panel;
-
-  /////////////////////////////////////////////////////////////////////////////
-  // WINDOWS
-  /////////////////////////////////////////////////////////////////////////////
-
-  function PanelItemDialog(app, metadata, scheme, callback) {
-    Window.apply(this, ['ApplicationSettingsPanelItemsWindow', {
-      icon: metadata.icon,
-      title: metadata.name + ' - Panel Items',
-      width: 400,
-      height: 300
-    }, app, scheme]);
-
-    this.callback = callback;
-    this.closed = false;
-  }
-
-  PanelItemDialog.prototype = Object.create(Window.prototype);
-  PanelItemDialog.constructor = Window;
-
-  PanelItemDialog.prototype.init = function(wm, app, scheme) {
-    var self = this;
-    var root = Window.prototype.init.apply(this, arguments);
-
-    // Load and set up scheme (GUI) here
-    scheme.render(this, 'PanelSettingWindow', root, null, null, {
-      _: OSjs.Applications.ApplicationSettings._
-    });
-
-    var pacman = OSjs.Core.getPackageManager();
-    var avail = pacman.getPackage('CoreWM').panelItems;
-    scheme.find(this, 'List').clear().add(Object.keys(avail).map(function(i, idx) {
-      return {
-        value: i,
-        columns: [{
-          icon: API.getIcon(avail[i].Icon),
-          label: Utils.format('{0} ({1})', avail[i].Name, avail[i].Description)
-        }]
-      };
-    }));
-
-    scheme.find(this, 'ButtonPanelOK').on('click', function() {
-      self.closed = true;
-      var selected = scheme.find(self, 'List').get('selected');
-      self.callback('ok', selected.length ? selected[0] : null);
-      self._close();
-    });
-
-    scheme.find(this, 'ButtonPanelCancel').on('click', function() {
-      self._close();
-    });
-
-    return root;
-  };
-
-  PanelItemDialog.prototype._close = function() {
-    if ( !this.closed ) {
-      this.callback('cancel');
-    }
-    return Window.prototype._close.apply(this, arguments);
-  };
 
   /////////////////////////////////////////////////////////////////////////////
   // HELPERS
@@ -162,7 +103,21 @@
   function createDialog(win, scheme, cb) {
     if ( scheme ) {
       var app = win._app;
-      win._addChild(new PanelItemDialog(app, app.__metadata, scheme, cb), true, true);
+      var nwin = new OSjs.Applications.ApplicationSettings.SettingsItemDialog(app, app.__metadata, scheme, cb);
+      nwin._on('inited', function(scheme) {
+        this._find('List').clear().add(Object.keys(items).map(function(i, idx) {
+          return {
+            value: i,
+            columns: [{
+              icon: API.getIcon(items[i].Icon),
+              label: Utils.format('{0} ({1})', items[i].Name, items[i].Description)
+            }]
+          };
+        }));
+
+        nwin._setTitle('Panel Items', true);
+      });
+      win._addChild(nwin, true, true);
     }
   }
 
@@ -188,6 +143,7 @@
     name: 'Panel',
     label: 'LBL_PANELS',
     icon: 'apps/gnome-panel.png',
+    watch: ['CoreWM'],
 
     init: function() {
     },
