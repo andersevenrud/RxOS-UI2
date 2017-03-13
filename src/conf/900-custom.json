@@ -1,4 +1,9 @@
 {
+  "build": {
+    "dist": {
+      "template": "skylark"
+    }
+  },
   "repositories": ["default", "skylark"],
   "packages": {
     "ForceDisable": [
