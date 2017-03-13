@@ -1,4 +1,20 @@
 {
+  "mime": {
+    "descriptions" : {
+      "application/vnd.oasis.opendocument.presentation": "OpenDocument Presentation",
+      "application/vnd.oasis.opendocument.spreadsheet": "OpenDocument Spreadsheet",
+      "application/vnd.oasis.opendocument.text": "OpenDocument Text",
+      "application/epub+zip": "Epub",
+      "text/markdown": "Markdown"
+    },
+    "mapping" : {
+      ".odp": "application/vnd.oasis.opendocument.presentation",
+      ".ods": "application/vnd.oasis.opendocument.spreadsheet",
+      ".odt": "application/vnd.oasis.opendocument.text",
+      ".epub": "application/epub+zip",
+      ".md": "text/markdown"
+    }
+  },
   "client" : {
     "SettingsManager": {
       "CoreWM": {
@@ -55,6 +71,10 @@
             "items": [
               {
                 "name": "AppMenu",
+                "settings": {}
+              },
+              {
+                "name": "Buttons",
                 "settings": {}
               },
               {

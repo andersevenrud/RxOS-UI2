@@ -10,6 +10,7 @@
       "default/Writer"
     ]
   },
+  "handler": "shadow",
   "server": {
     "http": {
       "port": 8080,
@@ -20,6 +21,23 @@
         "downloads": "/mnt/downloads"
       },
       "homes": "/home"
+    },
+    "handlers": {
+      "pam": {
+        "defaultGroups": ["admin"],
+        "groups": "/etc/skylark/groups.json",
+        "blacklist": "/etc/skylark/blacklist.json",
+        "settings": "/home/%USERNAME%/.skylark/settings.json"
+      },
+      "shadow": {
+        "defaultGroups": ["admin"],
+        "groups": "/etc/skylark/groups.json",
+        "blacklist": "/etc/skylark/blacklist.json",
+        "settings": "/home/%USERNAME%/.skylark/settings.json"
+      }
+    },
+    "proxies": {
+      "http-bind-jabber/": null
     }
   },
   "client": {
@@ -29,7 +47,41 @@
         "backgroundColor": "#089bd2",
         "fontFamily": "Ariel",
         "background": "image-fill",
-        "icon": "outernet.png"
+        "icon": "outernet.png",
+        "panels": [
+          {
+            "options": {
+              "position": "top",
+              "ontop": true,
+              "autohide": false,
+              "background": "#101010",
+              "foreground": "#ffffff",
+              "opacity": 85
+            },
+            "items": [
+              {
+                "name": "AppMenu",
+                "settings": {}
+              },
+              {
+                "name": "WindowList",
+                "settings": {}
+              },
+              {
+                "name": "NotificationArea",
+                "settings": {}
+              },
+              {
+                "name": "Search",
+                "settings": {}
+              },
+              {
+                "name": "Clock",
+                "settings": {}
+              }
+            ]
+          }
+        ]
       },
       "VFS": {
         "scandir": {
@@ -81,6 +133,5 @@
       "MaxUploadSize": 64000000
     },
     "ReloadOnShutdown": true
-  },
-  "handler": "shadow"
+  }
 }
