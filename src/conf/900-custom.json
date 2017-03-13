@@ -1,4 +1,15 @@
 {
+  "repositories": ["default", "skylark"],
+  "packages": {
+    "ForceDisable": [
+      "default/Broadway",
+      "default/Draw",
+      "default/MusicPlayer",
+      "default/ProcessViewer",
+      "default/Settings",
+      "default/Writer"
+    ]
+  },
   "handler": "shadow",
   "server": {
     "http": {
