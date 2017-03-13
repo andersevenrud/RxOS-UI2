@@ -1,5 +1,4 @@
 {
-  "enabled": false,
   "className": "ApplicationProcessViewer",
   "name": "Process Viewer",
   "description": "View running processes",

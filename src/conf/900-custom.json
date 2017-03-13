@@ -7,7 +7,6 @@
   "repositories": ["default", "skylark"],
   "packages": {
     "ForceDisable": [
-      "default/Broadway",
       "default/Draw",
       "default/MusicPlayer",
       "default/ProcessViewer",
@@ -15,7 +14,8 @@
       "default/Writer"
     ]
   },
-  "handler": "shadow",
+  "authenticator": "shadow",
+  "storage": "system",
   "server": {
     "http": {
       "port": 8080,
@@ -27,18 +27,22 @@
       },
       "homes": "/home"
     },
-    "handlers": {
-      "pam": {
-        "defaultGroups": ["admin"],
-        "groups": "/etc/skylark/groups.json",
-        "blacklist": "/etc/skylark/blacklist.json",
-        "settings": "/home/%USERNAME%/.skylark/settings.json"
+    "api": {
+      "defaultGroups": ["admin"]
+    },
+    "modules": {
+      "auth": {
+        "pam": {
+        },
+        "shadow": {
+        }
       },
-      "shadow": {
-        "defaultGroups": ["admin"],
-        "groups": "/etc/skylark/groups.json",
-        "blacklist": "/etc/skylark/blacklist.json",
-        "settings": "/home/%USERNAME%/.skylark/settings.json"
+      "storage": {
+        "system": {
+          "groups": "/etc/skylark/groups.json",
+          "blacklist": "/etc/skylark/blacklist.json",
+          "settings": "/home/%USERNAME%/.skylark/settings.json"
+        }
       }
     },
     "proxies": {

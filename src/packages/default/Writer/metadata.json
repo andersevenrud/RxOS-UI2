@@ -1,5 +1,4 @@
 {
-  "enabled": false,
   "className": "ApplicationWriter",
   "name": "Writer",
   "description": "Write rich text documents",

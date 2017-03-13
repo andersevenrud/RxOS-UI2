@@ -1,5 +1,4 @@
 	{
-  "enabled": false,
   "className":  "ApplicationDraw",
   "name":       "Draw",
   "description":"Simple drawing application",

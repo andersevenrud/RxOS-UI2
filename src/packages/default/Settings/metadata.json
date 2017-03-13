@@ -1,5 +1,4 @@
 {
-  "enabled": false,
   "className": "ApplicationSettings",
   "preloadParallel": true,
   "name": "Settings",
