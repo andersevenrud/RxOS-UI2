@@ -1,7 +1,8 @@
 {
   "build": {
     "dist": {
-      "template": "skylark"
+      "template": "skylark",
+      "login": "skylark"
     }
   },
   "repositories": ["default", "skylark"],

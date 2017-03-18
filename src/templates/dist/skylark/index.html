@@ -55,25 +55,19 @@
 
   </head>
   <body>
-    <div id="LoadingScreen">
-      <img alt="" src="splash.png" />
-    </div>
+%SPLASH%
 
-    <div id="Login">
-      <form method="post" id="LoginForm">
-        <div>
-          <label for="LoginUsername">Username</label>
-          <input type="text" name="LoginUsername" id="LoginUsername" autocorrect="off" autocapitalize="off" spellcheck="false"  value="guest" placeholder="Username" />
-        </div>
-        <div>
-          <label for="LoginPassword">Password</label>
-          <input type="password" name="LoginPassword" id="LoginPassword" value="guest" placeholder="Password" />
-        </div>
-        <div class="Submit">
-          <input type="submit" name="LoginSubmit" id="LoginSubmit" value="Login" />
-        </div>
-      </form>
-    </div>
+%LOGIN%
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        OSjs.Bootstrap.run({
+        });
+      });
+      document.addEventListener('unload', function() {
+        OSjs.Bootstrap.stop();
+      });
+    </script>
 
   </body>
 </html>
