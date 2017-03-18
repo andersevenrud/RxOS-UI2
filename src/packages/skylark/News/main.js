@@ -35,7 +35,9 @@
     var me = this;
 
     var dedupe = function (a) {
-        return a.filter( (el, i, arr) => arr.indexOf(el) === i );
+      return a.filter(function(el, i, arr) {
+        return arr.indexOf(el) === i;
+      });
     };
 
     scheme.render(this, 'NewsWindow', root);
@@ -77,8 +79,12 @@
                 if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {
                     var selectedChannel = ev.detail.entries[0].data;
                     var selectedEntries = entries
-                                .filter( (v) => v.channel == selectedChannel )
-                                .map( function(v) {return { value: v.path , mtime: v.mtime, columns: [ { label: v.date }, { label: v.title } ] }; } );
+                    .filter(function(v) {
+                      return v.channel == selectedChannel;
+
+                    }).map(function(v) {
+                      return { value: v.path , mtime: v.mtime, columns: [ { label: v.date }, { label: v.title } ] };
+                    });
 
                     var sortBymtime = function (a,b) {
                         return (Date.parse(b.mtime) - Date.parse(a.mtime));
