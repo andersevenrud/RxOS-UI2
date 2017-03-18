@@ -623,7 +623,11 @@
   function init(opts) {
     console.group('init()');
 
-    instanceOptions = opts || {};
+    instanceOptions = OSjs.Utils.argumentDefaults(opts || {}, {
+      mocha: false,
+      onInit: function() {},
+      onInited: function() {}
+    });
 
     var config = OSjs.Core.getConfig();
     var splash = document.getElementById('LoadingScreen');
@@ -647,12 +651,18 @@
 
     function _inited() {
       loading = loading.destroy();
-      splash = OSjs.Utils.$remove(splash);
+      splash = splash.style.display = 'none';
 
       var wm = OSjs.Core.getWindowManager();
       wm._fullyLoaded = true;
 
       OSjs.API.triggerHook('onWMInited');
+
+      try {
+        instanceOptions.onInited();
+      } catch ( e ) {
+        console.warn(e);
+      }
 
       console.groupEnd();
     }
@@ -664,6 +674,11 @@
 
     function _done() {
       OSjs.API.triggerHook('onInited');
+      try {
+        instanceOptions.onInit();
+      } catch ( e ) {
+        console.warn(e);
+      }
 
       loading.update(queue.length, queue.length);
 
@@ -692,6 +707,8 @@
       }
     }
 
+    splash.style.display = 'block';
+
     initLayout();
 
     OSjs.Utils.asyncs(queue, function asyncIter(entry, index, next) {
@@ -714,6 +731,35 @@
   OSjs.Bootstrap = {
 
     /**
+     * Restart OS.js
+     * @param {Boolean} [save]   Save current session when logging out
+     * @function run
+     * @memberof OSjs.Bootstrap
+     */
+    restart: function(save) {
+      if ( !loaded ) {
+        return;
+      }
+
+      var auth = OSjs.Core.getAuthenticator();
+      var storage = OSjs.Core.getStorage();
+
+      var saveFunction = save && storage ? function(cb) {
+        storage.saveSession(function() {
+          auth.logout(cb);
+        });
+      } : function(cb) {
+        auth.logout(cb);
+      };
+
+      saveFunction(function() {
+        console.clear();
+        OSjs.Bootstrap.stop(true);
+        OSjs.Bootstrap.run();
+      });
+    },
+
+    /**
      * Start OS.js
      * @param {Object} opts Options
      * @function run
@@ -730,10 +776,11 @@
 
     /**
      * Stop OS.js
+     * @param {Boolean} [restart] Restart does not fully shut down
      * @function stop
      * @memberof OSjs.Bootstrap
      */
-    stop: function() {
+    stop: function(restart) {
       if ( !inited || !loaded || signingOut ) {
         return;
       }
@@ -768,23 +815,44 @@
         ring.destroy();
       }
 
+      OSjs.Core.getSearchEngine().destroy();
+      OSjs.Core.getPackageManager().destroy();
       OSjs.Core.getAuthenticator().destroy();
       OSjs.Core.getStorage().destroy();
       OSjs.Core.getConnection().destroy();
 
-      OSjs.API.triggerHook('onShutdown');
+      OSjs.Utils._clearPreloadCache();
 
-      console.warn('OS.js was shut down!');
+      if ( restart ) {
+        Object.keys(OSjs.Applications).forEach(function(k) {
+          try {
+            delete OSjs.Applications[k];
+          } catch (e) {}
+        });
+        Object.keys(OSjs.Extensions).forEach(function(k) {
+          try {
+            delete OSjs.Extensions[k];
+          } catch (e) {}
+        });
+      } else {
+        OSjs.API.triggerHook('onShutdown');
 
-      if ( OSjs.API.getConfig('ReloadOnShutdown') === true ) {
-        window.location.reload();
+        console.warn('OS.js was shut down!');
+
+        if ( OSjs.API.getConfig('ReloadOnShutdown') === true ) {
+          window.location.reload();
+        }
+
+        Object.keys(OSjs).forEach(function(k) {
+          try {
+            delete OSjs[k];
+          } catch ( e ) {}
+        });
       }
 
-      Object.keys(OSjs).forEach(function(k) {
-        try {
-          delete OSjs[k];
-        } catch ( e ) {}
-      });
+      loaded = false;
+      inited = false;
+      signingOut = false;
     },
 
     isShuttingDown: function() {

@@ -223,6 +223,7 @@ function buildIcon(cli, cfg, name) {
  * Builds styles
  */
 function buildStyle(cli, cfg, name) {
+  const debug = cli.option('debug');
 
   function _buildStyle(n) {
     return new Promise((resolve) => {
@@ -242,7 +243,7 @@ function buildStyle(cli, cfg, name) {
         base = cfg.themes.styleBase;
       } catch ( e ) {}
 
-      _utils.compileLess(from, to, {
+      _utils.compileLess(debug, from, to, {
         sourceMap: {},
         paths: [
           '.',
@@ -281,6 +282,14 @@ function buildAll(cli, cfg) {
   ]);
 }
 
+/*
+ * Cleans up build files
+ */
+function cleanFiles() {
+  _utils.removeSilent(_path.join(ROOT, 'dist', 'themes'));
+  return Promise.resolve();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // EXPORTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,3 +300,4 @@ module.exports.buildStyle = buildStyle;
 module.exports.buildIcon = buildIcon;
 module.exports.buildStatic = buildStatic;
 module.exports.buildFonts = buildFonts;
+module.exports.clean = cleanFiles;

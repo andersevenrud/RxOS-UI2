@@ -267,7 +267,7 @@
       describe('preload', function() {
         it('should load files correctly', function(done) {
           OSjs.Utils.preload([
-            '/packages/default/FileManager/main.js',
+            '/packages/default/FileManager/_app.min.js',
             '/invalid/file.foo'
           ], function(total, failed, successes) {
             expect(failed.length).to.be.equal(1);
@@ -1048,7 +1048,7 @@
 
       describe('getThemeCSS()', function() {
         it('should return correct string', function() {
-          expect(OSjs.API.getThemeCSS('foo')).to.contain('styles/foo.css');
+          expect(OSjs.API.getThemeCSS('foo')).to.contain('styles/foo.min.css');
         });
       });
 

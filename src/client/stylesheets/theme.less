@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/*!
+/**
  * OS.js - JavaScript Cloud/Web Desktop Platform
  *
  * Copyright (c) 2011-2017, Anders Evenrud <andersevenrud@gmail.com>
@@ -512,7 +512,7 @@ application-window-warning {
     opacity : .9;
   }
 application-window-resize {
-  top : (-@window_top_height - @window_resize_offset);
+  top : calc(-@window_top_height ~"-" @window_resize_offset);
   left : -@window_resize_offset;
   right : -@window_resize_offset;
   bottom : -@window_resize_offset;

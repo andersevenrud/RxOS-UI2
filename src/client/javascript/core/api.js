@@ -313,20 +313,18 @@
    * @see OSjs.Utils.ajax
    * @throws {Error} On invalid arguments
    *
-   * @param   {String}    m         Method name
-   * @param   {Object}    a         Method arguments
-   * @param   {Function}  cb        Callback on success => fn(err, res)
-   * @param   {Object}    [options] Options to send to the XHR request
+   * @param   {String}    m                           Method name
+   * @param   {Object}    a                           Method arguments
+   * @param   {Function}  cb                          Callback on success => fn(err, res)
+   * @param   {Object}    [options]                   Options (all options except the ones listed below are sent to Connection)
+   * @param   {Boolean}   [options.indicator=true]    Show loading indicator
    */
   var _CALL_INDEX = 1;
   API.call = function API_call(m, a, cb, options) {
     a = a || {};
+    options = options || {};
 
     var lname = 'APICall_' + _CALL_INDEX;
-
-    if ( typeof a.__loading === 'undefined' || a.__loading === true ) {
-      API.createLoading(lname, {className: 'BusyNotification', tooltip: 'API Call'});
-    }
 
     if ( typeof cb !== 'function' ) {
       throw new TypeError('call() expects a function as callback');
@@ -334,6 +332,14 @@
 
     if ( options && typeof options !== 'object' ) {
       throw new TypeError('call() expects an object as options');
+    }
+
+    if ( options.indicator !== false ) {
+      API.createLoading(lname, {className: 'BusyNotification', tooltip: 'API Call'});
+    }
+
+    if ( typeof options.indicator !== 'undefined' ) {
+      delete options.indicator;
     }
 
     _CALL_INDEX++;
@@ -968,7 +974,7 @@
     }
 
     root = API.getConfig('Connection.ThemeURI');
-    return root + '/' + name + '.css';
+    return root + '/' + name + '.min.css';
   };
 
   /**
@@ -1249,26 +1255,42 @@
    * @function createDialog
    * @memberof OSjs.API
    *
-   * @param   {String}         className       Dialog Namespace Class Name
-   * @param   {Object}         args            Arguments you want to send to dialog
-   * @param   {CallbackDialog} callback        Callback on dialog action (close/ok etc) => fn(ev, button, result)
-   * @param   {Mixed}          [parentObj]     A window or app (to make it a child window)
+   * @param   {String}                                 className             Dialog Namespace Class Name
+   * @param   {Object}                                 args                  Arguments you want to send to dialog
+   * @param   {CallbackDialog}                         callback              Callback on dialog action (close/ok etc) => fn(ev, button, result)
+   * @param   {Mixed}                                  [options]             A window or app (to make it a child window) or a set of options:
+   * @param   {OSjs.Core.Window|OSjs.Core.Application} [options.parent]      Same as above argument (without options context)
+   * @param   {Boolean}                                [options.modal=false] If you provide a parent you can toggle "modal" mode.
    *
    * @return  {OSjs.Core.Window}
    */
-  API.createDialog = function API_createDialog(className, args, callback, parentObj) {
+  API.createDialog = function API_createDialog(className, args, callback, options) {
     callback = callback || function() {};
+    options = options || {};
+
+    var parentObj = options;
+    var parentIsWindow = (parentObj instanceof OSjs.Core.Window);
+    var parentIsProcess = (parentObj instanceof OSjs.Core.Process);
+    if ( parentObj && !(parentIsWindow && parentIsProcess) ) {
+      parentObj = options.parent;
+      parentIsWindow = (parentObj instanceof OSjs.Core.Window);
+      parentIsProcess = (parentObj instanceof OSjs.Core.Process);
+    }
 
     function cb() {
       if ( parentObj ) {
-        if ( (parentObj instanceof OSjs.Core.Window) && parentObj._destroyed ) {
+        if ( parentIsWindow && parentObj._destroyed ) {
           console.warn('API::createDialog()', 'INGORED EVENT: Window was destroyed');
           return;
         }
-        if ( (parentObj instanceof OSjs.Core.Process) && parentObj.__destroyed ) {
+        if ( parentIsProcess && parentObj.__destroyed ) {
           console.warn('API::createDialog()', 'INGORED EVENT: Process was destroyed');
           return;
         }
+      }
+
+      if ( options.modal && parentIsWindow ) {
+        parentObj._toggleDisabled(false);
       }
 
       callback.apply(null, arguments);
@@ -1288,6 +1310,10 @@
       parentObj._addChild(win, true);
     } else if ( parentObj instanceof OSjs.Core.Application ) {
       parentObj._addWindow(win);
+    }
+
+    if ( options.modal && parentIsWindow ) {
+      parentObj._toggleDisabled(true);
     }
 
     setTimeout(function() {
