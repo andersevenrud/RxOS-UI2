@@ -2,30 +2,27 @@
 (function(skylark_config) {
   'use strict';
 
-  module.exports.getNetConf = function(args, callback, request, response) {
-    if(request.session.get('groups').indexOf("admin")>-1) {
-        skylark_config.getNetConf( function (r) {
-            callback(false, r);
-        });
-    } else {
-       callback("You are not allowed to use this App/API");
-    }
-  };
+  function checkPermission(groupName, env, http, resolve, reject) {
+    // TODO: Add helper in OS.js instead
+    const storage = require(env.SERVERDIR + '/core/storage.js');
+    const username = http.session.get('username');
+    const groups = storage.get().getGroups(http, username, (groups) => {
+      resolve(groups.indexOf(groupName) !== -1);
+    }).catch(reject);
+  }
 
-  module.exports.setNetConf = function(args, callback, request, response) {
-    if(request.session.get('groups').indexOf("admin")>-1) {
-        skylark_config.setNetConf(args, function (r) {
-            callback(false, r);
-        });
-    } else {
-       callback("You are not allowed to use this App/API");
-    }
-  };
+  module.exports.api = {
+    getNetConf: function(env, http, resolve, reject, args) {
+      checkPermission('admin', env, http, () => {
+        skylark_config.getNetConf((r) => resolve(r));
+      }, () => reject('You are not allowed to use this App/API'));
+    },
 
-  //
-  // This is called whenever the HTTP server starts up
-  //
-  module.exports._onServerStart = function(server, instance, metadata) {
+    setNetConf: function(env, http, resolve, reject, args) {
+      checkPermission('admin', env, http, () => {
+        skylark_config.setNetConf(args, (r) => resolve(r));
+      }, () => reject('You are not allowed to use this App/API'));
+    }
   };
 
 })(require('skylark_config'));
