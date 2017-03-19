@@ -27,13 +27,13 @@
   ApplicationTunerWindow.prototype.init = function(wmRef, app, scheme) {
     var self = this;
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'TunerWindow', root);
+    this._render('TunerWindow');
 
-    var beams = scheme.find(this, 'Beams');
-    var param_table = scheme.find(this, 'BeamParameters');
-    var beamsave = scheme.find(this, 'BeamSave');
+    var beams = this._find('Beams');
+    var param_table = this._find('BeamParameters');
+    var beamsave = this._find('BeamSave');
 
-    var tunerstatus = scheme.find(this, "Status");
+    var tunerstatus = this._find("Status");
 
 
     this.statusInterval = setInterval(function() {

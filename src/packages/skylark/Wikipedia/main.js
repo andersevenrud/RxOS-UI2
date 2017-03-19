@@ -27,12 +27,13 @@
 
   ApplicationWikireaderWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'WikireaderWindow', root);
+
+    this._render('WikireaderWindow');
 
     //
     // Side View
     //
-    var side = scheme.find(this, 'SideView');
+    var side = this._find('SideView');
     var txtarea = this._find('iframe');
     side.on('activate', function(ev) {
         if( ev && ev.detail && ev.detail.entries && ev.detail.entries[0] && ev.detail.entries[0].data ) {

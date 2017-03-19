@@ -19,12 +19,13 @@
 
   ApplicationLogViewerWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'LogViewerWindow', root);
+
+    this._render('LogViewerWindow');
 
     //
     // Side View
     //
-    var side = scheme.find(this, 'SideView');
+    var side = this._find('SideView');
     var txtarea = this._find('Text');
     side.on('activate', function(ev) {
         txtarea.set('value', "Loading...");

@@ -26,7 +26,8 @@
 
   ApplicationWhatsNewWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'WhatsNewWindow', root);
+
+    this._render('WhatsNewWindow');
 
     var items = this._find('Items');
     items.set('zebra', false);

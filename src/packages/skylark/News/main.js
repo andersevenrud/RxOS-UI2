@@ -40,11 +40,11 @@
       });
     };
 
-    scheme.render(this, 'NewsWindow', root);
+    this._render('NewsWindow');
 
-    var channels_w = scheme.find(me, 'Channels');
-    var articles_w = scheme.find(me, 'Articles');
-    var text_w = scheme.find(me,'iframe');
+    var channels_w = me._find('Channels');
+    var articles_w = me._find('Articles');
+    var text_w = me._find('iframe');
 
     var populate = function() {
 

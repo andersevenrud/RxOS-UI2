@@ -26,7 +26,8 @@
 
   ApplicationMessagingWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'MessagingWindow', root);
+
+    this._render('MessagingWindow');
 
     var msgarea = this._find('Messages');
     msgarea.set('zebra', false);

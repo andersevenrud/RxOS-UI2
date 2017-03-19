@@ -19,10 +19,10 @@
 
   ApplicationNetconfWindow.prototype.init = function(wmRef, app, scheme) {
     var root = DefaultApplicationWindow.prototype.init.apply(this, arguments);
-    scheme.render(this, 'NetconfWindow', root);
 
+    this._render('NetconfWindow');
 
-    app._api('getNetConf', null, (function (scheme, me) { return function(err, netConf) {
+    app._api('getNetConf', null, (function (me) { return function(err, netConf) {
 
         if ( err ) {
                 API.error(API._('ERR_GENERIC_APP_FMT', "Network"), API._('ERR_GENERIC_APP_REQUEST'), err);
@@ -31,7 +31,7 @@
         // populate tabs
 
         // modes tab
-        var mode_w = scheme.find(me, 'Mode');
+        var mode_w = me._find('Mode');
         var modes = netConf['modes'];
         var modes_list = Object.keys(modes).map(function(v) { return modes[v]; });
         mode_w.add(modes_list);
@@ -40,45 +40,45 @@
         mode_w.set('value', selected);
 
         // hostname
-        scheme.find(me,'Hostname').set('value', netConf['hostname']);
+        me._find('Hostname').set('value', netConf['hostname']);
 
         // ap tab
-        scheme.find(me,'HotspotName').set('value', netConf['ap']['ssid']);
-        scheme.find(me,'HotspotHide').set('value', netConf['ap']['hidden']);
-        scheme.find(me,'HotspotCountry').add((netConf['ap']['countries']).map(function(v) { return { "value" : v['code'], "label": v['name']}; } ) );
+        me._find('HotspotName').set('value', netConf['ap']['ssid']);
+        me._find('HotspotHide').set('value', netConf['ap']['hidden']);
+        me._find('HotspotCountry').add((netConf['ap']['countries']).map(function(v) { return { "value" : v['code'], "label": v['name']}; } ) );
         var selectedCountry = netConf['ap']['selectedCountry'];
         selectedCountry = selectedCountry === null ? "none" : selectedCountry;
-        scheme.find(me,'HotspotCountry').set('value', selectedCountry);
-        scheme.find(me,'HotspotChannel').add((netConf['ap']['channels']).map(function(v) { return { "value" : v, "label": v}; } ) );
-        scheme.find(me,'HotspotChannel').set('value', netConf['ap']['selectedChannel']);
-        scheme.find(me,'HotspotSecurityEnabled').set('value', netConf['ap']['securityEnabled']);
-        scheme.find(me,'HotspotPassword').set('value', netConf['ap']['password']);
+        me._find('HotspotCountry').set('value', selectedCountry);
+        me._find('HotspotChannel').add((netConf['ap']['channels']).map(function(v) { return { "value" : v, "label": v}; } ) );
+        me._find('HotspotChannel').set('value', netConf['ap']['selectedChannel']);
+        me._find('HotspotSecurityEnabled').set('value', netConf['ap']['securityEnabled']);
+        me._find('HotspotPassword').set('value', netConf['ap']['password']);
 
         // sta tab
-        scheme.find(me,'SSID').set('value', netConf['sta']['ssid']);
-        scheme.find(me,'SSIDPass').set('value', netConf['sta']['password']);
+        me._find('SSID').set('value', netConf['sta']['ssid']);
+        me._find('SSIDPass').set('value', netConf['sta']['password']);
 
         // setup saving
-        var netsave = scheme.find(me, 'NetSave');
+        var netsave = me._find('NetSave');
 
-        var netsaveOnClick  = (function (scheme, me, netConf) { return function() {
+        var netsaveOnClick  = (function (me, netConf) { return function() {
             // mode tab
-            netConf['hostname'] = scheme.find(me, 'Hostname').get('value');
-            netConf['OuternetPassword'] = scheme.find(me, 'OuternetPassword').get('value');
-            netConf['mode'] = scheme.find(me, 'Mode').get('value');
+            netConf['hostname'] = me._find('Hostname').get('value');
+            netConf['OuternetPassword'] = me._find('OuternetPassword').get('value');
+            netConf['mode'] = me._find('Mode').get('value');
 
             // ap tab
-            netConf['ap']['ssid'] = scheme.find(me,'HotspotName').get('value');
-            netConf['ap']['hidden'] = scheme.find(me,'HotspotHide').get('value');
-            var selectedCountry = scheme.find(me,'HotspotCountry').get('value');
+            netConf['ap']['ssid'] = me._find('HotspotName').get('value');
+            netConf['ap']['hidden'] = me._find('HotspotHide').get('value');
+            var selectedCountry = me._find('HotspotCountry').get('value');
             netConf['ap']['selectedCountry'] = selectedCountry == "none" ? null : selectedCountry;
-            netConf['ap']['selectedChannel'] = scheme.find(me,'HotspotChannel').get('value');
-            netConf['ap']['securityEnabled'] = scheme.find(me,'HotspotSecurityEnabled').get('value');
-            netConf['ap']['password'] = scheme.find(me,'HotspotPassword').get('value');
+            netConf['ap']['selectedChannel'] = me._find('HotspotChannel').get('value');
+            netConf['ap']['securityEnabled'] = me._find('HotspotSecurityEnabled').get('value');
+            netConf['ap']['password'] = me._find('HotspotPassword').get('value');
 
             // sta tab
-            netConf['sta']['ssid'] = scheme.find(me,'SSID').get('value');
-            netConf['sta']['password'] = scheme.find(me,'SSIDPass').get('value');
+            netConf['sta']['ssid'] = me._find('SSID').get('value');
+            netConf['sta']['password'] = me._find('SSIDPass').get('value');
 
             // TODO: replace "console.log" with alert box
             if ( netConf['ap']['securityEnabled'] && netConf['ap']['password'].length < 8) {
@@ -86,11 +86,11 @@
             } else {
                 app._api('setNetConf', netConf , console.log);
             }
-        }}) (scheme, me , netConf);
+        }}) (me , netConf);
 
         netsave.on('click', netsaveOnClick);
 
-    }}) (scheme, this));
+    }}) (this));
 
     return root;
   };
