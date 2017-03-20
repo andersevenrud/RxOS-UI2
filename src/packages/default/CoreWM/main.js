@@ -462,7 +462,7 @@
 
     setTimeout(function() {
       self.setStyles(self._settings.get());
-    }, 1000);
+    }, 20);
   };
 
   CoreWM.prototype.initWidgets = function(applySettings) {
@@ -510,7 +510,7 @@
       if ( self.iconView ) {
         self.iconView.resize(self);
       }
-    }, 1000);
+    }, 280);
   };
 
   //
@@ -961,7 +961,7 @@
       this.initPanels(true);
       this.initWidgets(true);
 
-      if ( settings ) {
+      if ( settings && save === true ) {
         if ( settings.language ) {
           OSjs.Core.getSettingsManager().set('Core', 'Locale', settings.language, triggerWatch);
           API.setLocale(settings.language);
@@ -1028,6 +1028,13 @@
     }
 
     document.body.setAttribute('data-background-style', className);
+
+    var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if ( isFirefox ) {
+      document.body.style.backgroundAttachment = 'fixed';
+    } else {
+      document.body.style.backgroundAttachment = 'scroll';
+    }
 
     if ( back !== 'none' ) {
       try {
@@ -1183,7 +1190,7 @@
     this.panels.forEach(function(p) {
       if ( p && p.getOntop() ) {
         var ph = p.getHeight();
-        if ( p.getAutohide() ) {
+        if ( p.getAutohide() && p.isAutoHidden() ) {
           s.top    += PADDING_PANEL_AUTOHIDE;
           s.height -= PADDING_PANEL_AUTOHIDE;
         } else if ( p.getPosition('top') ) {

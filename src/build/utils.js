@@ -274,7 +274,12 @@ module.exports.writeScripts = function writeScripts(out, list, debug, verbose) {
     if ( verbose ) {
       console.log(i);
     }
-    return i.substr(0, 1) === '/' ? i : _path.join(ROOT, i.replace(/^(dev|prod):/, ''));
+
+    if ( i.match(/^(dev|prod):/) ) {
+      return _path.join(ROOT, i.replace(/^(dev|prod):/, ''));
+    }
+
+    return i;
   }));
 
   _fs.writeFileSync(headerFile, header);
@@ -316,6 +321,7 @@ module.exports.writeStyles = function writeStyles(out, list, debug, verbose) {
   _fs.writeFileSync(headerFile, header);
 
   const minified = new Cleancss({
+    rebase: false,
     sourceMapInlineSources: debug,
     sourceMap: true
   }).minify(finalList);

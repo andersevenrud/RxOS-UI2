@@ -143,12 +143,15 @@ function buildFonts(cli, cfg) {
       _utils.removeSilent(_path.join(dst, 'metadata.json'));
 
       const file = _path.join(dst, 'style.css');
-      const css = _fs.readFileSync(file).toString();
+      const css = _fs.readFileSync(file, 'utf8');
       return css.replace(/\%FONTURI\%/g, rep);
     });
 
-    const dest = _path.join(ROOT, 'dist', 'themes', 'fonts.css');
-    _fs.writeFileSync(dest, concated.join('\n'));
+    const src = _path.join(ROOT, 'dist', 'themes', 'fonts.css');
+    const dest = _path.join(ROOT, 'dist', 'themes', 'fonts.min.css');
+    _fs.writeFileSync(src, concated.join('\n'));
+    _utils.writeStyles(dest, [src], cli.option('debug'));
+    _utils.removeSilent(src);
 
     resolve();
   });

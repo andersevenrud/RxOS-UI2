@@ -6,11 +6,12 @@ More information: https://os.js.org/manual/build/cli/
 Building:
   build [--debug]                                        Builds everything
   build:config                                           Builds configuration files
+  build:dist [--debug]                                   Builds dist files
   build:manifest                                         Builds package manifest files
-  build:core [--debug]                                   Builds core files
+  build:core [--debug]                                   Builds client core files
   build:package --name=REPO/NAME [--debug]               Builds given package
   build:packages [--debug]                               Builds all packages
-  build:themes                                           Builds all themes
+  build:themes  [--debug]                                Builds all themes
 
 Configuration:
   config:get --name=KEY                                  Gets a configuration value
