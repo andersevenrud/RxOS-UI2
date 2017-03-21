@@ -169,18 +169,13 @@
    * @param   {Function}      cb        Callback => fn(discard_changes)
    */
   DefaultApplicationWindow.prototype.checkHasChanged = function(cb) {
-    var self = this;
-
     if ( this.hasChanged ) {
-      this._toggleDisabled(true);
-
       API.createDialog('Confirm', {
         buttons: ['yes', 'no'],
         message: API._('MSG_GENERIC_APP_DISCARD')
       }, function(ev, button) {
-        self._toggleDisabled(false);
         cb(button === 'ok' || button === 'yes');
-      });
+      }, {parent: this, modal: true});
       return;
     }
 

@@ -101,8 +101,25 @@ function watchDist(path, stats, watchdir, debug) {
 }
 
 function watchCore(path, stats, watchdir, debug) {
-  log('Core files changed');
-  runTask('core', null, null, debug);
+  const rdir = getBasedDirectory(path, watchdir);
+
+  if ( rdir.match(/^\/locales\//) ) {
+    log('Base locales changed');
+    runTask('core', 'only', 'locale', debug);
+  } else if ( path.match(/\.css$/) ) {
+    log('Base styles changed');
+    runTask('core', 'only', 'css', debug);
+  } else if ( path.match(/\.js$/) ) {
+    log('Base scripts changed');
+    runTask('core', 'only', 'javascript', debug);
+  } else if ( path.match(/\.less$/) ) {
+    log('Base theme changed');
+    runTask('themes', 'only', 'styles', debug);
+  } else {
+    log('Core files changed');
+
+    runTask('core', null, null, debug);
+  }
 }
 
 function watchThemes(path, stats, watchdir, debug) {
@@ -156,6 +173,7 @@ module.exports.watch = function watch(cli) {
   const paths = {
     'src/templates/dist/**/*': watchDist,
     'src/client/javascript/**/*': watchCore,
+    'src/client/stylesheets/*': watchCore,
     'src/client/themes/**/*': watchThemes,
     'src/conf/*': watchConfig,
     'src/packages/*/**': watchPackages
@@ -165,6 +183,8 @@ module.exports.watch = function watch(cli) {
     Object.keys(paths).forEach((p) => {
       const path = _path.join(root, p);
       const fn = (res, stats) => {
+        log('>>>', getBasedDirectory(res, path));
+
         paths[p](res, stats, path, debug);
       };
 

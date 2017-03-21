@@ -521,6 +521,7 @@ gui-tabs {
   display : block;
   position : relative;
   box-sizing : border-box;
+  overflow : hidden;
 }
   gui-tabs > ul {
     display : block;
@@ -591,7 +592,7 @@ gui-grid {
   }
 
     gui-grid > gui-grid-row > gui-grid-entry { /* li */
-      margin: 5px;
+      margin: 0.41666;
 
       -webkit-box-flex: 1 0 auto;
          -moz-box-flex: 1 0 auto;
@@ -1380,8 +1381,8 @@ gui-icon-view {
   }
   gui-icon-view-entry {
     float : left;
-    width : 34px;
-    width : 54px;
+    width : 2.8333em;
+    width : 4.5em;
   }
 
     gui-icon-view-entry > div {
@@ -1391,18 +1392,18 @@ gui-icon-view {
 
     gui-icon-view-entry > div > img {
       pointer-events: none;
-      width : 32px;
-      height : 32px;
+      width : 2.666em;
+      height : 2.666em;
     }
 
     gui-icon-view-entry > div > span {
       pointer-events: none;
       position : absolute;
       display : block;
-      left : -2px;
-      right : -2px;
+      left : -0.1666em;
+      right : -0.1666em;
       top : 0;
-      padding : 2px;
+      padding : 0.1666em;
       z-index : 9999;
 
       white-space : nowrap;
@@ -1569,7 +1570,7 @@ gui-tree-view {
     }*/
 
   gui-tree-view-entry.gui-expandable {
-    padding-left : 16px;
+    padding-left : 1.333em;
   }
   gui-tree-view-entry.gui-expandable gui-tree-view-expander {
     display : block;
