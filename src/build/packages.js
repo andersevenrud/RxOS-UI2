@@ -93,7 +93,7 @@ function copyResources(verbose, iter, src, dest) {
         }
 
         try {
-          if ( !_fs.existsSync ) {
+          if ( !_fs.existsSync(p) ) {
             _fs.mkdirSync(p);
           }
           if ( _fs.existsSync(d) ) {
@@ -115,7 +115,8 @@ function copyResources(verbose, iter, src, dest) {
       _utils.log('-', src, '->', dest);
     }
 
-    _fs.copy(_fs.realpathSync(src), dest, (err) => {
+    const rpath = _path.resolve(ROOT, src);
+    _fs.copy(_fs.realpathSync(rpath), dest, (err) => {
       /*eslint no-unused-expressions: "off"*/
       err ? reject(err) : resolve();
     });
@@ -133,6 +134,9 @@ function buildLess(debug, verbose, iter, src, dest) {
       const from = _path.join(src, f);
       const to = _path.join(dest, files[f]);
 
+      if ( verbose ) {
+        console.log('$ less', from.replace(ROOT + '/', ''), to.replace(ROOT + '/', ''));
+      }
       _utils.compileLess(debug, from, to, {
         sourceMap: {},
         paths: [
@@ -231,6 +235,9 @@ function combineResources(standalone, metadata, src, dest, debug) {
     }
 
     iter.preload = _manifest.combinePreloads(iter);
+    if ( iter._src ) {
+      delete iter._src;
+    }
 
     _fs.writeFileSync(_path.join(dest, 'metadata.json'), JSON.stringify(iter, null, 4));
 
@@ -248,7 +255,7 @@ function _buildPackage(cli, cfg, name, metadata) {
   const debug = cli.option('debug');
 
   return new Promise((resolve, reject) => {
-    const src = _path.join(ROOT, 'src', 'packages', name);
+    const src = _path.resolve(ROOT, metadata._src); //_path.join(ROOT, 'src', 'packages', name);
     const dest = _path.join(ROOT, 'dist', 'packages', name);
 
     _utils.eachp([

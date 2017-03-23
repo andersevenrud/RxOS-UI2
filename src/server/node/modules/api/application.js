@@ -64,11 +64,14 @@ module.exports.application = function(http, data) {
   const ameth = data.method || null;
   const aargs = data.args || {};
 
-  const manifest = _metadata.get(apath) || {};
-  const filename = manifest && manifest._indexFile ? manifest._indexFile : 'api.js';
+  const manifest = _metadata.get(apath);
+  if ( !manifest ) {
+    return Promise.reject('No such package');
+  }
 
-  const aroot = _path.join(env.PKGDIR, apath);
-  const fpath = _path.join(aroot, filename);
+  const filename = manifest && manifest._indexFile ? manifest._indexFile : 'api.js';
+  const rpath = _path.resolve(env.ROOTDIR, manifest._src);
+  const fpath = _path.join(rpath, filename);
 
   return new Promise((resolve, reject) => {
     // NOTE: Deprecated for old node

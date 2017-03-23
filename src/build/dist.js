@@ -45,10 +45,27 @@ const ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
 ///////////////////////////////////////////////////////////////////////////////
 
 /*
+ * Gets the correct template directory
+ */
+function getTemplatePath(cfg, category) {
+  const paths = [
+    _path.join.apply(_path.join, [ROOT, 'src', 'templates'].concat(category))
+  ];
+
+  _utils.enumOverlayPaths(cfg, 'templates', (p) => {
+    paths.push(_path.join.apply(_path.join, [ROOT, p].concat(category)));
+  });
+
+  return paths.filter((p) => {
+    return _fs.existsSync(p);
+  })[0];
+}
+
+/*
  * Create a 'index.html' file
  */
 function createIndex(debug, verbose, standalone, cfg) {
-  const tpldir = _path.join(ROOT, 'src', 'templates', 'dist', cfg.build.dist.template);
+  const tpldir = getTemplatePath(cfg, ['dist', cfg.build.dist.template]);
   const outdir = _path.join(ROOT, 'dist');
 
   function _write(fileName) {
@@ -56,6 +73,10 @@ function createIndex(debug, verbose, standalone, cfg) {
       'osjs.min.js',
       'locales.min.js'
     ];
+
+    if ( standalone ) {
+      inputScripts.push('_dialogs.js');
+    }
 
     const inputStylesheets = [
       'osjs.min.css'
@@ -80,11 +101,11 @@ function createIndex(debug, verbose, standalone, cfg) {
     });
 
     const loginName = cfg.build.dist.login || 'default';
-    const loginFile = _path.join(ROOT, 'src', 'templates', 'dist', 'login', loginName + '.html');
+    const loginFile = getTemplatePath(cfg, ['dist', 'login', loginName + '.html']);
     const loginHTML = _fs.readFileSync(loginFile).toString();
 
     const splashName = cfg.build.dist.splash || 'default';
-    const splashFile = _path.join(ROOT, 'src', 'templates', 'dist', 'splash', splashName + '.html');
+    const splashFile = getTemplatePath(cfg, ['dist', 'splash', splashName + '.html']);
     const splashHTML = _fs.readFileSync(splashFile).toString();
 
     const replace = {
@@ -113,7 +134,7 @@ function createIndex(debug, verbose, standalone, cfg) {
  * Copies a templates resources
  */
 function copyResources(verbose, cfg) {
-  const tpldir = _path.join(ROOT, 'src', 'templates', 'dist', cfg.build.dist.template);
+  const tpldir = getTemplatePath(cfg, ['dist', cfg.build.dist.template]);
   const dest = _path.join(ROOT, 'dist');
 
   return new Promise((resolve) => {
@@ -182,7 +203,7 @@ function cleanFiles(cli, cfg) {
       'dist/test.js'
     ];
 
-    const tpldir = _path.join(ROOT, 'src', 'templates', 'dist', cfg.build.dist.template);
+    const tpldir = getTemplatePath(cfg, ['dist', cfg.build.dist.template]);
     globs = globs.concat(_fs.readdirSync(tpldir).map((f) => {
       return 'dist/' + f;
     }));

@@ -156,7 +156,6 @@ module.exports.mergeObject = function mergeObject(into, from) {
  * Compiles given less file
  */
 module.exports.compileLess = function compileLess(debug, src, dest, opts, cb, onRead) {
-  console.log('$ less', src.replace(ROOT + '/', ''), dest.replace(ROOT + '/', ''));
   try {
     let css = _fs.readFileSync(src).toString();
     if ( typeof onRead === 'function' ) {
@@ -330,4 +329,23 @@ module.exports.writeStyles = function writeStyles(out, list, debug, verbose) {
   _fs.writeFileSync(out, minified.styles + footer);
   _fs.writeFileSync(outm, minified.sourceMap);
   module.exports.removeSilent(headerFile);
+};
+
+/*
+ * Helper for enumerating overlay paths
+ */
+module.exports.enumOverlayPaths = function enumOverlayPaths(cfg, key, onentry) {
+  const overlays = cfg.build.overlays;
+  const paths = [];
+
+  if ( overlays ) {
+    Object.keys(overlays).forEach((n) => {
+      const overlay = overlays[n];
+      if ( overlay[key] instanceof Array ) {
+        overlay[key].forEach(onentry);
+      }
+    });
+  }
+
+  return paths;
 };

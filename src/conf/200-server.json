@@ -1,6 +1,9 @@
 {
   "server" : {
+    "authenticator": "%authenticator%",
+    "storage": "%storage%",
     "tz": "",
+    "overlays": {},
     "vfs": {
       "mounts": {
         "home": "%DROOT%/vfs/home/%USERNAME%",
@@ -28,8 +31,6 @@
     },
     "http": {
       "mode": "http",
-      "authenticator": "%authenticator%",
-      "storage": "%storage%",
       "connection": "%connection%",
       "port" : 8000,
       "compression": {

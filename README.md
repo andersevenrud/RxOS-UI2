@@ -2,7 +2,7 @@
   <img alt="OS.js Logo" src="https://raw.githubusercontent.com/os-js/OS.js/master/src/gfx/logo-big.png" />
 </p>
 
-[OS.js](https://os-js.org/) is an [open-source](https://raw.githubusercontent.com/os-js/OS.js/master/LICENSE) desktop implementation for your browser with a fully-fledged window manager, Application APIs, GUI toolkits and filesystem abstraction.
+[OS.js](https://www.os-js.org/) is an [open-source](https://raw.githubusercontent.com/os-js/OS.js/master/LICENSE) desktop implementation for your browser with a fully-fledged window manager, Application APIs, GUI toolkits and filesystem abstraction.
 
 [![bitHound Score](https://www.bithound.io/github/os-js/OS.js/badges/score.svg)](https://www.bithound.io/github/os-js/OS.js)
 [![Travis CI Build Status](https://travis-ci.org/os-js/OS.js.svg?branch=master)](https://travis-ci.org/os-js/OS.js)
@@ -23,8 +23,6 @@ Visit the [official demo](https://demo.os-js.org) for a preview version. Please 
 
 You can find the quick setup guide in the [INSTALL.md file](https://github.com/os-js/OS.js/blob/master/INSTALL.md).
 
-Head over to the [installation manual page](https://os-js.org/manual/installation) for more detailed instructions.
-
 ## Documentation
 
 * [Manuals](https://os-js.org/manual/)
@@ -39,6 +37,7 @@ Head over to the [installation manual page](https://os-js.org/manual/installatio
 * [Twitter](https://twitter.com/osjsorg) ([author](https://twitter.com/andersevenrud))
 * [Google+](https://plus.google.com/b/113399210633478618934/113399210633478618934)
 * [Facebook](https://www.facebook.com/os.js.org)
+* [Docker Hub](https://hub.docker.com/u/osjs/)
 
 
 [![Analytics](https://ga-beacon.appspot.com/UA-35975596-2/repo?pixel)](https://github.com/igrigorik/ga-beacon)
