@@ -47,12 +47,23 @@ const _vfs = require('./../../core/vfs.js');
  * Create a read stream
  */
 function createReadStream(http, path) {
-  const resolved = _vfs.parseVirtualPath(path, http);
   return new Promise((resolve, reject) => {
     /*eslint new-cap: "off"*/
-    resolve(_fs.createReadStream(resolved.real, {
-      bufferSize: 64 * 1024
-    }));
+    try {
+      const resolved = _vfs.parseVirtualPath(path, http);
+      const stream = _fs.createReadStream(resolved.real, {
+        bufferSize: 64 * 1024
+      });
+
+      stream.on('error', (error) => {
+        reject(error);
+      });
+      stream.on('open', () => {
+        resolve(stream);
+      });
+    } catch ( e ) {
+      reject(e);
+    }
   });
 }
 
@@ -60,10 +71,21 @@ function createReadStream(http, path) {
  * Create a write stream
  */
 function createWriteStream(http, path) {
-  const resolved = _vfs.parseVirtualPath(path, http);
   return new Promise((resolve, reject) => {
     /*eslint new-cap: "off"*/
-    resolve(_fs.createWriteStream(resolved.real));
+    try {
+      const resolved = _vfs.parseVirtualPath(path, http);
+      const stream = _fs.createWriteStream(resolved.real);
+
+      stream.on('error', (error) => {
+        reject(error);
+      });
+      stream.on('open', () => {
+        resolve(stream);
+      });
+    } catch ( e ) {
+      reject(e);
+    }
   });
 }
 
@@ -81,7 +103,7 @@ function createWatch(name, mount, callback) {
     uid: '%USERNAME%'
   });
 
-  const parseWatch = (function parseWatch() {
+  const parseWatch = (() => {
     const reps = (s) => s.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
 
     const tmpDir = configPath.replace(/\\/g, '/');
@@ -322,19 +344,45 @@ const VFS = {
       streamIn.pipe(streamOut);
     }
 
-    const source = http.files.upload.path;
-    const dresolved = _vfs.parseVirtualPath(http.data.path, http);
-    const dest = _path.join(dresolved.real, http.files.upload.name);
+    const httpData = http.data || {};
+    const httpUpload = http.files.upload || {};
 
-    existsWrapper(false, source, () => {
-      if ( String(http.data.overwrite) === 'true' ) {
-        _proceed(source, dest);
+    const vfsFilename = httpUpload.name || httpData.filename;
+    const vfsDestination = httpData.path;
+    const realDestination = _vfs.parseVirtualPath(vfsDestination, http);
+    const destination = _path.join(realDestination.real, vfsFilename);
+    const source = httpUpload.path;
+    const overwrite = String(http.data.overwrite) === 'true';
+
+    function _createEmpty() {
+      _fs.writeFile(destination, '', 'utf8', (err) => {
+        if ( err ) {
+          reject(err);
+        } else {
+          resolve(true);
+        }
+      });
+    }
+
+    function _checkDestination() {
+      if ( overwrite ) {
+        return Promise.resolve(true);
+      }
+
+      return new Promise((yes, no) => {
+        existsWrapper(true, destination, yes, no);
+      });
+    }
+
+    _checkDestination().then(() => {
+      if ( !source ) {
+        _createEmpty();
       } else {
-        existsWrapper(true, dest, () => {
-          _proceed(source, dest);
+        existsWrapper(false, source, () => {
+          _proceed(source, destination);
         }, reject);
       }
-    }, reject);
+    }).catch(reject);
   },
 
   write: function(http, args, resolve, reject) {

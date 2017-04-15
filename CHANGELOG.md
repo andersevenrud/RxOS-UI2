@@ -1,3 +1,89 @@
+# 2.0.0-95
+
+Forgot to merge a branch in the last release, so see previous release notes for information.
+
+# 2.0.0-94
+
+Added support for 'generic' node modules that loads on server start.
+Also updated mouse/pointer handling in some cases for better compability.
+
+Relevant:
+
+* http://community.os.js.org/t/update-version-bump-alpha94/129
+
+Digest:
+
+* UI: Added PointerEvent compability
+* UI: Added MSPointerEvent compability
+* UI: Prevent Windows 8.x+ gesture events from blocking interactions
+* Themes: Some corrections to paddings in CoreWM
+* CoreWM: Removed some innerHTML usage
+* package-manager: Replaced a static path definition
+* server-node: Added support for 'generic' modules
+* server-node: Updated compability check
+* locales: Updated fr_FR
+* locales: Updated no_NO
+* misc: Updated some locales
+* misc: Removed some temporary files from codebase
+
+# 2.0.0-93
+
+Mostly bugfixes, but also added the '--optimization' build flag and changed
+package layout so server files are in a dedicated 'server' directory.
+
+If you want to use the new directory feature, use the 'main' setting in
+your package metadata file (see included).
+
+Relevant:
+
+* http://community.os.js.org/t/update-version-bump-alpha93/128
+
+Digest:
+
+* Preview: Added error message when opening location without mime
+* Settings: Added some exception handling to certain async events
+* CoreWM: Prevent an error in weather panel item when destroyed
+* VFS: Fixed creation of empty files
+* GUI: Improved error handler in drop event
+* connection: Added 'offline' and 'online' event
+* server-node: Added some signals on instance start/stop
+* server-node: Updates to 'sane' shutdown
+* server-node: Prevent falsy error message when loading modules
+* server: Support custom main server file via manifest
+* build: Remove 'server' files automatically from dist packages
+* build: Added optimization option to build
+* misc: Updated package.json dependencies
+* misc: Some linting, fixed broken icons
+* misc: Packages now have dedicated 'server' folder for server-side code
+
+# 2.0.0-92
+
+Adds new handling of user package resources.
+
+# 2.0.0-91
+
+Added theme overlay support. Updated zip handling in user-installable
+packages.
+
+Digest:
+
+* server-node: Updated user-installable package handling
+* build: Updated help
+* build: Support for theme overlays
+* build: Separated sound theme build from main
+* misc: Updated bin/add-user.js
+* misc: Updated Grunt tests
+* misc: Changed from 'unzip' to 'unzip-stream' library
+* misc: Updated package.json dependencies
+
+# 2.0.0-90
+
+This is a minor release that cleans up icon and sound themes.
+
+Paves the way for SVG icon themes as all duplicates has been eliminated.
+
+Also makes for a smaller total build size (and quicker builds.)
+
 # 2.0.0-89
 
 This is a minor release update that brings support for overlays

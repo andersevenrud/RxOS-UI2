@@ -1,16 +1,14 @@
 {
   "className":  "EXAMPLEExtension",
   "type":       "extension",
-  "build":      {
-    "copy": [
-      "metadata.json",
-      "extension.js"
-    ]
-  },
   "conf": [
   ],
+  "main": {
+    "node": "server/main.js",
+    "php": "server/main.php"
+  },
   "preload": [
-    {"src": "extension.js", "type": "javascript"}
+    {"src": "main.js", "type": "javascript"}
   ]
 }
 

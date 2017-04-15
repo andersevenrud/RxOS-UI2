@@ -42,6 +42,10 @@ body {
   background-color : #089bd2;
 }
 
+html {
+  touch-action:none;
+}
+
 body, input, button, textarea, label, select {
   font-size : 12px;
   font-family : Sans-serif, Arial;
@@ -235,7 +239,6 @@ application-window-title {
   margin : 0;
   height : 100%;
   text-align : center;
-  display : inline-block;
   position : relative;
   display : none;
 }

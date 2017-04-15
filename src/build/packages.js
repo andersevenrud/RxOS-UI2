@@ -80,7 +80,7 @@ function runBuildScripts(verbose, section, iter, src, dest, cb) {
 /*
  * Copies package resources
  */
-function copyResources(verbose, iter, src, dest) {
+function copyResources(verbose, iter, src, dest, noclean) {
   const copy = iter.build.copy || [];
   if ( copy.length ) {
     return new Promise((resolve, reject) => {
@@ -115,9 +115,41 @@ function copyResources(verbose, iter, src, dest) {
       _utils.log('-', src, '->', dest);
     }
 
+    const removal = [];
+
+    if ( !noclean ) {
+      if ( iter.main ) {
+        if ( typeof iter.main === 'string' ) {
+          removal.push(iter.main);
+        } else {
+          Object.keys(iter.main).forEach((k) => {
+            removal.push(iter.main[k]);
+          });
+        }
+      } else {
+        if ( ['application', 'service', 'windowmanager'].indexOf(iter.type) !== -1 ) {
+          removal.push('server');
+        }
+      }
+    }
+
     const rpath = _path.resolve(ROOT, src);
     _fs.copy(_fs.realpathSync(rpath), dest, (err) => {
       /*eslint no-unused-expressions: "off"*/
+      const removed = removal.map((f) => {
+        let rem = _path.join(dest, f);
+        if ( _path.dirname(rem) !== _path.resolve(dest) ) {
+          rem = _path.dirname(rem);
+        }
+
+        return rem;
+      }).filter((f) => {
+        return _utils.removeSilent(f);
+      });
+
+      if ( removed.length && verbose ) {
+        _utils.log(_logger.color('Removed:', 'yellow'), removed.join(', ') + '.', 'Use the --noclean option to keep files.');
+      }
       err ? reject(err) : resolve();
     });
   });
@@ -170,7 +202,7 @@ function createStandaloneScheme(iter, dest) {
 /*
  * Combines resources
  */
-function combineResources(standalone, metadata, src, dest, debug) {
+function combineResources(standalone, metadata, src, dest, debug, optimization) {
   const remove = [];
   const combined = {
     javascript: [],
@@ -202,8 +234,23 @@ function combineResources(standalone, metadata, src, dest, debug) {
       }
     });
 
-    _utils.writeScripts(_path.join(dest, '_app.min.js'), combined.javascript, debug);
-    _utils.writeStyles(_path.join(dest, '_app.min.css'), combined.stylesheet, debug);
+    try {
+      _fs.mkdirsSync(dest);
+    } catch ( e ) {}
+
+    _utils.writeScripts({
+      sources: combined.javascript,
+      dest: _path.join(dest, '_app.min.js'),
+      debug: debug,
+      optimizations: optimization
+    }),
+
+    _utils.writeStyles({
+      dest: _path.join(dest, '_app.min.css'),
+      sources: combined.stylesheet,
+      debug: debug,
+      optimizations: optimization
+    });
 
     const sfile = _path.join(dest, 'scheme.html');
     if ( _fs.existsSync(sfile) ) {
@@ -253,6 +300,8 @@ function _buildPackage(cli, cfg, name, metadata) {
   const verbose = cli.option('verbose');
   const standalone = cli.option('standalone');
   const debug = cli.option('debug');
+  const optimization = cli.option('optimization', false);
+  const noclean = cli.option('noclean', false);
 
   return new Promise((resolve, reject) => {
     const src = _path.resolve(ROOT, metadata._src); //_path.join(ROOT, 'src', 'packages', name);
@@ -270,12 +319,12 @@ function _buildPackage(cli, cfg, name, metadata) {
       function() {
         return runBuildScripts(verbose, 'before', metadata, src, dest);
       }, () => {
-        return copyResources(verbose, metadata, src, dest);
+        return copyResources(verbose, metadata, src, dest, noclean);
       }, () => {
         return buildLess(debug, verbose, metadata, src, dest);
       }, () => {
         return new Promise((yes, no) => {
-          return combineResources(standalone, metadata, src, dest, debug).then((data) => {
+          return combineResources(standalone, metadata, src, dest, debug, optimization).then((data) => {
             metadata = data; // Make sure we set new metadata after changes
             yes();
           }).catch(no);

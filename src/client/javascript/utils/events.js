@@ -100,6 +100,30 @@
     return Object.freeze(list);
   })();
 
+  /*
+   * Gets the event name considering compability with
+   * MSPointerEvent and PointerEvent interfaces.
+   */
+  function getRealEventName(evName) {
+    var realName = evName;
+    if ( evName !== 'mousewheel' && evName.match(/^mouse/) ) {
+      if ( window.PointerEvent ) {
+        realName = evName.replace(/^mouse/, 'pointer');
+      } else if ( window.MSPointerEvent ) {
+        var tmpName = evName.replace(/^mouse/, '');
+        realName = 'MSPointer' + tmpName.charAt(0).toUpperCase() + tmpName.slice(1).toLowerCase();
+      }
+    }
+    return realName;
+  }
+
+  /*
+   * Gets a list from string of event names
+   */
+  function getEventList(str) {
+    return str.replace(/\s/g, '').split(',');
+  }
+
   /////////////////////////////////////////////////////////////////////////////
   // EVENTS
   /////////////////////////////////////////////////////////////////////////////
@@ -254,7 +278,6 @@
    *
    * @function $bind
    * @memberof OSjs.Utils
-   * @TODO Implement MS Pointer events
    *
    * @param   {Node}            el            DOM Element to attach event to
    * @param   {String}          ev            DOM Event Name
@@ -472,6 +495,8 @@
       }
 
       function addEvent(nsType, type) {
+        type = getRealEventName(type);
+
         addEventHandler(el, nsType, type, callback, function mouseEventHandler(ev) {
           if ( !OSjs || !OSjs.Utils ) { // Probably shut down
             return;
@@ -510,7 +535,7 @@
         return found.length === 0;
       }
 
-      evName.replace(/\s/g, '').split(',').forEach(function(ns) {
+      getEventList(evName).forEach(function(ns) {
         var type = ns.split(':')[0];
 
         if ( !initNamespace(ns) ) {
@@ -586,7 +611,7 @@
 
     if ( el ) {
       if ( evName ) {
-        evName.replace(/\s/g, '').split(',').forEach(function(type) {
+        getEventList(evName).forEach(function(type) {
           unbindNamed(type);
         });
       } else {

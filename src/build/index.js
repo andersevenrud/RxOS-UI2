@@ -109,7 +109,8 @@ const TASKS = {
         [cli.option('style'), _themes.buildStyle],
         [cli.option('icons'), _themes.buildIcon],
         [cli.option('static'), _themes.buildStatic],
-        [cli.option('fonts'), _themes.buildFonts]
+        [cli.option('fonts'), _themes.buildFonts],
+        [cli.option('sounds'), _themes.buildSounds]
       ];
 
       const list = targets.filter((iter) => {
@@ -323,6 +324,15 @@ module.exports.run = function(cli, args) {
 
     process.on('uncaughtException', (error) => {
       _logger.log('UNCAUGHT EXCEPTION', error, error.stack);
+    });
+
+    ['SIGTERM', 'SIGINT'].forEach((sig) => {
+      process.on(sig, () => {
+        console.log('\n');
+        instance.destroy((err) => {
+          process.exit(err ? 1 : 0);
+        });
+      });
     });
   }).catch((error) => {
     _logger.log(error);

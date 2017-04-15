@@ -101,7 +101,7 @@
 
     if ( wm ) {
       this.notif = wm.createNotificationIcon('ServiceNotificationIcon', {
-        image: API.getIcon('status/gtk-dialog-authentication.png'),
+        image: API.getIcon('status/dialog-password.png'),
         onContextMenu: show,
         onClick: show,
         onInited: function(el, img) {
@@ -953,7 +953,7 @@
 
       if ( pkg ) {
         if ( pkg.scope === 'user' ) {
-          path = API.getConfig('Connection.FSURI') + '/get/' + Utils.pathJoin(pkg.path, name);
+          path = '/user-package/' + OSjs.Utils.filename(pkg.path) + '/' + name.replace(/^\//, '');
         } else {
           path = 'packages/' + pkg.path + '/' + name;
         }
@@ -996,7 +996,7 @@
    * @return  {String}            The absolute URL to the icon
    */
   API.getFileIcon = function API_getFileIcon(file, size, icon) {
-    icon = icon || 'mimetypes/gnome-fs-regular.png';
+    icon = icon || 'mimetypes/text-x-preview.png';
 
     if ( typeof file === 'object' && !(file instanceof OSjs.VFS.File) ) {
       file = new OSjs.VFS.File(file);
@@ -1007,23 +1007,23 @@
     }
 
     var map = [
-      {match: 'application/pdf', icon: 'mimetypes/gnome-mime-application-pdf.png'},
-      {match: 'application/zip', icon: 'mimetypes/folder_tar.png'},
-      {match: 'application/x-python', icon: 'mimetypes/stock_script.png'},
-      {match: 'application/x-lua', icon: 'mimetypes/stock_script.png'},
-      {match: 'application/javascript', icon: 'mimetypes/stock_script.png'},
-      {match: 'text/html', icon: 'mimetypes/stock_script.png'},
-      {match: 'text/xml', icon: 'mimetypes/stock_script.png'},
-      {match: 'text/css', icon: 'mimetypes/stock_script.png'},
+      {match: 'application/pdf', icon: 'mimetypes/x-office-document.png'},
+      {match: 'application/zip', icon: 'mimetypes/package-x-generic.png'},
+      {match: 'application/x-python', icon: 'mimetypes/text-x-script.png'},
+      {match: 'application/x-lua', icon: 'mimetypes/text-x-script.png'},
+      {match: 'application/javascript', icon: 'mimetypes/text-x-script.png'},
+      {match: 'text/html', icon: 'mimetypes/text-html.png'},
+      {match: 'text/xml', icon: 'mimetypes/text-html.png'},
+      {match: 'text/css', icon: 'mimetypes/text-x-script.png'},
 
-      {match: 'osjs/document', icon: 'mimetypes/gnome-mime-application-msword.png'},
-      {match: 'osjs/draw', icon: 'mimetypes/image.png'},
+      {match: 'osjs/document', icon: 'mimetypes/x-office-document.png'},
+      {match: 'osjs/draw', icon: 'mimetypes/image-x-generic.png'},
 
-      {match: /^text\//, icon: 'mimetypes/txt.png'},
-      {match: /^audio\//, icon: 'mimetypes/sound.png'},
-      {match: /^video\//, icon: 'mimetypes/video.png'},
-      {match: /^image\//, icon: 'mimetypes/image.png'},
-      {match: /^application\//, icon: 'mimetypes/binary.png'}
+      {match: /^text\//, icon: 'mimetypes/text-x-generic.png'},
+      {match: /^audio\//, icon: 'mimetypes/audio-x-generic.png'},
+      {match: /^video\//, icon: 'mimetypes/video-x-generic.png'},
+      {match: /^image\//, icon: 'mimetypes/image-x-generic.png'},
+      {match: /^application\//, icon: 'mimetypes/application-x-executable.png'}
     ];
 
     if ( file.type === 'dir' ) {
@@ -1439,13 +1439,19 @@
     title.appendChild(titleText);
     title.appendChild(document.createTextNode('...'));
 
-    var progressBar = OSjs.GUI.Element.create('gui-progress-bar');
+    var progressBar;
 
     if ( img ) {
       splash.appendChild(img);
     }
     splash.appendChild(title);
-    splash.appendChild(progressBar.$element);
+
+    try {
+      progressBar = OSjs.GUI.Element.create('gui-progress-bar');
+      splash.appendChild(progressBar.$element);
+    } catch ( e ) {
+      console.warn(e, e.stack);
+    }
 
     parentEl.appendChild(splash);
 

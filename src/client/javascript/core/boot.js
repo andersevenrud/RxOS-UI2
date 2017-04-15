@@ -91,7 +91,8 @@
 
     body_click: function(ev) {
       var t = ev.target;
-      if ( !t || t.tagName !== 'GUI-MENU-BAR-ENTRY' ) {
+      var allowed = ['GUI-MENU-BAR-ENTRY', 'GUI-MENU-ENTRY'];
+      if ( !t || allowed.indexOf(t.tagName) === -1  ) {
         OSjs.API.blurMenu();
       }
 
@@ -133,10 +134,10 @@
         if ( notif ) {
           if ( !document.fullScreen && !document.mozFullScreen && !document.webkitIsFullScreen && !document.msFullscreenElement ) {
             notif.opts._isFullscreen = false;
-            notif.setImage(OSjs.API.getIcon('actions/gtk-fullscreen.png', '16x16'));
+            notif.setImage(OSjs.API.getIcon('actions/view-fullscreen.png', '16x16'));
           } else {
             notif.opts._isFullscreen = true;
-            notif.setImage(OSjs.API.getIcon('actions/gtk-leave-fullscreen.png', '16x16'));
+            notif.setImage(OSjs.API.getIcon('actions/view-restore.png', '16x16'));
           }
         }
       } catch ( e ) {

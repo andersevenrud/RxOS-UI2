@@ -41,6 +41,28 @@ const _logger = _utils.logger;
 const ROOT = _path.dirname(_path.dirname(_path.join(__dirname)));
 
 ///////////////////////////////////////////////////////////////////////////////
+// HELPERS
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Gets the correct template directory
+ */
+function getTemplatePath(cfg, category, name) {
+  const paths = [
+    _path.join(ROOT, 'src', 'client', 'themes', category, name)
+  ];
+
+  _utils.enumOverlayPaths(cfg, 'themes', (p) => {
+    const rel = _path.resolve(ROOT, p);
+    paths.push(_path.join(rel, category, name));
+  });
+
+  return paths.filter((p) => {
+    return _fs.existsSync(p);
+  })[0];
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // API
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -127,7 +149,6 @@ function readMetadata(cfg) {
  */
 function buildFonts(cli, cfg) {
   return new Promise((resolve, reject) => {
-    _logger.log('Building fonts');
     _utils.mkdirSilent(_path.join(ROOT, 'dist', 'themes', 'fonts'));
 
     let rep = cfg.client.Connection.FontURI;
@@ -136,7 +157,9 @@ function buildFonts(cli, cfg) {
     }
 
     const concated = cfg.themes.fonts.map((iter) => {
-      const src = _path.join(ROOT, 'src', 'client', 'themes', 'fonts', iter);
+      _logger.log('Building font pack', _logger.color(iter, 'blue,bold'));
+
+      const src = getTemplatePath(cfg, 'fonts', iter);
       const dst = _path.join(ROOT, 'dist', 'themes', 'fonts', iter);
 
       _fs.copySync(src, dst);
@@ -150,8 +173,35 @@ function buildFonts(cli, cfg) {
     const src = _path.join(ROOT, 'dist', 'themes', 'fonts.css');
     const dest = _path.join(ROOT, 'dist', 'themes', 'fonts.min.css');
     _fs.writeFileSync(src, concated.join('\n'));
-    _utils.writeStyles(dest, [src], cli.option('debug'));
+    _utils.writeStyles({
+      dest: dest,
+      sources: [src],
+      debug: cli.option('debug'),
+      optimizations: cli.option('optimization', false)
+    });
     _utils.removeSilent(src);
+
+    resolve();
+  });
+}
+
+/*
+ * Builds sound files
+ */
+function buildSounds(cli, cfg) {
+  return new Promise((resolve, reject) => {
+
+    const sdst = _path.join(ROOT, 'dist', 'themes', 'sounds');
+    _utils.mkdirSilent(sdst);
+
+    cfg.themes.sounds.forEach((i) => {
+      _logger.log('Building sound pack', _logger.color(i, 'blue,bold'));
+
+      const src = getTemplatePath(cfg, 'sounds', i);
+      const dst = _path.join(ROOT, 'dist', 'themes', 'sounds', i);
+      _fs.copySync(src, dst);
+      _utils.removeSilent(_path.join(dst, 'metadata.json'));
+    });
 
     resolve();
   });
@@ -162,20 +212,19 @@ function buildFonts(cli, cfg) {
  */
 function buildStatic(cli, cfg) {
   return new Promise((resolve, reject) => {
-    _logger.log('Building statics');
+    _logger.log('Copying statics', _logger.color('wallpapers', 'blue,bold'));
+
+    const dst = _path.join(ROOT, 'dist', 'themes', 'wallpapers');
 
     const src = _path.join(ROOT, 'src', 'client', 'themes', 'wallpapers');
-    const dst = _path.join(ROOT, 'dist', 'themes', 'wallpapers');
     _fs.copySync(src, dst);
 
-    const sdst = _path.join(ROOT, 'dist', 'themes', 'sounds');
-    _utils.mkdirSilent(sdst);
-
-    cfg.themes.sounds.forEach((i) => {
-      const src = _path.join(ROOT, 'src', 'client', 'themes', 'sounds', i);
-      const dst = _path.join(ROOT, 'dist', 'themes', 'sounds', i);
-      _fs.copySync(src, dst);
-      _utils.removeSilent(_path.join(dst, 'metadata.json'));
+    _utils.enumOverlayPaths(cfg, 'themes', (p) => {
+      const rel = _path.resolve(ROOT, p);
+      const dir = _path.join(rel, 'wallpapers');
+      if ( _fs.existsSync(dir) ) {
+        _fs.copySync(dir, dst);
+      }
     });
 
     resolve();
@@ -191,7 +240,7 @@ function buildIcon(cli, cfg, name) {
     return new Promise((resolve) => {
       _logger.log('Building icon pack', _logger.color(n, 'blue,bold'));
 
-      const src = _path.join(ROOT, 'src', 'client', 'themes', 'icons', n);
+      const src = getTemplatePath(cfg, 'icons', n);
       const dst = _path.join(ROOT, 'dist', 'themes', 'icons', n);
       _utils.mkdirSilent(dst);
 
@@ -232,7 +281,7 @@ function buildStyle(cli, cfg, name) {
     return new Promise((resolve) => {
       _logger.log('Building style', _logger.color(n, 'blue,bold'));
 
-      const src = _path.join(ROOT, 'src', 'client', 'themes', 'styles', n);
+      const src = getTemplatePath(cfg, 'styles', n);
       const dst = _path.join(ROOT, 'dist', 'themes', 'styles');
 
       _utils.mkdirSilent(dst);
@@ -285,6 +334,7 @@ function buildAll(cli, cfg) {
 
   return Promise.all([
     !only || only === 'fonts' ? buildFonts(cli, cfg) : Promise.resolve(),
+    !only || only === 'sounds' ? buildSounds(cli, cfg) : Promise.resolve(),
     !only || only === 'static' ? buildStatic(cli, cfg) : Promise.resolve(),
     !only || only === 'icons' ? buildIcon(cli, cfg) : Promise.resolve(),
     !only || only === 'styles' ? buildStyle(cli, cfg) : Promise.resolve()
@@ -309,4 +359,5 @@ module.exports.buildStyle = buildStyle;
 module.exports.buildIcon = buildIcon;
 module.exports.buildStatic = buildStatic;
 module.exports.buildFonts = buildFonts;
+module.exports.buildSounds = buildSounds;
 module.exports.clean = cleanFiles;

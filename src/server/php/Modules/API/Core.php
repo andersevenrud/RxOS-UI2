@@ -33,6 +33,7 @@ use OSjs\Core\Instance;
 use OSjs\Core\Authenticator;
 use OSjs\Core\Request;
 use OSjs\Core\Storage;
+use OSjs\Lib\Utils;
 
 use Exception;
 
@@ -89,10 +90,12 @@ abstract class Core
         $packages = Instance::GetPackages();
         $apath = null;
         if ( isset($packages[$path]) ) {
-            if ( preg_match('/^\/|([A-z]:\\\)/', $packages[$path]['_src']) ) {
-                $apath = $packages[$path]['_src'] . '/api.php';
+            $package = $packages[$path];
+            $indexFile = Utils::getPackageMainFile($package);
+            if ( preg_match('/^\/|([A-z]:\\\)/', $package['_src']) ) {
+                $apath = $package['_src'] . '/' . $indexFile;
             } else {
-                $apath = DIR_ROOT . '/' . $packages[$path]['_src'] . '/api.php';
+                $apath = DIR_ROOT . '/' . $package['_src'] . '/' . $indexFile;
             }
         }
 

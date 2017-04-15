@@ -40,6 +40,7 @@ const _env = require('./../../core/env.js');
 const _metadata = require('./../../core/metadata.js');
 const _settings = require('./../../core/settings.js');
 const _logger = require('./../../lib/logger.js');
+const _utils = require('./../../lib/utils.js');
 
 /**
  * Sends a request to an application
@@ -69,7 +70,7 @@ module.exports.application = function(http, data) {
     return Promise.reject('No such package');
   }
 
-  const filename = manifest && manifest._indexFile ? manifest._indexFile : 'api.js';
+  const filename = _utils.getPackageMainFile(manifest);
   const rpath = _path.resolve(env.ROOTDIR, manifest._src);
   const fpath = _path.join(rpath, filename);
 

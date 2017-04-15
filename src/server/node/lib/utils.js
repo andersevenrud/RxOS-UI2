@@ -131,18 +131,22 @@ module.exports.loadModule = function loadModule(directories, category, name) {
   }
 
   return new Promise((resolve, reject) => {
+    let found = false;
+
     directories.some((p) => {
       const path = _path.join(p, category, name + '.js');
 
       if ( _fs.existsSync(path) ) {
+        found = true;
         resolve(path);
-        return false;
       }
 
-      return false;
+      return !found;
     });
 
-    reject('No such module: ' + name);
+    if ( !found ) {
+      reject('No such module: ' + name);
+    }
   });
 };
 
@@ -166,9 +170,11 @@ module.exports.loadModules = function loadModules(directories, category, onentry
     return new Promise((resolve, reject) => {
       _glob(_path.join(dirname, '*.js')).then((list) => {
         Promise.all(list.map((path) => {
-          onentry(path);
-
-          return Promise.resolve();
+          const result = onentry(path);
+          if ( !(result instanceof Promise) ) {
+            return Promise.resolve();
+          }
+          return result;
         })).then(resolve).catch(reject);
       }).catch(reject);
     });
@@ -179,3 +185,14 @@ module.exports.loadModules = function loadModules(directories, category, onentry
   }));
 };
 
+module.exports.getPackageMainFile = function getApplicationMainFile(manifest) {
+  let filename = 'api.js';
+  if ( manifest.main ) {
+    if ( typeof manifest.main === 'string' ) {
+      filename = manifest.main;
+    } else {
+      filename = manifest.main.node;
+    }
+  }
+  return filename;
+};

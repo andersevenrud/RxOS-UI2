@@ -97,6 +97,7 @@
     'CONNECTION_LOST': 'Connection to the server was lost. Reconnecting...',
     'CONNECTION_RESTORED': 'Connection to the server was restored',
     'CONNECTION_RESTORE_FAILED': 'Failed to re-establish connection. Trying again.',
+    'CONNECTION_ERROR': 'Connection error',
 
     // Utils
     'ERR_UTILS_XHR_FATAL' : 'Fatal Error',
@@ -217,6 +218,7 @@
     'ERR_VFS_DOWNLOAD_NO_FILE' : 'Cannot download a path without a path',
     'ERR_VFS_DOWNLOAD_FAILED'  : 'An error occured while downloading: {0}',
     'ERR_VFS_REMOTEREAD_EMPTY' : 'Response was empty',
+    'ERR_VFS_NO_MIME_DETECT'   : 'No mime type detected',
 
     'ERR_VFSMODULE_INVALID'            : 'Invalid VFS Module',
     'ERR_VFSMODULE_INVALID_FMT'        : 'Invalid VFS Module: {0}',

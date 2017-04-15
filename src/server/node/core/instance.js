@@ -72,6 +72,7 @@ const _middleware = require('./middleware.js');
 
 const _logger = require('./../lib/logger.js');
 const _utils = require('./../lib/utils.js');
+const _evhandler = require('./../lib/evhandler.js');
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBALS
@@ -85,6 +86,21 @@ let ENV = {};
 ///////////////////////////////////////////////////////////////////////////////
 // LOADERS
 ///////////////////////////////////////////////////////////////////////////////
+
+/*
+ * Loads modules from a folder
+ */
+function _loadStandardModule(type, label, arg) {
+  return _utils.loadModules(ENV.MODULEDIR, type, (path) => {
+    _logger.lognt('INFO', 'Loading:', _logger.colored(label, 'bold'), path.replace(ENV.ROOTDIR, ''));
+    try {
+      return require(path).register(ENV, CONFIG, arg);
+    } catch ( e ) {
+      _logger.lognt('WARN', _logger.colored('Warning:', 'yellow'), e);
+      console.warn(e.stack);
+    }
+  });
+}
 
 /*
  * Loads generated configuration file
@@ -162,16 +178,10 @@ function registerPackages(servers) {
     _metadata.load(path).then((packages) => {
       Object.keys(packages).forEach((p) => {
         const metadata = packages[p];
-
-        let filename = 'api.js';
-        if ( metadata.build && metadata.build.index ) {
-          filename = _path.resolve(metadata.build.index);
-        }
-
-        metadata._indexFile = filename;
-
+        const filename = _utils.getPackageMainFile(metadata);
         const rpath = _path.resolve(ENV.ROOTDIR, metadata._src);
         const check = _path.join(rpath, filename);
+
         if ( metadata.enabled !== false && _fs.existsSync(check) ) {
           let deprecated = false;
           if ( metadata.type === 'extension' ) {
@@ -202,17 +212,10 @@ function registerPackages(servers) {
  * Registers Services
  */
 function registerServices(servers) {
-  return _utils.loadModules(ENV.MODULEDIR, 'services', (path) => {
-    _logger.lognt('INFO', 'Loading:', _logger.colored('Service', 'bold'), path.replace(ENV.ROOTDIR, ''));
-    try {
-      const p = require(path).register(ENV, CONFIG, servers);
-      if ( p instanceof Promise ) {
-        return p;
-      }
-    } catch ( e ) {
-      _logger.lognt('WARN', _logger.colored('Warning:', 'yellow'), e);
-      console.warn(e.stack);
-    }
+  return new Promise((resolve, reject) => {
+    _loadStandardModule('services', 'Service', servers).then(() => {
+      resolve(servers);
+    }).catch(reject);
   });
 }
 
@@ -271,6 +274,17 @@ function destroyServices() {
   }));
 }
 
+/*
+ * Loads generic modules
+ */
+function loadGenerics(opts) {
+  return new Promise((resolve, reject) => {
+    _loadStandardModule('generic', 'Generic').then(() => {
+      resolve(opts);
+    }).catch(reject);
+  });
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // EXPORTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,18 +309,22 @@ module.exports.destroy = (() => {
 
     _logger.log('INFO', _logger.colored('Trying to shut down sanely...', 'bold'));
 
+    _evhandler.emit('server:destroy');
+
     function done() {
       CHILDREN.forEach((c) => {
-        c.kill();
+        if ( c && typeof c.kill === 'function' ) {
+          c.kill();
+        }
       });
 
       const auth = _auth.get();
-      if ( auth ) {
+      if ( auth && typeof auth.destroy === 'function' ) {
         auth.destroy();
       }
 
       const storage = _storage.get();
-      if ( storage ) {
+      if ( storage && typeof storage.destroy === 'function' ) {
         storage.destroy();
       }
 
@@ -334,7 +352,10 @@ module.exports.destroy = (() => {
  */
 module.exports.init = function init(opts) {
   return new Promise((resolve, reject) => {
+    _evhandler.emit('server:init');
+
     loadConfiguration(opts)
+      .then(loadGenerics)
       .then((opts) => {
         return new Promise((resolve, reject) => {
           _middleware.load().then(() => {
@@ -368,6 +389,8 @@ module.exports.init = function init(opts) {
  */
 module.exports.run = function run(port) {
   const httpConfig = Object.assign({ws: {}}, CONFIG.http || {});
+
+  _evhandler.emit('server:run');
 
   _logger.log('INFO', _logger.colored('Starting OS.js server', 'green'));
   _logger.log('INFO', _logger.colored(['Running', httpConfig.mode, 'on localhost:' + ENV.PORT].join(' '), 'green'));

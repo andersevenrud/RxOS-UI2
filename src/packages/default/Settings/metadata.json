@@ -36,6 +36,10 @@
     "tr_TR": "Program Ayarlarını düzenle",
     "vi_VN": "Cài đặt"
   },
+  "main": {
+    "node": "server/main.js",
+    "php": "server/main.php"
+  },
   "preload": [
     {"src": "locale.js", "type": "javascript"},
     {"src": "main.js", "type": "javascript"},
